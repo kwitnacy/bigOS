@@ -52,32 +52,90 @@ public class Interpreter {
         }
         if (rozkaz.equals("IC"))
         {
-
+            increment(x);
         }
         if (rozkaz.equals("JP"))
         {
-
+            jump(x);
         }
         if (rozkaz.equals("HT"))
         {
             //koniec programu
         }
+    }
+    public void increment(String x)
+    {
+        Pattern rejestr = Pattern.compile("[A-D]");
+        Matcher rejestrmatcher = rejestr.matcher(x);
+        Pattern adres = Pattern.compile("\\[\\d+\\]");
+        Matcher adresmatcher = adres.matcher(x);
+        if (!rejestrmatcher.matches()&&!adresmatcher.matches())
+        {
+            //blad - zakonczenie programu
+        }
+        if (rejestrmatcher.matches())
+        {
+            if(x.equals("A"))
+            {
+                A++;
+            }
+            else if(x.equals("B"))
+            {
+                B++;
+            }
+            else if(x.equals("C"))
+            {
+                C++;
+            }
+            else if(x.equals("D"))
+            {
+                D++;
+            }
+        }
+        else if (adresmatcher.matches())
+        {
+            if(Integer.parseInt(x)>base + limit)
+            {
+                //blad - zakonczenie programu
+            }
+            else
+            {
+                //miejsce w pamieci ++
+            }
+        }
         program_counter++;
+    }
+    public void jump(String x)
+    {
+        Pattern jump = Pattern.compile("\\d+");
+        Matcher jumpmatcher = jump.matcher(x);
+        if (!jumpmatcher.matches())
+        {
+            //blad - zakonczenie programu
+        }
+        if (base+Integer.parseInt(x) > base + limit)
+        {
+            //blad - zakonczenie programu
+        }
+        else
+        {
+            program_counter = Integer.parseInt(x);
+        }
     }
     public void mov(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
         Matcher rejestrmatchery = rejestr.matcher(y);
-        if (!rejestrmatcherx.matches())
-        {
-            //blad - zakonczenie programu
-        }
         Pattern liczba = Pattern.compile("\\d+");
         Matcher liczbamatcher = liczba.matcher(y);
         Pattern adres = Pattern.compile("\\[\\d+\\]");
         Matcher adresmatchery = adres.matcher(y);
         Matcher adresmatcherx = adres.matcher(x);
+        if (!rejestrmatcherx.matches()&&!adresmatcherx.matches())
+        {
+            //blad - zakonczenie programu
+        }
         if(!liczbamatcher.matches()&&!adresmatchery.matches()&&!rejestrmatchery.matches())
         {
             //blad - zakonczenie programu
@@ -207,6 +265,7 @@ public class Interpreter {
                 //do pamieci o danym adresie = D;
             }
         }
+        program_counter++;
     }
     public void add(String x, String y)
     {
@@ -330,5 +389,6 @@ public class Interpreter {
                 C = C + D;
             }
         }
+        program_counter++;
     }
 }
