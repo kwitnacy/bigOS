@@ -42,6 +42,7 @@ public class Interpreter {
         {
             calyRozkaz = rozkaz + pamiec[base+program_counter];
             if(i<2) rozkaz = rozkaz + pamiec[base + program_counter]
+            i++;
         } */
         System.out.println("wykonywany rozkaz: "+rozkaz);
     }
