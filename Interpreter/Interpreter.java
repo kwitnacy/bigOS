@@ -1,4 +1,6 @@
 package Interpreter;
+import filemodule.FileManagement;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -6,6 +8,8 @@ public class Interpreter {
 
     private int A,B,C,D, program_counter, base, limit, PID;
     private String rozkaz, calyRozkaz;
+    private String user;
+    private FileManagement fileManagement = new FileManagement();
     public Interpreter()
     {
         //A = klasaJonasza running getAX();
@@ -16,7 +20,7 @@ public class Interpreter {
         //limit = klasaJonasza.get_Limit();
         //program_counter = klasaJonasza.get_Program_counter();
         //PID = klasaJonasza.get_PID
-        getOrder();
+        getOrder(); //tutaj pierwszy rozkaz programu
     }
     public void updateProcessor()
     {
@@ -46,14 +50,13 @@ public class Interpreter {
         } */
         System.out.println("wykonywany rozkaz: "+rozkaz);
     }
-    public void executeProgram()
+    public void executeProgram() //to bedzie wykonywane w main
     {
-        getOrder();
         while(!rozkaz.equals("HT"))
         {
             executeOrder();
-            display();
             updateProcessor();
+            display();
             getOrder();
         }
     }
@@ -96,6 +99,26 @@ public class Interpreter {
         if (rozkaz.equals("HT"))
         {
             //koniec programu
+        }
+        if (rozkaz.equals("CF"))
+        {
+            fileManagement.create(x,user);
+            program_counter++;
+        }
+        if (rozkaz.equals("WF"))
+        {
+            fileManagement.write(x, y);
+            program_counter++;
+        }
+        if(rozkaz.equals("RF"))
+        {
+            fileManagement.read();
+            program_counter++;
+        }
+        if (rozkaz.equals("DF"))
+        {
+            fileManagement.delete(x);
+            program_counter++;
         }
     }
     public void increment(String x)
