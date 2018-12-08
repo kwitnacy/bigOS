@@ -5,19 +5,26 @@ import java.util.regex.Pattern;
 public class Interpreter {
 
     private int A,B,C,D, program_counter, base, limit, PID;
-    private String rozkaz;
+    private String rozkaz, calyRozkaz;
     public Interpreter()
     {
-        //A = klasaJonasza running getAX()
-        //B = klasaJonasza.get_BX()
-        //C = klasaJonasza.get_CX()
-        //D = klasaJonasza.get_DX()
-        //base = klasaJonasza.get_Base(),
-        //limit = klasaJonasza.get_Limit(),
-        //program_counter = klasaJonasza.get_Program_counter(),
+        //A = klasaJonasza running getAX();
+        //B = klasaJonasza.get_BX();
+        //C = klasaJonasza.get_CX();
+        //D = klasaJonasza.get_DX();
+        //base = klasaJonasza.get_Base();
+        //limit = klasaJonasza.get_Limit();
+        //program_counter = klasaJonasza.get_Program_counter();
         //PID = klasaJonasza.get_PID
-        //getOrder()
-
+        getOrder();
+    }
+    public void updateProcessor()
+    {
+        //klasaJonasza running setAX(A);
+        //klasaJonasza.set_BX(B);
+        //klasaJonasza.set_CX(C);
+        //klasaJonasza.set_DX(D);
+        //klasaJonasza.set_Program_counter(program_counter);
     }
     public void display()
     {
@@ -30,18 +37,45 @@ public class Interpreter {
     }
     public void getOrder()
     {
-        //while(rozkaz nie jest caly)
-        //rozkaz = rozkaz + pamiec[base + program_counter]
+        int i=0;
+        /* while(rozkaz nie jest caly)
+        {
+            calyRozkaz = rozkaz + pamiec[base+program_counter];
+            if(i<2) rozkaz = rozkaz + pamiec[base + program_counter]
+        } */
         System.out.println("wykonywany rozkaz: "+rozkaz);
+    }
+    public void executeProgram()
+    {
+        getOrder();
+        while(!rozkaz.equals("HT"))
+        {
+            executeOrder();
+            display();
+            updateProcessor();
+            getOrder();
+        }
     }
     public void executeOrder()
     {
+        Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+\\]*)\\s(\\[*\\w+\\]*)");
+        Matcher dane2matcher = dane2.matcher(calyRozkaz);
+        String x="", y="";
+        if (dane2matcher.matches())
+        {
+            x = dane2matcher.group(2);
+            y = dane2matcher.group(3);
+        }
+        Pattern dane1 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+\\]*)");
+        Matcher dane1matcher = dane1.matcher(calyRozkaz);
+        if (dane1matcher.matches())
+        {
+            x = dane1matcher.group(2);
+        }
         //if(!rozkaz.equals("AD")&&!rozkaz.equals("MO")&&itd.)
         //{
         //blad -koniec programu
         //}
-        String x="", y="";
-        //wyciagniecie z rozkazu nazwy rozkazu i danych (np. x,y)
         if (rozkaz.equals("AD"))
         {
             add(x,y);
@@ -207,7 +241,7 @@ public class Interpreter {
         if (y.equals("B"))
         {
             if(x.equals("B")){}
-            else if(x=="A")
+            else if(x.equals("A"))
             {
                 A = B;
             }
@@ -343,7 +377,7 @@ public class Interpreter {
         if (y.equals("B"))
         {
             if(x.equals("B")){}
-            else if(x=="A")
+            else if(x.equals("A"))
             {
                 A = A+B;
             }
