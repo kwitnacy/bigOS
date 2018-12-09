@@ -1,7 +1,7 @@
 import java.util.Queue;
 
 public class Semaphore{
-    Queue<Integer> queue;
+    Queue<Process> queue;
     int value;
 
     Semaphore(int val){
@@ -19,7 +19,7 @@ public class Semaphore{
     public void signal_s(){
         this.value++;
         if(this.value <= 0){
-            //Process P = process_queue.poll();
+            Process P = process_queue.poll();
             //wakeup(P);
         }
     }
