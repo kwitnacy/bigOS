@@ -1,4 +1,5 @@
 package Interpreter;
+import Procesy.Process_container;
 import filemodule.FileManagement;
 
 import java.util.regex.Matcher;
@@ -9,8 +10,9 @@ public class Interpreter {
     private int A,B,C,D, program_counter, base, limit, PID;
     private String rozkaz, calyRozkaz;
     private String user;
-    private FileManagement fileManagement = new FileManagement();
-    public Interpreter()
+    private FileManagement fileManagement;
+    private Process_container process_container;
+    public Interpreter(FileManagement fileManagement, Process_container process_container)
     {
         //A = klasaJonasza running getAX();
         //B = klasaJonasza.get_BX();
@@ -18,9 +20,11 @@ public class Interpreter {
         //D = klasaJonasza.get_DX();
         //base = klasaJonasza.get_Base();
         //limit = klasaJonasza.get_Limit();
-        //program_counter = klasaJonasza.get_Program_counter();
+        program_counter = 0;
         //PID = klasaJonasza.get_PID
         getOrder(); //tutaj pierwszy rozkaz programu
+        this.fileManagement = fileManagement;
+        this.process_container = process_container;
     }
     public void updateProcessor()
     {
@@ -28,7 +32,6 @@ public class Interpreter {
         //klasaJonasza.set_BX(B);
         //klasaJonasza.set_CX(C);
         //klasaJonasza.set_DX(D);
-        //klasaJonasza.set_Program_counter(program_counter);
     }
     public void display()
     {
@@ -37,14 +40,14 @@ public class Interpreter {
         System.out.println("rejestr B: "+B);
         System.out.println("rejestr C: "+C);
         System.out.println("rejestr D: "+D);
-        System.out.println("program_counter: "+program_counter);
+        System.out.println("program_counter: "+ program_counter);
     }
-    public void getOrder()
+    private void getOrder()
     {
-        int i=0;
+        int i =0;
         /* while(rozkaz nie jest caly)
         {
-            calyRozkaz = rozkaz + pamiec[base+program_counter];
+            calyRozkaz = rozkaz + pamiec[base + program_counter];
             if(i<2) rozkaz = rozkaz + pamiec[base + program_counter]
             i++;
         } */
@@ -60,68 +63,94 @@ public class Interpreter {
             getOrder();
         }
     }
-    public void executeOrder()
-    {
-        Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+\\]*)\\s(\\[*\\w+\\]*)");
+    private void executeOrder() {
+        Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
         Matcher dane2matcher = dane2.matcher(calyRozkaz);
-        String x="", y="";
-        if (dane2matcher.matches())
-        {
+        String x = "", y = "", z = "";
+        if (dane2matcher.matches()) {
             x = dane2matcher.group(2);
             y = dane2matcher.group(3);
         }
-        Pattern dane1 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+\\]*)");
+        Pattern dane1 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)");
         Matcher dane1matcher = dane1.matcher(calyRozkaz);
-        if (dane1matcher.matches())
-        {
+        if (dane1matcher.matches()) {
             x = dane1matcher.group(2);
+        }
+        Pattern dane3 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
+        Matcher dane3matcher = dane3.matcher(calyRozkaz);
+        if (dane3matcher.matches()) {
+            x = dane3matcher.group(2);
+            y = dane3matcher.group(3);
+            z = dane3matcher.group(4);
         }
         //if(!rozkaz.equals("AD")&&!rozkaz.equals("MO")&&itd.)
         //{
         //blad -koniec programu
         //}
-        if (rozkaz.equals("AD"))
-        {
-            add(x,y);
-        }
-        if (rozkaz.equals("MO"))
-        {
-            mov(x,y);
-        }
-        if (rozkaz.equals("IC"))
-        {
-            increment(x);
-        }
-        if (rozkaz.equals("JP"))
-        {
-            jump(x);
-        }
-        if (rozkaz.equals("HT"))
-        {
-            //koniec programu
-        }
-        if (rozkaz.equals("CF"))
-        {
-            fileManagement.create(x,user);
-            program_counter++;
-        }
-        if (rozkaz.equals("WF"))
-        {
-            fileManagement.write(x, y);
-            program_counter++;
-        }
-        if(rozkaz.equals("RF"))
-        {
-            fileManagement.read();
-            program_counter++;
-        }
-        if (rozkaz.equals("DF"))
-        {
-            fileManagement.delete(x);
-            program_counter++;
+        switch (rozkaz) {
+            case "AD": {
+                add(x, y);
+                break;
+            }
+            case "MO": {
+                mov(x, y);
+                break;
+            }
+            case "IC": {
+                increment(x);
+                break;
+            }
+            case "JP": {
+                jump(x);
+                break;
+            }
+            case "HT": {
+                //koniec programu
+                break;
+            }
+            case "CF": {
+                fileManagement.create(x, user);
+                program_counter++;
+                break;
+            }
+            case "WF": {
+                fileManagement.write(x, y);
+                program_counter++;
+                break;
+            }
+            case "RF": {
+                fileManagement.read();
+                program_counter++;
+                break;
+            }
+            case "DF": {
+                fileManagement.delete(x);
+                program_counter++;
+                break;
+            }
+            case "CP": {
+                process_container.create_process(x, y, Integer.parseInt(z));
+                //np. CP M file 7
+                break;
+            }
+            case "DP": {
+                Process_container.delete(Integer.parseInt(x));
+                //np. DP 3
+                //tu bedzie tez delete po nazwie jak zostanie zrobiona
+                break;
+            }
+            case "SM": {
+                //SM [nazwa/PID procesu odbiorcy] [rozmiar wiadomości] [wiadomość]
+                break;
+            }
+            case "RM": {
+                //RM [nazwa\PID procesu który ma odczytać wiadomość] [rozmiar wiadomości]
+                break;
+            }
+            default:break;
         }
     }
-    public void increment(String x)
+    private void increment(String x)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcher = rejestr.matcher(x);
@@ -131,23 +160,26 @@ public class Interpreter {
         {
             //blad - zakonczenie programu
         }
-        if (rejestrmatcher.matches())
-        {
-            if(x.equals("A"))
-            {
-                A++;
-            }
-            else if(x.equals("B"))
-            {
-                B++;
-            }
-            else if(x.equals("C"))
-            {
-                C++;
-            }
-            else if(x.equals("D"))
-            {
-                D++;
+        if (rejestrmatcher.matches()) {
+            switch (x) {
+                case "A":{
+                    A++;
+                    break;
+                }
+                case "B": {
+                    B++;
+                    break;
+                }
+                case "C": {
+                    C++;
+                    break;
+                }
+                case "D": {
+                    D++;
+                    break;
+                }
+                default:
+                    break;
             }
         }
         else if (adresmatcher.matches())
@@ -163,7 +195,7 @@ public class Interpreter {
         }
         program_counter++;
     }
-    public void jump(String x)
+    private void jump(String x)
     {
         Pattern jump = Pattern.compile("\\d+");
         Matcher jumpmatcher = jump.matcher(x);
@@ -180,7 +212,7 @@ public class Interpreter {
             program_counter = Integer.parseInt(x);
         }
     }
-    public void mov(String x, String y)
+    private void mov(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
@@ -225,27 +257,33 @@ public class Interpreter {
         {
             int dana = 0;
             //dana = pobieranie z pamieci
-            if(x.equals("A"))
+            switch(x){
+            case "A":
             {
                 A = dana;
+                break;
             }
-            else if(x.equals("B"))
+                case "B":
             {
                 B = dana;
+                break;
             }
-            else if(x.equals("C"))
+                case "C":
             {
                 C = dana;
+                break;
             }
-            else if(x.equals("D"))
+                case("D"):
             {
                 D = dana;
+                break;
+            }
+                default: break;
             }
         }
         if (y.equals("A"))
         {
-            if(x.equals("A")){}
-            else if(x.equals("B"))
+            if(x.equals("B"))
             {
                 B = A;
             }
@@ -264,8 +302,7 @@ public class Interpreter {
         }
         if (y.equals("B"))
         {
-            if(x.equals("B")){}
-            else if(x.equals("A"))
+            if(x.equals("A"))
             {
                 A = B;
             }
@@ -284,8 +321,7 @@ public class Interpreter {
         }
         if(y.equals("C"))
         {
-            if(x.equals("C")){}
-            else if(x.equals("A"))
+            if(x.equals("A"))
             {
                 System.out.println("bardziej");
                 A = C;
@@ -305,8 +341,7 @@ public class Interpreter {
         }
         if (y.equals("D"))
         {
-            if(x.equals("D")){}
-            else if(x.equals("A"))
+            if(x.equals("A"))
             {
                 A = D;
             }
@@ -325,7 +360,7 @@ public class Interpreter {
         }
         program_counter++;
     }
-    public void add(String x, String y)
+    private void add(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
@@ -344,107 +379,124 @@ public class Interpreter {
         }
         if(liczbamatcher.matches())
         {
-            if(x.equals("A"))
+            switch (x){
+                case "A":
             {
                 A = A+Integer.parseInt(y);
+                break;
             }
-            else if(x.equals("B"))
+                case "B":
             {
                 B = B+Integer.parseInt(y);
+                break;
             }
-            else if(x.equals("C"))
+                case "C":
             {
                 C = C+Integer.parseInt(y);
+                break;
             }
-            else if(x.equals("D"))
+                case "D":
             {
                 D = D+Integer.parseInt(y);
+                break;
             }
+            default:break;
+        }
         }
         if(adresmatcher.matches())
         {
             int dana = 0;
             //dana = pobieranie z pamieci
-            if(x.equals("A"))
+            switch(x){
+                case "A":
             {
                 A = A+dana;
+                break;
             }
-            else if(x.equals("B"))
+                case "B":
             {
                 B = B + dana;
+                break;
             }
-            else if(x.equals("C"))
+                case "C":
             {
                 C = C+dana;
+                break;
             }
-            else if(x.equals("D"))
+                case "D":
             {
                 D = D+dana;
+                break;
+            }
+            default: break;
             }
         }
         if (y.equals("A"))
         {
-            if(x.equals("A")){}
-            else if(x.equals("B"))
+            switch(x){
+                case "B":
             {
                 B = B+A;
+                break;
             }
-            else if(x.equals("C"))
+                case "C":
             {
                 C = C+A;
+                break;
             }
-            else if(x.equals("D"))
+                case "D":
             {
                 D = D+A;
+                break;
+            }
+            default:break;
+        }
+        }
+        if (y.equals("B")) {
+            switch (x) {
+                case "A":
+                {
+                    A = A + B;
+                    break;
+                }
+                case "C": {
+                    C = C + B;
+                    break;
+                }case "D": {
+                    D = D + B;
+                    break;
+                }
+                default:break;
             }
         }
-        if (y.equals("B"))
-        {
-            if(x.equals("B")){}
-            else if(x.equals("A"))
-            {
-                A = A+B;
-            }
-            else if(x.equals("C"))
-            {
-                C = C+B;
-            }
-            else if(x.equals("D"))
-            {
-                D = D+B;
-            }
-        }
-        if(y.equals("C"))
-        {
-            if(x.equals("C")){}
-            else if(x.equals("A"))
-            {
-                System.out.println("bardziej");
-                A = A+C;
-            }
-            else if(x.equals("B"))
-            {
-                B = B + C;
-            }
-            else if(x.equals("D"))
-            {
-                D = D + C;
+        if(y.equals("C")) {
+            switch (x) {
+                case "A":{
+                    A = A + C;
+                    break;
+                }case "B": {
+                    B = B + C;
+                    break;
+                }case "D": {
+                    D = D + C;
+                    break;
+                }
+                default:break;
             }
         }
-        if (y.equals("D"))
-        {
-            if(x.equals("D")){}
-            else if(x.equals("A"))
-            {
-                A = A + D;
-            }
-            else if(x.equals("B"))
-            {
-                B = B + D;
-            }
-            else if(x.equals("C"))
-            {
-                C = C + D;
+        if (y.equals("D")) {
+            switch (x) {
+                case "A": {
+                    A = A + D;
+                    break;
+                }case "B": {
+                    B = B + D;
+                    break;
+                }case "C": {
+                    C = C + D;
+                    break;
+                }
+                default:break;
             }
         }
         program_counter++;

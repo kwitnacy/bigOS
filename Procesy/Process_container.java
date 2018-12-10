@@ -22,7 +22,7 @@ public class Process_container {
         processes.put(0, new Process("dumpy", "", 0, 0));
     }
 
-    void create_process(String name, String file_name, int priority){
+    public void create_process(String name, String file_name, int priority){
         if(taken_names.contains(name))
             System.out.println("Nie można utworzyć procesu - zajeta nazwa");
         else{
@@ -99,7 +99,7 @@ public class Process_container {
         return null;
     }
 
-    static void delete(int PID){
+    public static void delete(int PID){
         Process temp = get_by_PID(PID);
         System.out.println("usuwanie " + temp.get_name());
         processes.values().remove(temp);
