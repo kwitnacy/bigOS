@@ -82,20 +82,6 @@ public class Process {
         }
     }
 
-    public void send(int PID, String  message){
-        Process_container.get_by_PID(PID).receive(this.PID, message);
-    }
-
-    public void send_mess_data(){}
-
-    public void receive(int PID, String message){
-        this.messages.offer(message);
-    }
-
-    public void read(){
-        this.last_message = this.messages.poll();
-    }
-
 ////////////////////////////////////////////////////////////////////////////////////
     public int get_PID(){
         return this.PID;
@@ -131,5 +117,9 @@ public class Process {
 
     public State get_state() {
         return this.state;
+    }
+
+    public void make_porocess(String name, String file, int priority){
+        Process_container.create_process(name, file, priority);
     }
 }

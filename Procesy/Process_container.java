@@ -1,40 +1,65 @@
 package Procesy;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import nie_procesy.Cos;
 
 public class Process_container {
-    static private Map<Integer, Process> processes;
-    static private Vector<Process> waiting_processes;
-    static private int counter;
+    static private Map<Integer, Process> processes;                                 //  Wszystkie procesy (Ready,
+                                                                                    //Running, Waitting)
 
-    static private Vector<String> taken_names;
+    static private int counter;                                                     //  Licznik - zlicza ile powstalo
+                                                                                    //procesow; nadawanie PID
 
-    Process_container(){
+    static private Vector<String> taken_names;                                      //  wektor przechowuje wykorzystane
+                                                                                    //nazwy procesow
+
+    static private Vector<Process> procesor;
+
+    public Process_container(Vector<Process> procesor_x){
         counter = 1;
         processes = new ConcurrentHashMap<Integer, Process>();
         taken_names = new Vector<>();
-        waiting_processes = new Vector<>();
+        procesor = procesor_x;
 
         taken_names.add("dumpy");
         processes.put(0, new Process("dumpy", "", 0, 0));
     }
 
-    public void create_process(String name, String file_name, int priority){
-        if(taken_names.contains(name))
-            System.out.println("Nie można utworzyć procesu - zajeta nazwa");
-        else{
-            System.out.println("Stworzenie nowe procesu o nazwie: " + name);
-            Process temp = new Process(name, file_name, priority, counter);
-            processes.put(counter, temp);
-            counter = counter + 1;
-            /*
+    public Process_container(){
+        counter = 1;
+        processes = new ConcurrentHashMap<Integer, Process>();
+        procesor = new Vector<>(); 
+        taken_names = new Vector<>();
 
-                    Dodanie do procesora
+        taken_names.add("dumpy");
+        processes.put(0, new Process("dumpy", "", 0, 0));
+    }
 
-             */
+    public static void create_process(String name, String file_name, int priority){
+        try {
+            if (priority > 15 || priority < 1)
+                throw new Exception("zly piorytet");
+
+            if (taken_names.contains(name))
+                System.out.println("Nie można utworzyć procesu - zajeta nazwa");
+            else {
+                System.out.println("Stworzenie nowe procesu o nazwie: " + name);
+                Process temp = new Process(name, file_name, priority, counter);
+                processes.put(counter, temp);
+                counter = counter + 1;
+
+                procesor.add(temp);
+                /*
+
+                        Dodanie do procesora
+
+                 */
+            }
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
         }
     }
 
@@ -86,7 +111,7 @@ public class Process_container {
         /*processes.get(idx).get_mess(s);*/
     }
 
-    static Process get_by_PID(int idx){
+    public static Process get_by_PID(int idx){
         return processes.get(idx);
     }
 
@@ -100,51 +125,17 @@ public class Process_container {
     }
 
     public static void delete(int PID){
+        Cos.delete(PID);
         Process temp = get_by_PID(PID);
         System.out.println("usuwanie " + temp.get_name());
         processes.values().remove(temp);
     }
 
-    static void add_to_waitting(int PID){
-        Process temp = get_by_PID(PID);
-        if(temp.state != State.Waiting)
-            temp.state = State.Waiting;
-
-        waiting_processes.add(temp);
-    }
-
     void add_to_CPU(int PID){
         Process to_add = new Process();
         boolean flag = false;
-
-        for (Process temp : waiting_processes){
-            if(temp.PID == PID) {
-                to_add = temp;
-                to_add.state = State.Ready;
-                flag = true;
-                break;
-            }
-        }
-        if(flag)
-            System.out.println("temp PID, " + to_add.PID);
-        else
-            System.out.println("brak takeigo procesu czekajcego");
-
-        /*
-
-                Dodaj do CPU to add
-
-         */
-
     }
 
-    void disp_waiting(){
-        System.out.println("Czekajace:");
-        for (Process temp: waiting_processes) {
-            temp.display_process();
-        }
-        System.out.println("---------------------------------------------------------");
-    }
 
     int size(){
         return processes.size();
