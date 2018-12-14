@@ -1,0 +1,7 @@
+MO A 10 (MOV)
+MO B A (MOV)
+MO C 5
+IC B
+JP [7] 
+AD A C
+HT

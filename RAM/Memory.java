@@ -1,3 +1,5 @@
+package RAM;
+
 import java.util.Arrays;
 
 public class Memory {
@@ -25,20 +27,20 @@ public class Memory {
     }
 
     //zapis do pamieci
-    public static void writeMemory(String value,Integer size){
-       Integer check = check(size);
-       if(check>0){
-            for(int i=check;i<=size;i++){
-                memory[i]=value.charAt(i);
+    public static void writeMemory(String value,Integer size) {
+        Integer check = check(size);
+        if (check > 0) {
+            for (int i = check; i <= size; i++) {
+                memory[i] = value.charAt(i);
             }
-       }
-       else {
-           move();
-           if(check>0){
-               for(int i=check;i<=size;i++){
-                   memory[i]=value.charAt(i);
-               }
-           }else; //semafor?
+        } else {
+            move();
+            if (check > 0) {
+                for (int i = check; i <= size; i++) {
+                    memory[i] = value.charAt(i);
+                }
+            } else ; //semafor?
+        }
     }
     //odczyt z pamieci
     public static char readMemory(Integer adress){

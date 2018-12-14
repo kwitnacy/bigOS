@@ -1,0 +1,5 @@
+CP M p1 5
+CP D p2 8
+SM D 1 alooaloo
+RM M 1 [33]
+HT

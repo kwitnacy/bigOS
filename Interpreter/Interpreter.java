@@ -1,11 +1,12 @@
 package Interpreter;
 import Procesy.Process;
-import Procesy.Process_container;
 import Procesy.State;
 import filemodule.FileManagement;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static RAM.Memory.readMemory;
 
 public class Interpreter {
 
@@ -13,8 +14,7 @@ public class Interpreter {
     private String rozkaz, calyRozkaz;
     private String user;
     private FileManagement fileManagement;
-    private Process process;
-    public Interpreter(FileManagement fileManagement, Process process)
+    public Interpreter(FileManagement fileManagement)
     {
         //A = klasaJonasza running getAX();
         //B = klasaJonasza.get_BX();
@@ -26,7 +26,6 @@ public class Interpreter {
         //PID = klasaJonasza.get_PID
         getOrder(); //tutaj pierwszy rozkaz programu
         this.fileManagement = fileManagement;
-        this.process = process;
     }
     public void updateProcessor()
     {
@@ -47,12 +46,14 @@ public class Interpreter {
     private void getOrder()
     {
         int i =0;
-        /* while(rozkaz nie jest caly)
+        char now;
+        while(!rozkaz.equals("HT"))
         {
-            calyRozkaz = rozkaz + pamiec[base + program_counter];
-            if(i<2) rozkaz = rozkaz + pamiec[base + program_counter]
+            now = readMemory(base + program_counter);
+            calyRozkaz = rozkaz + now;
+            if(i<2) rozkaz = rozkaz + now;
             i++;
-        } */
+        }
         System.out.println("wykonywany rozkaz: "+rozkaz);
     }
     public void executeProgram() //to bedzie wykonywane w main
@@ -88,7 +89,7 @@ public class Interpreter {
         //if(!rozkaz.equals("AD")&&!rozkaz.equals("MO")&&itd.)
         //{
         //System.out.println("Blad. Nie ma takiego rozkazu. Koniec programu");
-        //process.change_state(State.Terminated);
+        //running.change_state(State.Terminated);
         //}
         switch (rozkaz) {
             case "AD": {
@@ -109,7 +110,7 @@ public class Interpreter {
             }
             case "HT": {
                 System.out.println("Koniec programu");
-                process.change_state(State.Terminated);
+                //running.change_state(State.Terminated);
                 break;
             }
             case "CF": {
@@ -133,7 +134,7 @@ public class Interpreter {
                 break;
             }
             case "CP": {
-                process.make_porocess(x,y,Integer.parseInt(z));
+                //running.make_porocess(x,y,Integer.parseInt(z));
                 //np. CP M file 7
                 break;
             }
@@ -152,12 +153,12 @@ public class Interpreter {
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcher = rejestr.matcher(x);
-        Pattern adres = Pattern.compile("\\[\\d+\\]");
+        Pattern adres = Pattern.compile("\\[\\d+]");
         Matcher adresmatcher = adres.matcher(x);
         if (!rejestrmatcher.matches()&&!adresmatcher.matches())
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         if (rejestrmatcher.matches()) {
             switch (x) {
@@ -186,11 +187,12 @@ public class Interpreter {
             if(Integer.parseInt(x)>base + limit)
             {
                 System.out.println("Blad. Koniec programu");
-                process.change_state(State.Terminated);
+                //running.change_state(State.Terminated);
             }
             else
             {
                 //miejsce w pamieci ++
+                //spytac Macieja czy w ogole jest taka mozliwosc
             }
         }
         program_counter++;
@@ -202,12 +204,12 @@ public class Interpreter {
         if (!jumpmatcher.matches())
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         if (base+Integer.parseInt(x) > base + limit)
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         else
         {
@@ -221,18 +223,18 @@ public class Interpreter {
         Matcher rejestrmatchery = rejestr.matcher(y);
         Pattern liczba = Pattern.compile("\\d+");
         Matcher liczbamatcher = liczba.matcher(y);
-        Pattern adres = Pattern.compile("\\[\\d+\\]");
+        Pattern adres = Pattern.compile("\\[\\d+]");
         Matcher adresmatchery = adres.matcher(y);
         Matcher adresmatcherx = adres.matcher(x);
         if (!rejestrmatcherx.matches()&&!adresmatcherx.matches())
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         if(!liczbamatcher.matches()&&!adresmatchery.matches()&&!rejestrmatchery.matches())
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         if(liczbamatcher.matches())
         {
@@ -260,7 +262,7 @@ public class Interpreter {
         if(adresmatchery.matches())
         {
             int dana = 0;
-            //dana = pobieranie z pamieci
+            dana = readMemory(Integer.parseInt(y));
             switch(x){
             case "A":
             {
@@ -371,16 +373,16 @@ public class Interpreter {
         if (!rejestrmatcherx.matches())
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         Pattern liczba = Pattern.compile("\\d+");
         Matcher liczbamatcher = liczba.matcher(y);
-        Pattern adres = Pattern.compile("\\[\\d+\\]");
+        Pattern adres = Pattern.compile("\\[\\d+]");
         Matcher adresmatcher = adres.matcher(y);
         if(!liczbamatcher.matches()&&!adresmatcher.matches()&&!rejestrmatchery.matches())
         {
             System.out.println("Blad. Koniec programu");
-            process.change_state(State.Terminated);
+            //running.change_state(State.Terminated);
         }
         if(liczbamatcher.matches())
         {
@@ -410,8 +412,7 @@ public class Interpreter {
         }
         if(adresmatcher.matches())
         {
-            int dana = 0;
-            //dana = pobieranie z pamieci
+            int dana = readMemory(Integer.parseInt(y));
             switch(x){
                 case "A":
             {
