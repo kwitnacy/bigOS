@@ -46,12 +46,21 @@ public class Interpreter {
     private void getOrder()
     {
         int i =0;
-        char now;
-        while(!rozkaz.equals("HT"))
+        char newPart, nastepny1, nastepny2;
+        String IfNew;
+        Pattern newOrder = Pattern.compile("[A-Z][A-Z]");
+        Matcher newOrderMatches = newOrder.matcher("");
+        while(!newOrderMatches.matches())
         {
-            now = readMemory(base + program_counter);
-            calyRozkaz = rozkaz + now;
-            if(i<2) rozkaz = rozkaz + now;
+            newPart = readMemory(base + program_counter);
+            //odczytywanie calego rozkazu jako stringa
+            calyRozkaz = rozkaz + newPart;
+            if(i<2) rozkaz = rozkaz + newPart;
+            //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
+            nastepny1 = readMemory(base + program_counter + 1);
+            nastepny2 = readMemory(base + program_counter + 2);
+            IfNew = ""+nastepny1 + nastepny2;
+            newOrderMatches = newOrder.matcher(IfNew);
             i++;
         }
         System.out.println("wykonywany rozkaz: "+rozkaz);
