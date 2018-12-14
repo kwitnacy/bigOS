@@ -15,7 +15,8 @@ public class Process {
 
     //  Messages
     private String last_message;                //  Ostatnio przeczytana wiadomosci
-    private Queue<String> messages;             //  Referencja do kontenera wiadomosci
+    
+    private Queue<String> messages_queue;       //  Referencja do kolejki wiadomosci
 
     String file_name;
 

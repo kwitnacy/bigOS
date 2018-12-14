@@ -115,7 +115,7 @@ public class Process_container {
         return processes.get(idx);
     }
 
-    public Process get_by_name(String name){
+    public static Process get_by_name(String name){
         for(Process temp : this.processes.values()){
             if(temp.name.equals(name))
                 return temp;
