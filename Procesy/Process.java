@@ -15,7 +15,7 @@ public class Process {
 
     //  Messages
     private String last_message;                //  Ostatnio przeczytana wiadomosci
-    
+    private last_message_addres;                //  Adres logiczny wiadomości
     private Queue<String> messages_queue;       //  Referencja do kolejki wiadomosci
 
     String file_name;
