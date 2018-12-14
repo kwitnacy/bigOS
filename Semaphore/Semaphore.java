@@ -1,7 +1,7 @@
 import java.util.Queue;
 
 public class Semaphore{
-    Queue<Process> queue;
+    Queue<Process> process_queue;
     int value;
 
     Semaphore(int val){
