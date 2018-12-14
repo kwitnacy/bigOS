@@ -123,4 +123,52 @@ public class Process {
     public void make_porocess(String name, String file, int priority){
         Process_container.create_process(name, file, priority);
     }
+////Messages//////////////////////////////////////////////////////////////////////
+public void send_message(String receiverName,int size, String text){
+    Process p = Process_container.get_by_name(receiverName);
+    send_message(p.get_PID(),size,text);
+}
+public void send_message(int receiverPID,int size, String text){
+        Process p= Process_container.get_by_PID(receiverPID);
+        String message=(++size)+text;
+        if(p!=null){
+            p.message_queue.add(message);
+            System.out.println("[SEND] String in RAM: "+message+" PID: "+p.get_PID());
+        }
+        else{
+            ///błąd, nie znaleziono procesu
+        }
+    }
+    
+public void send_message(String receiverName,int size, int addres){
+        Process p = Process_container.get_by_name(receiverName);
+        send_message(p.get_PID(),size,addres);
+    }
+public void send_message(int receiverPID,int size, int addres){
+        ///kopiowanie komórek od addres do addres+size
+        String text="abcd";
+        Process p= Process_container.get_by_PID(receiverPID);
+        String message=(++size)+text;
+        if(p!=null){
+            p.message_queue.add(message);
+            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+message);
+        }
+        else{
+            ///błąd, nie znaleziono procesu
+        }
+}
+
+public String read_message(int size){   /// proces_PID jako argument?
+        if(!this.message_queue.isEmpty()){
+            String message=this.message_queue.peek();
+            System.out.println("[READ] String: "+message+" Text: "+message.substring(1));
+            ///zapisywanie do RAM od adresu licznika rozkazów w formacie [ilość znaków +1][znaki]...
+            /// przykład: [6][b][i][g][O][S]
+            return this.message_queue.poll();
+        }
+        else{
+            ///przenoszenie procesu do kolejki wait
+            return null;
+        }
+}
 }
