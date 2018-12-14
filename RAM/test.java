@@ -26,9 +26,19 @@ public class Memory {
 
     //zapis do pamieci
     public static void writeMemory(String value,Integer size){
-        for(int i=check(size);i<size;i++){
-            memory[i]=value.charAt(i);
-        }
+       Integer check = check(size);
+       if(check>0){
+            for(int i=check;i<=size;i++){
+                memory[i]=value.charAt(i);
+            }
+       }
+       else {
+           move();
+           if(check>0){
+               for(int i=check;i<=size;i++){
+                   memory[i]=value.charAt(i);
+               }
+           }else; //semafor?
     }
     //odczyt z pamieci
     public static char readMemory(Integer adress){
