@@ -39,8 +39,23 @@ public class Process {
         this.state = State.Ready;
     }
 
-    public Process(){
+    public Process(String name, String file_name, int priority, int PID, int limit) {
+        this.state = State.New;
+        this.name = name;
+        this.base = 0;
+        this.limit = limit;
 
+        this.AX = this.BX = this.CX = this.DX = 0;
+        this.base_priority = priority;
+        this.temp_priority = priority;
+        this.PID = PID;
+
+        this.messages = new ArrayDeque<String>();
+        this.last_message = "";
+
+        this.program_counter = 0;
+
+        this.state = State.Ready;
     }
 
     public void display_process(){
@@ -58,16 +73,6 @@ public class Process {
         else
             System.out.println(this.message_byte);
 */
-    }
-
-    public void run_process(){
-        this.state = State.Running;
-        this.program_counter = this.program_counter + 1;
-        /*
-        *
-        *       Dzialanie processu
-        *
-        */
     }
 
     public void change_state(State state){
@@ -119,7 +124,11 @@ public class Process {
         return this.state;
     }
 
-    public void make_porocess(String name, String file, int priority){
+    public static void make_porocess(String name, String file, int priority){
         Process_container.create_process(name, file, priority);
+    }
+
+    public static void make_porocess(String name, String file, int priority, int limit){
+        Process_container.create_process(name, file, priority, limit);
     }
 }
