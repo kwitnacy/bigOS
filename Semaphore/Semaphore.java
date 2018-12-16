@@ -1,10 +1,11 @@
+package Semaphore;
 import java.util.Queue;
 
 public class Semaphore{
     Queue<Process> process_queue;
     int value;
 
-    Semaphore(int val){
+    public Semaphore(int val){
         this.value = val;
     }
 

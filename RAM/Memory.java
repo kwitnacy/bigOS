@@ -1,3 +1,4 @@
+package RAM;
 import java.util.Arrays;
 
 public class Memory {
@@ -34,11 +35,12 @@ public class Memory {
        }
        else {
            move();
-           if(check>0){
-               for(int i=check;i<=size;i++){
-                   memory[i]=value.charAt(i);
+           if (check > 0) {
+               for (int i = check; i <= size; i++) {
+                   memory[i] = value.charAt(i);
                }
-           }else; //semafor?
+           } else ; //semafor?
+       }
     }
     //odczyt z pamieci
     public static char readMemory(Integer adress){
