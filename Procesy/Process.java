@@ -19,7 +19,7 @@ public class Process {
 
     String file_name;
 
-////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public Process(String name, String file_name, int priority, int PID){
         this.state = State.New;
         this.name = name;
@@ -58,6 +58,52 @@ public class Process {
         this.state = State.Ready;
     }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public int get_PID(){
+        return this.PID;
+    }
+
+    public int get_base(){
+        return this.base;
+    }
+
+    public int get_limit(){
+        return this.limit;
+    }
+
+    public int get_base_priority(){
+        return this.base_priority;
+    }
+
+    public int get_temp_priority(){
+        return this.temp_priority;
+    }
+
+    public int get_waiting_counter(){
+        return this.waiting_counter;
+    }
+
+    public String get_name(){
+        return this.name;
+    }
+
+    public String get_last_mess(){
+        return this.last_message;
+    }
+
+    public Queue<String> get_all_mess(){
+        return this.messages;
+    }
+
+    public State get_state() {
+        return this.state;
+    }
+
+    public void set_waiting_counter(int waiting_counter){
+        this.waiting_counter = waiting_counter;
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void display_process(){
         System.out.println("Name: " + this.name);
         System.out.println("State: " + this.state);
@@ -87,43 +133,6 @@ public class Process {
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////////
-    public int get_PID(){
-        return this.PID;
-    }
-
-    public int get_base(){
-        return this.base;
-    }
-
-    public int get_limit(){
-        return this.limit;
-    }
-
-    public int get_base_priority(){
-        return this.base_priority;
-    }
-
-    public int get_temp_priority(){
-        return this.temp_priority;
-    }
-
-    public String get_name(){
-        return this.name;
-    }
-
-    public String get_last_mess(){
-        return this.last_message;
-    }
-
-    public Queue<String> get_all_mess(){
-        return this.messages;
-    }
-
-    public State get_state() {
-        return this.state;
-    }
-
     public static void make_porocess(String name, String file, int priority){
         Process_container.create_process(name, file, priority);
     }
@@ -131,4 +140,21 @@ public class Process {
     public static void make_porocess(String name, String file, int priority, int limit){
         Process_container.create_process(name, file, priority, limit);
     }
+
+    public void inc_temp_priority(){
+        this.temp_priority++;
+    }
+
+    public void dec_temp_priority(){
+        this.temp_priority--;
+    }
+
+    public void inc_waiting_counter(){
+        this.temp_priority++;
+    }
+
+    public void dec_waiting_counter(){
+        this.temp_priority--;
+    }
+
 }
