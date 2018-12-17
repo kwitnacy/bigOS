@@ -1,5 +1,8 @@
 package Procesy;
 
+import RAM.Memory;
+import Semaphore.Semaphore;
+
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -15,7 +18,9 @@ public class Process {
 
     //  Messages
     private String last_message;                //  Ostatnio przeczytana wiadomosci
-    private Queue<String> messages;             //  Referencja do kontenera wiadomosci
+    private int messages_addr;                  //  Adres logiczny wiadomości
+    private Queue<String> messages_queue;       //  Referencja do kolejki wiadomosci
+    private Semaphore messages_semaphore;       //  Semafor kontrolujący odbieranie wiadomości
 
     String file_name;
 
@@ -31,8 +36,10 @@ public class Process {
         this.temp_priority = priority;
         this.PID = PID;
 
-        this.messages = new ArrayDeque<String>();
+        this.messages_queue = new ArrayDeque<String>();
+        this.messages_semaphore= new Semaphore(0);
         this.last_message = "";
+        this. messages_addr=0;
 
         this.program_counter = 0;
 
@@ -50,8 +57,10 @@ public class Process {
         this.temp_priority = priority;
         this.PID = PID;
 
-        this.messages = new ArrayDeque<String>();
+        this.messages_queue = new ArrayDeque<String>();
+        this.messages_semaphore= new Semaphore(0);
         this.last_message = "";
+        this. messages_addr=0;
 
         this.program_counter = 0;
 
@@ -85,14 +94,6 @@ public class Process {
 
     public String get_name(){
         return this.name;
-    }
-
-    public String get_last_mess(){
-        return this.last_message;
-    }
-
-    public Queue<String> get_all_mess(){
-        return this.messages;
     }
 
     public State get_state() {
@@ -157,4 +158,71 @@ public class Process {
         this.temp_priority--;
     }
 
+///Messages/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public String get_last_message(){
+        return this.last_message;
+    }
+    public Queue<String> get_messages_queue(){
+        return this.messages_queue;
+    }
+    public Semaphore get_messages_semaphore(){
+        return this.messages_semaphore;
+    }
+
+    public boolean send_message(String receiverName,int size, String text){
+        Process p = Process_container.get_by_name(receiverName);
+        return send_message(p.get_PID(),size,text);
+    }
+    public boolean send_message(int receiverPID,int size, String text){
+
+        Process p= Process_container.get_by_PID(receiverPID);
+        String message=(++size)+text;
+
+        if(p!=null){
+            p.messages_queue.add(message);
+            p.get_messages_semaphore().signal_s();
+            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+message);
+            return true;
+        }
+        else{
+            ///błąd, nie znaleziono procesu
+            return false;
+        }
+    }
+
+    boolean send_message(String receiverName,int size, int addres){
+        Process p = Process_container.get_by_name(receiverName);
+        return send_message(p.get_PID(),size,addres);
+    }
+    public boolean send_message(int receiverPID,int size, int addres){
+        String text="";
+
+        for(int i=addres; i<addres+size; i++){
+            text+= Memory.readMemory(i);
+        }
+
+        Process p= Process_container.get_by_PID(receiverPID);
+        String message=(++size)+text;
+
+        if(p!=null){
+            p.messages_queue.add(message);
+            p.get_messages_semaphore().signal_s();
+            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+message);
+            return true;
+        }
+        else{
+            ///błąd, nie znaleziono procesu
+            return false;
+        }
+    }
+
+    public String read_message(int size){   /// proces_PID jako argument?
+
+        String message=this.messages_queue.peek();
+        this.messages_semaphore.wait_s();
+        ///zapisywanie do RAM od adresu licznika rozkazów w formacie [ilość znaków +1][znaki]...
+        /// przykład: [6][b][i][g][O][S]
+        System.out.println("[READ] String: "+message+" Text: "+message.substring(1));
+        return this.messages_queue.poll();
+    }
 }
