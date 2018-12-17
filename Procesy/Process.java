@@ -100,6 +100,32 @@ public class Process {
         return this.state;
     }
 
+    public int get_AX() {
+        return this.AX;
+    }
+    public int get_BX() {
+        return this.BX;
+    }
+    public int get_CX() {
+        return this.CX;
+    }
+    public int get_DX() {
+        return this.DX;
+    }
+    public void set_AX(int AX) {
+        this.AX=AX;
+    }
+    public void set_BX(int BX) {
+        this.BX=BX;
+    }
+    public void set_CX(int CX) {
+        this.CX=CX;
+    }
+    public void set_DX(int DX) {
+        this.DX=DX;
+    }
+
+
     public void set_waiting_counter(int waiting_counter){
         this.waiting_counter = waiting_counter;
     }

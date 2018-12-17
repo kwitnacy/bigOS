@@ -1,6 +1,7 @@
 package Interpreter;
-import Procesy.Process;
+import Processor.Scheduler;
 import Procesy.State;
+import static Procesy.Process.make_porocess;
 import filemodule.FileManagement;
 
 import java.util.regex.Matcher;
@@ -11,28 +12,27 @@ import static RAM.Memory.readMemory;
 public class Interpreter {
 
     private int A,B,C,D, program_counter, base, limit, PID;
-    private String rozkaz, calyRozkaz;
-    private String user;
+    private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
     public Interpreter(FileManagement fileManagement)
     {
-        //A = klasaJonasza running getAX();
-        //B = klasaJonasza.get_BX();
-        //C = klasaJonasza.get_CX();
-        //D = klasaJonasza.get_DX();
-        //base = klasaJonasza.get_Base();
-        //limit = klasaJonasza.get_Limit();
+        PID = Scheduler.running.get_PID();
+        base = Scheduler.running.get_base();
+        limit = Scheduler.running.get_limit();
+        A = Scheduler.running.get_AX();
+        B = Scheduler.running.get_BX();
+        C = Scheduler.running.get_CX();
+        D = Scheduler.running.get_DX();
         program_counter = 0;
-        //PID = klasaJonasza.get_PID
+        this.fileManagement=fileManagement;
         getOrder(); //tutaj pierwszy rozkaz programu
-        this.fileManagement = fileManagement;
     }
-    public void updateProcessor()
+    private void updateProcessor()
     {
-        //klasaJonasza running setAX(A);
-        //klasaJonasza.set_BX(B);
-        //klasaJonasza.set_CX(C);
-        //klasaJonasza.set_DX(D);
+        Scheduler.running.set_AX(A);
+        Scheduler.running.set_BX(B);
+        Scheduler.running.set_CX(C);
+        Scheduler.running.set_DX(D);
     }
     public void display()
     {
@@ -70,6 +70,7 @@ public class Interpreter {
         while(!rozkaz.equals("HT"))
         {
             executeOrder();
+            //Scheduler.makeOlder(); zobaczyc czy moze byc statyczna
             updateProcessor();
             display();
             getOrder();
@@ -98,7 +99,7 @@ public class Interpreter {
         //if(!rozkaz.equals("AD")&&!rozkaz.equals("MO")&&itd.)
         //{
         //System.out.println("Blad. Nie ma takiego rozkazu. Koniec programu");
-        //running.change_state(State.Terminated);
+        Scheduler.running.change_state(State.Terminated);
         //}
         switch (rozkaz) {
             case "AD": {
@@ -119,11 +120,12 @@ public class Interpreter {
             }
             case "HT": {
                 System.out.println("Koniec programu");
-                //running.change_state(State.Terminated);
+                Scheduler.running.change_state(State.Terminated);
                 break;
             }
             case "CF": {
                 fileManagement.create(x, user);
+                //?????????????????? skad usera mam miec
                 program_counter++;
                 break;
             }
@@ -143,7 +145,7 @@ public class Interpreter {
                 break;
             }
             case "CP": {
-                //running.make_porocess(x,y,Integer.parseInt(z));
+                make_porocess(x,y,Integer.parseInt(z));
                 //np. CP M file 7
                 break;
             }
@@ -167,7 +169,7 @@ public class Interpreter {
         if (!rejestrmatcher.matches()&&!adresmatcher.matches())
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         if (rejestrmatcher.matches()) {
             switch (x) {
@@ -196,7 +198,7 @@ public class Interpreter {
             if(Integer.parseInt(x)>base + limit)
             {
                 System.out.println("Blad. Koniec programu");
-                //running.change_state(State.Terminated);
+                Scheduler.running.change_state(State.Terminated);
             }
             else
             {
@@ -213,12 +215,12 @@ public class Interpreter {
         if (!jumpmatcher.matches())
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         if (base+Integer.parseInt(x) > base + limit)
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         else
         {
@@ -238,12 +240,12 @@ public class Interpreter {
         if (!rejestrmatcherx.matches()&&!adresmatcherx.matches())
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         if(!liczbamatcher.matches()&&!adresmatchery.matches()&&!rejestrmatchery.matches())
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         if(liczbamatcher.matches())
         {
@@ -382,7 +384,7 @@ public class Interpreter {
         if (!rejestrmatcherx.matches())
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         Pattern liczba = Pattern.compile("\\d+");
         Matcher liczbamatcher = liczba.matcher(y);
@@ -391,7 +393,7 @@ public class Interpreter {
         if(!liczbamatcher.matches()&&!adresmatcher.matches()&&!rejestrmatchery.matches())
         {
             System.out.println("Blad. Koniec programu");
-            //running.change_state(State.Terminated);
+            Scheduler.running.change_state(State.Terminated);
         }
         if(liczbamatcher.matches())
         {
