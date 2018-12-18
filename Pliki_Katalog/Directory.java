@@ -23,14 +23,34 @@ public class Directory {
         return false;       //w katalogu nie ma pliku o podanej nazwie
     }
     
-    public void addToRoot(File file){      //dodawanie pliku do katalogu
+    public boolean addToRoot(File file){      //dodawanie pliku do katalogu
+        for(File f : root){
+            if(this.checkExistance(file.getName()) == true){ 
+                return false;    //podany plik istnieje więc nie dodajemy
+            }
+        }
         this.root.add(file);
+        System.out.println("File added to root.");
+        return true;   //dodanie do katalogu
     }
     
-    public void deleteFromRoot(String fileName){       //usuwanie pliku o podanej nazwie z katalogu
+    public boolean deleteFromRoot(String fileName){       //usuwanie pliku o podanej nazwie z katalogu
         for(File f : root){
-            if(this.checkExistance(fileName) == true) root.remove(f);
-            else System.out.println("File not found.");
+            if(this.checkExistance(fileName) == true){ 
+                root.remove(f);
+                return true;    //poprawna nazwa i usunięcie FCB z katalogu
+            }
         }
+        System.out.println("File not found.");
+        return false;   //niepoprawna nazwa
+    }
+    
+    public File getFileByName(String fName){
+        if(checkExistance(fName) == true){
+            for(File f : root){
+                if(f.getName() == fName) return f;  //zwraca żądany plik
+            }
+        }
+        return null;
     }
 }

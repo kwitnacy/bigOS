@@ -22,4 +22,12 @@ public class FileSystem {
         
         this.root = new Directory(); //tworzenie głównego katalogu
     }
+    
+    public int checkFreeBlocks(){   //zwraca liczbę wolnych bloków
+        int freeB = 0;
+        for(int i = 0; i < freeBlocks.size(); i++){
+            if(freeBlocks.get(i) == false) freeB++; //jeżeli jest wolny
+        }
+        return freeB;
+    }
 }
