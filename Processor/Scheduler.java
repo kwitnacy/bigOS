@@ -18,11 +18,10 @@ public class Scheduler
 		Scheduler.dummy = dummy;					// inicjalizacja pustego procesu dummy
 		
 		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla ka¿dedgo priorytetu
-		Queue<Process> temp = new LinkedList<Process>();
 		
 		for (int i=0 ; i<15 ; i++)
 		{
-			queuesPCB.add(temp);
+			queuesPCB.add(new LinkedList<Process>());
 		}
 		
 		running = dummy; 											// przypisanie procesorowi procesu dummy
@@ -104,7 +103,7 @@ public class Scheduler
 						queuesPCB.get(i).remove(block);
 						System.out.println("Procesor: Przydzielilem procesor do procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 						+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
-						break;
+						break; // dodaæ ifa ¿eby proces który siê nie skoñczy³ wróci³
 				}
 			}			
 		}
@@ -150,7 +149,6 @@ public class Scheduler
 			{
 				System.out.println(block.get_name() + " ; " + block.get_PID() + " ; " + block.get_base_priority() + " ; " + block.get_temp_priority());
 			}
-			break;
 		}
 	}
 
