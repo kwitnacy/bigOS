@@ -1,26 +1,25 @@
 package projekt_so;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-//import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class Scheduler
 {
 	private static final int waitingLimit = 2;						// maskymalny czas oczekiwania (po tylu rozkazach postarzamy procses
-	private List<Queue<Process>> queuesPCB; 						// lista kolejek PCB w stanie ready
-	private Process dummy;											// proces dummy o priorytecie 0
+	private static List<Queue<Process>> queuesPCB; 						// lista kolejek PCB w stanie ready
+	private static Process dummy;											// proces dummy o priorytecie 0
 	public static Process running;									// aktualnie wykonywany proces
 	
-	public Scheduler() 								// sprawdziæ czy wszystko dzia³a
+	public Scheduler(Process dummy) 												// sprawdziæ czy wszystko dzia³a
 	{
-		this.dummy = new Process("dumpy",0, 0, 0);										// inicjalizacja pustego procesu dummy
+		Scheduler.dummy = dummy;					// inicjalizacja pustego procesu dummy
 		
 		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla ka¿dedgo priorytetu
 		Queue<Process> temp = new LinkedList<Process>();
-		//Queue<Process> temp = new PriorityQueue<Process>();
-		//priorityqueue mia³ problem z .add
+		
 		for (int i=0 ; i<15 ; i++)
 		{
 			queuesPCB.add(temp);
@@ -29,7 +28,7 @@ public class Scheduler
 		running = dummy; 											// przypisanie procesorowi procesu dummy
 	}
 	
-	public void add(Process toAdd) 									// dodawanie procesu do odpowiedniej kolejki
+	public static void add(Process toAdd) 									// dodawanie procesu do odpowiedniej kolejki
 	{
 		queuesPCB.get(toAdd.get_temp_priority()-1).add(toAdd);
 		if(toAdd.get_base_priority() == toAdd.get_temp_priority())
@@ -49,24 +48,25 @@ public class Scheduler
 		return;
 	}
 	
-	public void remove() 											// usuwanie z kolejek procesów które nie s¹ ready
+	public static void remove() 											// usuwanie z kolejek procesów które nie s¹ ready
 	{
 		for(Queue<Process> qq : queuesPCB)
 			{
-				for(Process block : qq)
-				{
-					if(block.get_state() != State.Ready)
+				Iterator<Process> iteratorkolejek = qq.iterator();
+				while (iteratorkolejek.hasNext())
 					{
-						System.out.println("Procesor: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
-						+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
-						qq.remove(block);
+						Process block = iteratorkolejek.next();
+						if(block.get_state() != State.Ready)
+						{
+							System.out.println("Procesor: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
+							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
+							iteratorkolejek.remove();
+						}
 					}
-				}
 			}
-		return;
 	}
 	
-	public void makeOlder() // postarzanie procesów, oraz inkrementacja licznika czekania procesów
+	public static void makeOlder() 										// postarzanie procesów, oraz inkrementacja licznika czekania procesów
 	{
 		for (Queue<Process> qq : queuesPCB)
 		{
@@ -91,7 +91,7 @@ public class Scheduler
 		return;
 	}
 	
-	public void schedule() // planista
+	public static void schedule() 											// planista
 	{
 		if(running.get_state() == State.Terminated || running.get_temp_priority() == 0) //zwyk³y przydzia³ procesora
 		{
@@ -140,4 +140,23 @@ public class Scheduler
 		return;
 	}
 	
+	public void showReadyProcesses()								// wyswietlanie procesow gotowych - coœ tu siê ewidentnie popsu³o, musze naprawiæ :<
+	{
+		System.out.println("Procesor: Procesy w stanie gotowosci to:");
+		System.out.println("Nazwa ; PID ; Priorytet bazowy ; Priorytet Tymczasowy");
+		for(Queue<Process> qq : queuesPCB)
+		{
+			for(Process block : qq)
+			{
+				System.out.println(block.get_name() + " ; " + block.get_PID() + " ; " + block.get_base_priority() + " ; " + block.get_temp_priority());
+			}
+			break;
+		}
+	}
+
+	public void showRunning()										// wyswietlanie running
+	{
+		System.out.println("Procesor: Aktualnie wykonywany proces to: (Nazwa ; PID ; Priorytet bazowy ; Priorytet tymczasowy)");
+		System.out.println(running.get_name() + " ; " + running.get_PID() + " ; " + running.get_base_priority() + " ; " + running.get_temp_priority());
+	}
 }
