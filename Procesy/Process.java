@@ -17,9 +17,9 @@ public class Process {
     String name;                                //  Nazwa procesu
 
     //  Messages
-    private String last_message;                //  Ostatnio przeczytana wiadomosci
+    private Message last_message;                //  Ostatnio przeczytana wiadomosci
     private int messages_addr;                  //  Adres logiczny wiadomości
-    private Queue<String> messages_queue;       //  Referencja do kolejki wiadomosci
+    private Queue<Message> messages_queue;       //  Referencja do kolejki wiadomosci
     private Semaphore messages_semaphore;       //  Semafor kontrolujący odbieranie wiadomości
 
     String file_name;
@@ -36,10 +36,10 @@ public class Process {
         this.temp_priority = priority;
         this.PID = PID;
 
-        this.messages_queue = new ArrayDeque<String>();
+        this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
-        this.last_message = "";
-        this. messages_addr=0;
+        this.last_message = new Message(-1,-1,null);
+        this. messages_addr=-1;
 
         this.program_counter = 0;
 
@@ -57,10 +57,10 @@ public class Process {
         this.temp_priority = priority;
         this.PID = PID;
 
-        this.messages_queue = new ArrayDeque<String>();
+        this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
-        this.last_message = "";
-        this. messages_addr=0;
+        this.last_message = new Message(-1,-1,null);
+        this. messages_addr=-1;
 
         this.program_counter = 0;
 
@@ -185,38 +185,17 @@ public class Process {
     }
 
 ///Messages/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public String get_last_message(){
+    public Message get_last_message(){
         return this.last_message;
     }
-    public Queue<String> get_messages_queue(){
+    public Queue<Message> get_messages_queue(){
         return this.messages_queue;
     }
     public Semaphore get_messages_semaphore(){
         return this.messages_semaphore;
     }
 
-    public boolean send_message(String receiverName,int size, String text){
-        Process p = Process_container.get_by_name(receiverName);
-        return send_message(p.get_PID(),size,text);
-    }
-    public boolean send_message(int receiverPID,int size, String text){
-
-        Process p= Process_container.get_by_PID(receiverPID);
-        String message=(++size)+text;
-
-        if(p!=null){
-            p.messages_queue.add(message);
-            p.get_messages_semaphore().signal_s();
-            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+message);
-            return true;
-        }
-        else{
-            ///błąd, nie znaleziono procesu
-            return false;
-        }
-    }
-
-    boolean send_message(String receiverName,int size, int addres){
+    public boolean send_message(String receiverName,int size, int addres){
         Process p = Process_container.get_by_name(receiverName);
         return send_message(p.get_PID(),size,addres);
     }
@@ -227,13 +206,22 @@ public class Process {
             text+= Memory.readMemory(i);
         }
 
+        return send_message(receiverPID,size,text);
+    }
+
+    public boolean send_message(String receiverName,int size, String text){
+        Process p = Process_container.get_by_name(receiverName);
+        return send_message(p.get_PID(),size,text);
+    }
+    public boolean send_message(int receiverPID,int size, String text){
+
         Process p= Process_container.get_by_PID(receiverPID);
-        String message=(++size)+text;
+        Message msg=new Message(receiverPID,size,text);
 
         if(p!=null){
-            p.messages_queue.add(message);
+            p.messages_queue.add(msg);
             p.get_messages_semaphore().signal_s();
-            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+message);
+            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+msg);
             return true;
         }
         else{
@@ -242,13 +230,20 @@ public class Process {
         }
     }
 
-    public String read_message(int size){   /// proces_PID jako argument?
 
-        String message=this.messages_queue.peek();
-        this.messages_semaphore.wait_s();
+    public Message read_message(int size){   /// proces_PID jako argument?
+
+        this.messages_semaphore.wait_s(this.PID);
+//        Message msg=this.messages_queue.peek();
+        Message msg=this.messages_queue.poll();
+        String ram_msg=(char) msg.get_send_PID()+msg.get_text();
         ///zapisywanie do RAM od adresu licznika rozkazów w formacie [ilość znaków +1][znaki]...
-        /// przykład: [6][b][i][g][O][S]
-        System.out.println("[READ] String: "+message+" Text: "+message.substring(1));
+        /// przykład: [PID jako char][b][i][g][O][S]
+        for(int i=0; i<ram_msg.length();i++){
+            //write(++program_counter,ram_msg.charAt(i));
+        }
+
+        System.out.println("[READ] Sender: "+ram_msg.charAt(0)+" Text: "+ram_msg.substring(1,1+ram_msg.length()));
         return this.messages_queue.poll();
     }
 }
