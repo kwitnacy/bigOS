@@ -1,5 +1,5 @@
 package Interpreter;
-import Processor.Scheduler;
+import projekt_so.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
 import filemodule.FileManagement;
@@ -11,13 +11,13 @@ import static RAM.Memory.readMemory;
 
 public class Interpreter {
 
-    private int A,B,C,D, program_counter, base, limit, PID;
+    private int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
     public Interpreter(FileManagement fileManagement)
     {
-        PID = Scheduler.running.get_PID();
-        base = Scheduler.running.get_base();
+        PID = projekt_so.Scheduler.running.get_PID();
+        base = projekt_so.Scheduler.running.get_base();
         limit = Scheduler.running.get_limit();
         A = Scheduler.running.get_AX();
         B = Scheduler.running.get_BX();
@@ -70,7 +70,7 @@ public class Interpreter {
         while(!rozkaz.equals("HT"))
         {
             executeOrder();
-            //Scheduler.makeOlder(); zobaczyc czy moze byc statyczna
+            Scheduler.makeOlder();
             updateProcessor();
             display();
             getOrder();
@@ -101,6 +101,8 @@ public class Interpreter {
         //System.out.println("Blad. Nie ma takiego rozkazu. Koniec programu");
         Scheduler.running.change_state(State.Terminated);
         //}
+        Pattern etykieta = Pattern.compile("\\w+:");
+        Matcher etykietamatcher = etykieta.matcher(calyRozkaz);
         switch (rozkaz) {
             case "AD": {
                 add(x, y);
@@ -151,14 +153,88 @@ public class Interpreter {
             }
             case "SM": {
                 //SM [nazwa/PID procesu odbiorcy] [rozmiar wiadomości] [wiadomość]
+                //SM [nazwa/PID procesu odbiorcy] [rozmiar wiadomości] [adres]
+                Pattern adres = Pattern.compile("\\[\\d+]");
+                Matcher adresmatcher = adres.matcher(z);
+                if (adresmatcher.matches())
+                {
+                    Scheduler.running.send_message(Integer.parseInt(x),Integer.parseInt(y),Integer.parseInt(z));
+                }
+                else
+                {
+                    Scheduler.running.send_message(Integer.parseInt(x),Integer.parseInt(y),z);
+                }
                 break;
             }
             case "RM": {
+                int size=0;
+                //skad wielkosc odebranej wiadomosci
+                Scheduler.running.read_message(size);
                 //RM [nazwa\PID procesu który ma odczytać wiadomość] [rozmiar wiadomości]
                 break;
             }
-            default:break;
+            case "DI":
+            {
+                div(x);
+            }
+            case "JC":
+            {
+                if (C == 0)
+                {
+                    jump(String.valueOf(etykietka));
+                }
+            }
+            default: {
+                if (etykietamatcher.matches()) {
+                    etykietka = base + program_counter;
+                } else {
+                    System.out.println("Bledny rozkaz. Koniec programu");
+                    Scheduler.running.change_state(State.Terminated);
+                }
+                break;
+            }
         }
+    }
+    private void div(String x)
+    {
+        Pattern rejestr = Pattern.compile("[A-D]");
+        Matcher rejestrmatcher = rejestr.matcher(x);
+        Pattern adres = Pattern.compile("\\[\\d+]");
+        Matcher adresmatcher = adres.matcher(x);
+        if (!rejestrmatcher.matches()&&!adresmatcher.matches())
+        {
+            System.out.println("Blad. Koniec programu");
+            Scheduler.running.change_state(State.Terminated);
+        }
+        if(rejestrmatcher.matches())
+        {
+            if(x.equals("A"))
+            {
+                A = 1;
+                D = 0;
+            }
+            if(x.equals("B"))
+            {
+                A = A/B;
+                D = A%B;
+            }
+            if(x.equals("C"))
+            {
+                A = A/C;
+                D = A%C;
+            }
+            if(x.equals("D"))
+            {
+                A = A/D;
+                D = A%D;
+            }
+        }
+        else if(adresmatcher.matches())
+        {
+            A = A/readMemory(Integer.parseInt(x));
+            D = D/readMemory(Integer.parseInt(x));
+        }
+        program_counter++;
     }
     private void increment(String x)
     {
@@ -275,26 +351,26 @@ public class Interpreter {
             int dana = 0;
             dana = readMemory(Integer.parseInt(y));
             switch(x){
-            case "A":
-            {
-                A = dana;
-                break;
-            }
+                case "A":
+                {
+                    A = dana;
+                    break;
+                }
                 case "B":
-            {
-                B = dana;
-                break;
-            }
+                {
+                    B = dana;
+                    break;
+                }
                 case "C":
-            {
-                C = dana;
-                break;
-            }
+                {
+                    C = dana;
+                    break;
+                }
                 case("D"):
-            {
-                D = dana;
-                break;
-            }
+                {
+                    D = dana;
+                    break;
+                }
                 default: break;
             }
         }
@@ -399,75 +475,75 @@ public class Interpreter {
         {
             switch (x){
                 case "A":
-            {
-                A = A+Integer.parseInt(y);
-                break;
-            }
+                {
+                    A = A+Integer.parseInt(y);
+                    break;
+                }
                 case "B":
-            {
-                B = B+Integer.parseInt(y);
-                break;
-            }
+                {
+                    B = B+Integer.parseInt(y);
+                    break;
+                }
                 case "C":
-            {
-                C = C+Integer.parseInt(y);
-                break;
-            }
+                {
+                    C = C+Integer.parseInt(y);
+                    break;
+                }
                 case "D":
-            {
-                D = D+Integer.parseInt(y);
-                break;
+                {
+                    D = D+Integer.parseInt(y);
+                    break;
+                }
+                default:break;
             }
-            default:break;
-        }
         }
         if(adresmatcher.matches())
         {
             int dana = readMemory(Integer.parseInt(y));
             switch(x){
                 case "A":
-            {
-                A = A+dana;
-                break;
-            }
+                {
+                    A = A+dana;
+                    break;
+                }
                 case "B":
-            {
-                B = B + dana;
-                break;
-            }
+                {
+                    B = B + dana;
+                    break;
+                }
                 case "C":
-            {
-                C = C+dana;
-                break;
-            }
+                {
+                    C = C+dana;
+                    break;
+                }
                 case "D":
-            {
-                D = D+dana;
-                break;
-            }
-            default: break;
+                {
+                    D = D+dana;
+                    break;
+                }
+                default: break;
             }
         }
         if (y.equals("A"))
         {
             switch(x){
                 case "B":
-            {
-                B = B+A;
-                break;
-            }
+                {
+                    B = B+A;
+                    break;
+                }
                 case "C":
-            {
-                C = C+A;
-                break;
-            }
+                {
+                    C = C+A;
+                    break;
+                }
                 case "D":
-            {
-                D = D+A;
-                break;
+                {
+                    D = D+A;
+                    break;
+                }
+                default:break;
             }
-            default:break;
-        }
         }
         if (y.equals("B")) {
             switch (x) {
