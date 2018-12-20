@@ -1,7 +1,9 @@
-MO A 10 (MOV)
-MO B A (MOV)
-MO C 5
-IC B
-JP [7] 
-AD A C
+MO A 10
+MO C 3
+POWT:
+MO A C
+DI C
+MO C D
+JC POWT
+MO [99] A
 HT
