@@ -16,7 +16,7 @@ public class Semaphore{
     public void wait_s(int pid){
         this.value--;
         if(this.value < 0){
-            process_queue.offer(pid);
+            this.process_queue.offer(pid);
             Process_container.get_by_PID(pid).change_state(State.Waiting);
         }
     }
@@ -24,7 +24,7 @@ public class Semaphore{
     public void signal_s(){
         this.value++;
         if(this.value <= 0){
-            int pid = process_queue.poll();
+            int pid = this.process_queue.poll();
             Process_container.get_by_PID(pid).change_state(State.Ready);
         }
     }
