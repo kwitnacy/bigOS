@@ -232,7 +232,7 @@ public class Interpreter {
         else if(adresmatcher.matches())
         {
             A = A/readMemory(Integer.parseInt(x));
-            D = D/readMemory(Integer.parseInt(x));
+            D = D%readMemory(Integer.parseInt(x));
         }
         program_counter++;
     }
