@@ -9,7 +9,7 @@ import java.util.Queue;
 public class Process {
     int PID;                                    //  Unikatowy idnetyfiaktor
     private int AX, BX, CX, DX;                 //  Rejestry
-    private int base_priority, temp_priority;     //  Piorytet bazowy (stały) i tymczasowy (zmienny)
+    private int base_priority, temp_priority;   //  Piorytet bazowy (stały) i tymczasowy (zmienny)
     private int base, limit;                    //  Adres procesu w pamieci RAM
     private int program_counter;                //  Licznik rozkazu programu przydzielonego do procesu
     private int waiting_counter;                //  Zmienna pomocna w rarzadzaniu procesorem
@@ -17,10 +17,10 @@ public class Process {
     String name;                                //  Nazwa procesu
 
     //  Messages
-    private Message last_message;                //  Ostatnio przeczytana wiadomosci
-    private int messages_addr;                  //  Adres logiczny wiadomości
-    private Queue<Message> messages_queue;       //  Referencja do kolejki wiadomosci
-    private Semaphore messages_semaphore;       //  Semafor kontrolujący odbieranie wiadomości
+    private Message last_message;               //  Ostatnia przeczytana wiadomosci
+    private int message_addr;                   //  Adres logiczny ostatnio przeczytanej wiadomości
+    private Queue<Message> messages_queue;      //  Kolejka odebranych wiadomości
+    private Semaphore messages_semaphore;       //  Semafor kontrolujący odczytywanie wiadomości
 
     String file_name;
 
@@ -39,7 +39,7 @@ public class Process {
         this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
         this.last_message = new Message(-1,-1,null);
-        this. messages_addr=-1;
+        this. message_addr=-1;
 
         this.program_counter = 0;
 
@@ -60,7 +60,7 @@ public class Process {
         this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
         this.last_message = new Message(-1,-1,null);
-        this. messages_addr=-1;
+        this.message_addr=-1;
 
         this.program_counter = 0;
 
@@ -197,21 +197,40 @@ public class Process {
 
     public boolean send_message(String receiverName,int size, int addres){
         Process p = Process_container.get_by_name(receiverName);
-        return send_message(p.get_PID(),size,addres);
+        /// wyszukiwanie procesu po imieniu
+
+        if(p!=null){
+            return send_message(p.get_PID(),size,addres);
+            /// znaleziono proces, podaj dalej do odpowiednej funkcji
+        }
+        return false;
+        /// nie ma takiego procesu
     }
     public boolean send_message(int receiverPID,int size, int addres){
+
         String text="";
 
-        for(int i=addres; i<addres+size; i++){
-            text+= Memory.readMemory(i);
+        int counter=0;
+        while(Memory.readMemory(addres+1+counter)!='\0'){
+            text+=Memory.readMemory(addres+1+counter);
+            counter++;
         }
+        /// wczytaj tekst wiadomości
 
         return send_message(receiverPID,size,text);
+        /// podaj do odpowiedniej funkcji
     }
 
     public boolean send_message(String receiverName,int size, String text){
         Process p = Process_container.get_by_name(receiverName);
-        return send_message(p.get_PID(),size,text);
+        /// wyszukiwanie procesu po imieniu
+
+        if(p!=null){
+            return send_message(p.get_PID(),size,text);
+            /// znaleziono proces, podaj dalej do odpowiednej funkcji
+        }
+        return false;
+        /// nie ma takiego procesu
     }
     public boolean send_message(int receiverPID,int size, String text){
 
@@ -220,30 +239,44 @@ public class Process {
 
         if(p!=null){
             p.messages_queue.add(msg);
+            /// dodaj wiadomość do kolejki procesu odbiorcy
+
             p.get_messages_semaphore().signal_s();
-            System.out.println("[SEND] PID: "+p.get_PID()+" String in RAM: "+msg);
+            /// wykonaj signal na semaforze odbiotcy aby pokazać że jest wiadomość do przeczytania
+
+            System.out.println("[SEND] PID:"+msg.get_sender_PID()+" Size:"+msg.get_size()+" Text:"+msg.get_text());
+            /// wyswietlanie budowy wysyłanej wiadomości
+
             return true;
+            /// wysylanie wiadomosci powiodlo sie
         }
         else{
-            ///błąd, nie znaleziono procesu
             return false;
+            ///błąd, nie znaleziono procesu
         }
     }
 
-
-    public Message read_message(int size){   /// proces_PID jako argument?
+    public void read_message(int size){
 
         this.messages_semaphore.wait_s(this.PID);
-//        Message msg=this.messages_queue.peek();
-        Message msg=this.messages_queue.poll();
-        String ram_msg=(char) msg.get_send_PID()+msg.get_text();
-        ///zapisywanie do RAM od adresu licznika rozkazów w formacie [ilość znaków +1][znaki]...
-        /// przykład: [PID jako char][b][i][g][O][S]
-        for(int i=0; i<ram_msg.length();i++){
-            //write(++program_counter,ram_msg.charAt(i));
-        }
+        /// operacja na semaforze (sprawdza czy są wiadomości do odebrania, jeżeli nie ma to robi czekanko)
 
-        System.out.println("[READ] Sender: "+ram_msg.charAt(0)+" Text: "+ram_msg.substring(1,1+ram_msg.length()));
-        return this.messages_queue.poll();
+        this.last_message=this.messages_queue.poll();
+        /// wyciąganie wiadomości z kolejki z usunięciem do zmiennej PCB last_message
+
+        this.message_addr=this.limit-size-2;
+        /// koniec pamięci procesu - rozmiar wiadomości -2(PID nadawcy i znak końca stringa)
+
+        String ram_msg = (char)last_message.get_sender_PID() + last_message.get_text() + '\0';
+        /// przykładowy zapis wiadomości o treści "bigos" pochodzącej od procesu o pid 12
+        /// [char 12][b][i][g][o][s][\0]
+
+        for(int i=0; i<ram_msg.length();i++){
+            //write(msessage_addr+i,ram_msg.charAt(i));
+        }
+        /// pętla zapisująca wiadomość
+
+        System.out.println("[RM FUNCTION] Sender: "+ram_msg.charAt(0)+" Text: "+ram_msg.substring(1,ram_msg.length()));
+        ///wyświetlanie budowy wiadomości, identycznie powinna wyglądać w RAM'ie
     }
 }

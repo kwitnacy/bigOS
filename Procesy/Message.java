@@ -12,7 +12,7 @@ public class Message{
     }
 
     /// funkcje get
-    public int get_send_PID(){
+    public int get_sender_PID(){
         return this.senderPID;
     }
     public String get_text(){
@@ -22,7 +22,7 @@ public class Message{
         return this.size;
     }
     /// funkcje set
-    public void set_send_PID(int PID){
+    public void set_sender_PID(int PID){
         this.senderPID=PID;
     }
     public void set_text(String text){
