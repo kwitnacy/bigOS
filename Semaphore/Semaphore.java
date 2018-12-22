@@ -9,6 +9,7 @@ import java.util.Queue;
 
 public class Semaphore{
     private Queue<Integer> process_queue;
+
     private int value;
 
     public Semaphore(int val){
@@ -104,6 +105,10 @@ public class Semaphore{
 
             }
         };
+    }
+
+    public int getValue() {
+        return value;
     }
 
     public void wait_s(int pid){
