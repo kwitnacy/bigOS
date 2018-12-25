@@ -1,5 +1,6 @@
 package Procesy;
 
+import Processor.Scheduler;
 import RAM.Memory;
 import Semaphore.Semaphore;
 
@@ -9,7 +10,7 @@ import java.util.Queue;
 public class Process {
     int PID;                                    //  Unikatowy idnetyfiaktor
     private int AX, BX, CX, DX;                 //  Rejestry
-    private int base_priority, temp_priority;   //  Piorytet bazowy (stały) i tymczasowy (zmienny)
+    private int base_priority, temp_priority;     //  Piorytet bazowy (stały) i tymczasowy (zmienny)
     private int base, limit;                    //  Adres procesu w pamieci RAM
     private int program_counter;                //  Licznik rozkazu programu przydzielonego do procesu
     private int waiting_counter;                //  Zmienna pomocna w rarzadzaniu procesorem
@@ -39,7 +40,7 @@ public class Process {
         this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
         this.last_message = new Message(-1,-1,null);
-        this. message_addr=-1;
+        this.message_addr = -1;
 
         this.program_counter = 0;
 
@@ -60,7 +61,7 @@ public class Process {
         this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
         this.last_message = new Message(-1,-1,null);
-        this.message_addr=-1;
+        this.message_addr = -1;
 
         this.program_counter = 0;
 
@@ -103,28 +104,34 @@ public class Process {
     public int get_AX() {
         return this.AX;
     }
+
     public int get_BX() {
         return this.BX;
     }
+
     public int get_CX() {
         return this.CX;
     }
+
     public int get_DX() {
         return this.DX;
     }
+
     public void set_AX(int AX) {
-        this.AX=AX;
-    }
-    public void set_BX(int BX) {
-        this.BX=BX;
-    }
-    public void set_CX(int CX) {
-        this.CX=CX;
-    }
-    public void set_DX(int DX) {
-        this.DX=DX;
+        this.AX = AX;
     }
 
+    public void set_BX(int BX) {
+        this.BX = BX;
+    }
+
+    public void set_CX(int CX) {
+        this.CX = CX;
+    }
+
+    public void set_DX(int DX) {
+        this.DX = DX;
+    }
 
     public void set_waiting_counter(int waiting_counter){
         this.waiting_counter = waiting_counter;
@@ -140,12 +147,6 @@ public class Process {
         System.out.println("Piority (base): " + this.base_priority);
         System.out.println("Piority (temp): " + this.temp_priority);
         System.out.println("Message: " + this.last_message);
-/*
-        if(this.message_byte.equals(""))
-            System.out.println("None");
-        else
-            System.out.println(this.message_byte);
-*/
     }
 
     public void change_state(State state){
@@ -157,6 +158,10 @@ public class Process {
         if(this.state == State.Terminated){
             Process_container.delete(this.PID);
             System.out.println("Usuniecie procesu: " + this.name);
+        }
+
+        if(this.state == State.Waiting){
+            Scheduler.schedule();
         }
     }
 
