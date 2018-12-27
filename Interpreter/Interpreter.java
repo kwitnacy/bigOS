@@ -1,4 +1,5 @@
 package Interpreter;
+import Semaphore.Semaphore;
 import projekt_so.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
@@ -8,24 +9,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static RAM.Memory.readMemory;
-
+//Procesor tworzy obiekt i wywoluje funkcje executeProgram()
 public class Interpreter {
 
     private int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
-    public Interpreter(FileManagement fileManagement)
+    private Semaphore semaphore;
+    public Interpreter(FileManagement fileManagement, Semaphore semaphore)
     {
-        PID = projekt_so.Scheduler.running.get_PID();
-        base = projekt_so.Scheduler.running.get_base();
-        limit = Scheduler.running.get_limit();
-        A = Scheduler.running.get_AX();
-        B = Scheduler.running.get_BX();
-        C = Scheduler.running.get_CX();
-        D = Scheduler.running.get_DX();
-        program_counter = 0;
-        this.fileManagement=fileManagement;
-        getOrder(); //tutaj pierwszy rozkaz programu
+        /*if (!loadToMemory(filename)){
+            Scheduler.running.change_state(State.Terminated);
+        }*/
+        //else {
+            PID = projekt_so.Scheduler.running.get_PID();
+            base = projekt_so.Scheduler.running.get_base();
+            limit = Scheduler.running.get_limit();
+            A = Scheduler.running.get_AX();
+            B = Scheduler.running.get_BX();
+            C = Scheduler.running.get_CX();
+            D = Scheduler.running.get_DX();
+            program_counter = 0;
+            this.fileManagement = fileManagement;
+            this.semaphore = semaphore;
+            getOrder(); //tutaj pierwszy rozkaz programu
+        //}
     }
     private void updateProcessor()
     {
@@ -43,7 +51,7 @@ public class Interpreter {
         System.out.println("rejestr D: "+D);
         System.out.println("program_counter: "+ program_counter);
     }
-    private void getOrder()
+    private void getOrder() //odczytywanie rozkazu z pamieci
     {
         int i =0;
         char newPart, nastepny1, nastepny2;
@@ -65,15 +73,16 @@ public class Interpreter {
         }
         System.out.println("wykonywany rozkaz: "+rozkaz);
     }
-    public void executeProgram() //to bedzie wykonywane w main
+    public void executeProgram() //te funkcje powinien wywolywac procesor po stworzeniu obiektu
     {
         while(!rozkaz.equals("HT"))
         {
-            executeOrder();
-            Scheduler.makeOlder();
-            updateProcessor();
-            display();
-            getOrder();
+            //pierwszy rozkaz jest pobierany juz w konstruktorze
+            executeOrder(); //wykonanie rozkazu
+            Scheduler.makeOlder(); //postarzanie procesu
+            updateProcessor(); //zapisanie zmienionych wartosci rejestru
+            display(); //wypisanie stanu procesora
+            getOrder(); //odczytanie rozkazu z pamieci
         }
     }
     private void executeOrder() {
@@ -132,12 +141,16 @@ public class Interpreter {
                 break;
             }
             case "WF": {
+                semaphore.wait_s(PID);
                 fileManagement.write(x, y);
+                semaphore.signal_s();
                 program_counter++;
                 break;
             }
             case "RF": {
+                semaphore.wait_s(PID);
                 fileManagement.read();
+                semaphore.signal_s();
                 program_counter++;
                 break;
             }
@@ -595,3 +608,10 @@ public class Interpreter {
         program_counter++;
     }
 }
+/* Sprawdzanie programow - polecenia z pliku z moodle'a
+programy nie mogą być takie same w różnych grupach
+1) NWD
+2) przepisywanie do plików wybranych wartości,
+zamiana wybranych znaków, sumowanie danych z pliku,
+przeszukiwanie pliku
+3) różne sposoby komunikacji międzyprocesowej, odpowiedniki wait/exit???*/
