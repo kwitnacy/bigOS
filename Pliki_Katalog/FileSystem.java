@@ -18,7 +18,8 @@ public class FileSystem {
         for(int i = 0; i < 32; i++) 
             FAT[i] = 0;         //wypełnia FAT zerami    
         
-        this.freeBlocks.set(0, 31, true); //wszystkie wolne
+        for(int i = 0; i < 32; i++) 
+            this.freeBlocks.set(i, false); //wszystkie wolne
         
         this.root = new Directory(); //tworzenie głównego katalogu
     }

@@ -16,4 +16,14 @@ public class Disk {
     public int getDataSize() {
         return 32*32;
     }
+    
+    public char[] getBlock(Double blockNr){
+        int blocknr = blockNr.intValue();
+        char[] block = new char[32];
+        int j = 0;
+        for(int i = blocknr*32; i < (blockNr+1)*32 - 1; i++){
+            block[j] = data[i]; j++;
+        }
+        return block;
+    }
 }

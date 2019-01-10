@@ -53,4 +53,19 @@ public class Directory {
         }
         return null;
     }
+    
+    public void replacebyName (File newFile){
+        for(int i = 0; i < root.size(); i++){
+            if(newFile.getName() == root.get(i).getName()){
+                root.set(i, newFile);   //podmienia plik na ten podnay w argumenice
+            }
+        }
+    } 
+    
+    public void printRoot(){
+        for(int i = 0; i < root.size(); i++){
+            System.out.print(root.get(i).getName() + " ");
+        }
+        System.out.println();
+    }
 }
