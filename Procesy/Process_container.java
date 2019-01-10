@@ -28,45 +28,36 @@ public class Process_container {
     }
 
     public static void create_process(String name, String file_name, int priority){
-        try {
-            if (priority > 15 || priority < 1)
-                throw new Exception("zly piorytet");
-
-            if (taken_names.contains(name))
-                System.out.println("Nie można utworzyć procesu - zajeta nazwa");
-
-            else {
-                System.out.println("Stworzenie nowe procesu o nazwie: " + name);
-                Process temp = new Process(name, file_name, priority, counter);
-                processes.put(counter, temp);
-		        names.put(name, counter);
-                counter = counter + 1;
-
-                /*
-                 *      DODAWNIE DO CPU
-                 */
-
-            }
+        if (priority > 15 || priority < 1){
+            System.out.println("Process Manager: Wrong priority");
+            return;
         }
-        catch(Exception e){
-            System.out.println(e.getMessage());
+
+        if (taken_names.contains(name)){
+            System.out.println("Process Manager: Name taken");
+            return;
         }
+
+        System.out.println("Stworzenie nowe procesu o nazwie: " + name);
+        Process temp = new Process(name, file_name, priority, counter);
+        processes.put(counter, temp);
+        names.put(name, counter);
+        taken_names.add(name);
+        counter = counter + 1;
+
+        Scheduler.add(temp);
     }
 
     public static void create_process(String name, String file_name, int priority, int limit){
-        try {
-            if (priority > 15 || priority < 1)
-                throw new Exception("zly piorytet");
+        if (priority > 15 || priority < 1){
+            System.out.println("Process Manager: Wrong priority");
+            return;
+        }
 
-            if (taken_names.contains(name))
-                System.out.println("Nie można utworzyć procesu - zajeta nazwa");
-
-            else {
-                System.out.println("Stworzenie nowe procesu o nazwie: " + name);
-                Process temp = new Process(name, file_name, priority, counter, limit);
-                processes.put(counter, temp);
-                names.put(name, counter);
-                counter = counter + 1;
+        if (taken_names.contains(name)){
+            System.out.println("Process Manager: Name taken");
+            return;
+        }
 
         System.out.println("Stworzenie nowe procesu o nazwie: " + name);
         Process temp = new Process(name, file_name, priority, counter, limit);
