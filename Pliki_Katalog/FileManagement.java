@@ -29,10 +29,20 @@ public class FileManagement {
     
     //metody do zarządzana plikami
     
-    public void signalFile(String file_name){}
-    public void waitFile(String file_name){}
+    public void signalFile(String file_name)
+    {
+        File ftemp = disk.fileSystem.root.getFileByName(file_name);
+        //ftemp.s.signal();    ???
+        disk.fileSystem.root.replacebyName(ftemp);
+    }
     
-
+    public void waitFile(String file_name)
+    {
+        File ftemp = disk.fileSystem.root.getFileByName(file_name);
+        //ftemp.s.wait();    ???
+        disk.fileSystem.root.replacebyName(ftemp);
+    }
+    
     public int create(String name, String user) //tworzenie pliku
     {
         if(properFileName(name) == false) return 1;   //niepoprawna nazwa pliku
