@@ -68,15 +68,14 @@ public class Process_container {
                 names.put(name, counter);
                 counter = counter + 1;
 
-                /*
-                 *      DODAWNIE DO CPU
-                 */
+        System.out.println("Stworzenie nowe procesu o nazwie: " + name);
+        Process temp = new Process(name, file_name, priority, counter, limit);
+        processes.put(counter, temp);
+        names.put(name, counter);
+        taken_names.add(name);
+        counter = counter + 1;
 
-            }
-        }
-        catch(Exception e){
-            System.out.println(e.getMessage());
-        }
+        Scheduler.add(temp);
     }
 
     public void show_all_processes(){
