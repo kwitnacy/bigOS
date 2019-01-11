@@ -1,5 +1,4 @@
 package Interpreter;
-import Semaphore.Semaphore;
 import projekt_so.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
@@ -15,8 +14,7 @@ public class Interpreter {
     private int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
-    private Semaphore semaphore;
-    public Interpreter(FileManagement fileManagement, Semaphore semaphore)
+    public Interpreter(FileManagement fileManagement)
     {
         /*if (!loadToMemory(filename)){
             Scheduler.running.change_state(State.Terminated);
@@ -31,7 +29,6 @@ public class Interpreter {
             D = Scheduler.running.get_DX();
             program_counter = 0;
             this.fileManagement = fileManagement;
-            this.semaphore = semaphore;
             getOrder(); //tutaj pierwszy rozkaz programu
         //}
     }
@@ -88,7 +85,7 @@ public class Interpreter {
     private void executeOrder() {
         Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
         Matcher dane2matcher = dane2.matcher(calyRozkaz);
-        String x = "", y = "", z = "";
+        String x = "", y = "", z = "", xx="";
         if (dane2matcher.matches()) {
             x = dane2matcher.group(2);
             y = dane2matcher.group(3);
@@ -104,6 +101,14 @@ public class Interpreter {
             x = dane3matcher.group(2);
             y = dane3matcher.group(3);
             z = dane3matcher.group(4);
+        }
+        Pattern dane4 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*\\s(\\[*\\w+]*))");
+        Matcher dane4matcher = dane4.matcher(calyRozkaz);
+        if (dane3matcher.matches()) {
+            x = dane3matcher.group(2);
+            y = dane3matcher.group(3);
+            z = dane3matcher.group(4);
+            xx = dane3matcher.group(5);
         }
         //if(!rozkaz.equals("AD")&&!rozkaz.equals("MO")&&itd.)
         //{
@@ -141,16 +146,40 @@ public class Interpreter {
                 break;
             }
             case "WF": {
-                semaphore.wait_s(PID);
                 fileManagement.write(x, y);
-                semaphore.signal_s();
                 program_counter++;
                 break;
             }
             case "RF": {
-                semaphore.wait_s(PID);
-                fileManagement.read();
-                semaphore.signal_s();
+                if (xx.equals("")) {
+                System.out.println(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));}
+                else {
+                    Pattern rejestr = Pattern.compile("[A-D]");
+                    Matcher rejestrmatcher = rejestr.matcher(xx);
+                    if (rejestrmatcher.matches())
+                    {
+                        if(x.equals("A"))
+                        {
+                            A = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                        }
+                        if(x.equals("B"))
+                        {
+                            B = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                        }
+                        if(x.equals("C"))
+                        {
+                            C = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                        }
+                        if(x.equals("D"))
+                        {
+                            D = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                        }
+                    }
+                    else {
+                        System.out.println("Bledny rozkaz. Koniec programu");
+                        Scheduler.running.change_state(State.Terminated);
+                    }
+                }
                 program_counter++;
                 break;
             }
@@ -189,12 +218,14 @@ public class Interpreter {
             case "DI":
             {
                 div(x);
+                break;
             }
             case "JC":
             {
                 if (C == 0)
                 {
                     jump(String.valueOf(etykietka));
+                    break;
                 }
             }
             default: {
@@ -608,10 +639,9 @@ public class Interpreter {
         program_counter++;
     }
 }
-/* Sprawdzanie programow - polecenia z pliku z moodle'a
-programy nie mogą być takie same w różnych grupach
+/* Dzialanie poszczegolnych programow
 1) NWD
-2) przepisywanie do plików wybranych wartości,
-zamiana wybranych znaków, sumowanie danych z pliku,
-przeszukiwanie pliku
+2) przepisywanie do plików wybranych wartości, sumowanie danych z pliku,
+
+Wg Moodle'a, jeszcze dopracuje
 3) różne sposoby komunikacji międzyprocesowej, odpowiedniki wait/exit???*/

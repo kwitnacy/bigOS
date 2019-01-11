@@ -1,5 +1,11 @@
 CF f
-WF f [100]
-RF f [44]
-SF
+WF f a
+RF f 1 2
+DF f
+CF f2
+WF f2 8
+WF f2 5
+RF f2 1 1 A
+RF f2 2 1 B
+ADD A B
 HT
