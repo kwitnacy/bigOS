@@ -15,7 +15,7 @@ public class File {
         this.userName = ""; //????????????
         this.size = 0;     
         this.index = -1;    //żeby przy alokacji mozna było rozpoznać czy ma już przydzielony indeks czy nie
-        //czy cos zrobić z semaforem w konstruktorze    ????
+        //this.s = new Semaphore(1);
     }
 
     //gettery

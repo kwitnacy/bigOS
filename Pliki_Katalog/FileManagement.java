@@ -142,16 +142,19 @@ public class FileManagement {
     {
         File ftemp = disk.fileSystem.root.getFileByName(fileName);
         String output = new String();  //tu będą zapisane zczytane dane
-        int index = ftemp.getIndex();
         int size = ftemp.getSize();
+        int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
-        int tempindex = index;
         
         //Ściąganie indeksów bloków pliku z FAT
-        do{
+        blocks.add(tempindex);
+        while(tempindex != -1){
             tempindex = disk.fileSystem.FAT[tempindex];
             blocks.add(tempindex);
-        }while(tempindex != -1);
+        }
+        blocks.removeLast();
+        
+        System.out.println("Pobrane nr blokow: " + blocks);
         
         //Numer indeksu w pliku od którego mamy czytać
         Double fromIndex = Math.floor(howMany/32);
@@ -160,7 +163,7 @@ public class FileManagement {
         Double toIndex = Math.floor((from+howMany)/32);
         
         //Pozycja czytania
-        int readPosition = from;
+        int readPosition = fromIndex.intValue() + from;
         
         String buffer = new String();
         Double bufferIndex = new Double(-1);
@@ -182,8 +185,33 @@ public class FileManagement {
     }
     
     //zczytywanie zawartości całego pliku o podanej nazwie
-    public void readFile(String fileName) //odczytywanie wszystkich danych z dysku
-    {}
+    public String readFile(String fileName) //odczytywanie wszystkich danych z dysku
+    {
+        File ftemp = disk.fileSystem.root.getFileByName(fileName);
+        String output = new String();  //tu będą zapisane zczytane dane
+        int size = ftemp.getSize();
+        int tempindex = ftemp.getIndex();
+        LinkedList<Integer> blocks = new LinkedList();
+        
+        //Ściąganie indeksów bloków pliku z FAT
+        blocks.add(tempindex);
+        while(tempindex != -1){
+            tempindex = disk.fileSystem.FAT[tempindex];
+            blocks.add(tempindex);
+        }
+        blocks.removeLast();
+        
+        System.out.println("Pobrane nr blokow: " + blocks);
+        String buffer = new String();
+        
+        for(int i = blocks.getFirst(); i <= blocks.getLast(); i++){
+           Double d = new Double(i);
+           buffer = new String(disk.getBlock(d));
+           output = output.concat(buffer);
+        }
+        System.out.println("Oto przeczytany plik: " + output);
+        return output;
+    }
     
     public void readAll() //odczytywanie wszystkich danych z dysku
     {}
