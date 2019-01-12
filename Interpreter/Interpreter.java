@@ -1,4 +1,4 @@
-package Interpreter;
+ package Interpreter;
 import projekt_so.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
@@ -17,9 +17,11 @@ public class Interpreter {
     public Interpreter(FileManagement fileManagement)
     {
         /*if (!loadToMemory(filename)){
+            System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
             Scheduler.running.change_state(State.Terminated);
         }*/
         //else {
+            //Scheduler.running.change_state(State.Running);
             PID = projekt_so.Scheduler.running.get_PID();
             base = projekt_so.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -39,8 +41,9 @@ public class Interpreter {
         Scheduler.running.set_CX(C);
         Scheduler.running.set_DX(D);
     }
-    public void display()
+    private void display()
     {
+        System.out.println("Stan po wykonanym rozkazie ");
         System.out.println("PID: "+PID);
         System.out.println("rejestr A: "+A);
         System.out.println("rejestr B: "+B);
@@ -104,17 +107,12 @@ public class Interpreter {
         }
         Pattern dane4 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*\\s(\\[*\\w+]*))");
         Matcher dane4matcher = dane4.matcher(calyRozkaz);
-        if (dane3matcher.matches()) {
+        if (dane4matcher.matches()) {
             x = dane3matcher.group(2);
             y = dane3matcher.group(3);
             z = dane3matcher.group(4);
             xx = dane3matcher.group(5);
         }
-        //if(!rozkaz.equals("AD")&&!rozkaz.equals("MO")&&itd.)
-        //{
-        //System.out.println("Blad. Nie ma takiego rozkazu. Koniec programu");
-        Scheduler.running.change_state(State.Terminated);
-        //}
         Pattern etykieta = Pattern.compile("\\w+:");
         Matcher etykietamatcher = etykieta.matcher(calyRozkaz);
         switch (rozkaz) {
@@ -176,7 +174,7 @@ public class Interpreter {
                         }
                     }
                     else {
-                        System.out.println("Bledny rozkaz. Koniec programu");
+                        System.out.println("Bledny rozkaz - czwarty argument niezgodny. Koniec programu");
                         Scheduler.running.change_state(State.Terminated);
                     }
                 }
@@ -198,13 +196,27 @@ public class Interpreter {
                 //SM [nazwa/PID procesu odbiorcy] [rozmiar wiadomości] [adres]
                 Pattern adres = Pattern.compile("\\[\\d+]");
                 Matcher adresmatcher = adres.matcher(z);
+                Pattern pid = Pattern.compile("\\d+");
+                Matcher pidmatcher = pid.matcher(x);
                 if (adresmatcher.matches())
                 {
-                    Scheduler.running.send_message(Integer.parseInt(x),Integer.parseInt(y),Integer.parseInt(z));
+                    if (pidmatcher.matches()) {
+                        Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z));
+                    }
+                    else{
+                        Scheduler.running.send_message(x, Integer.parseInt(y), Integer.parseInt(z));
+
+                    }
                 }
                 else
                 {
-                    Scheduler.running.send_message(Integer.parseInt(x),Integer.parseInt(y),z);
+                    if (pidmatcher.matches()) {
+                        Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), z);
+                    }
+                    else{
+                        Scheduler.running.send_message(x, Integer.parseInt(y), z);
+
+                    }
                 }
                 break;
             }
@@ -247,7 +259,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(x);
         if (!rejestrmatcher.matches()&&!adresmatcher.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         if(rejestrmatcher.matches())
@@ -275,6 +287,10 @@ public class Interpreter {
         }
         else if(adresmatcher.matches())
         {
+            if (readMemory(Integer.parseInt(x))==0){
+                System.out.println("Blad. Proba dzielenia przez zero. Koniec programu");
+                Scheduler.running.change_state(State.Terminated);
+            }
             A = A/readMemory(Integer.parseInt(x));
             D = D%readMemory(Integer.parseInt(x));
         }
@@ -288,7 +304,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(x);
         if (!rejestrmatcher.matches()&&!adresmatcher.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         if (rejestrmatcher.matches()) {
@@ -309,15 +325,13 @@ public class Interpreter {
                     D++;
                     break;
                 }
-                default:
-                    break;
             }
         }
         else if (adresmatcher.matches())
         {
             if(Integer.parseInt(x)>base + limit)
             {
-                System.out.println("Blad. Koniec programu");
+                System.out.println("Blad. Proba wyjscoa poza pamiec programu. Koniec programu");
                 Scheduler.running.change_state(State.Terminated);
             }
             else
@@ -334,12 +348,12 @@ public class Interpreter {
         Matcher jumpmatcher = jump.matcher(x);
         if (!jumpmatcher.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         if (base+Integer.parseInt(x) > base + limit)
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Blad. Proba wyjscoa poza pamiec programu. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         else
@@ -359,12 +373,12 @@ public class Interpreter {
         Matcher adresmatcherx = adres.matcher(x);
         if (!rejestrmatcherx.matches()&&!adresmatcherx.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         if(!liczbamatcher.matches()&&!adresmatchery.matches()&&!rejestrmatchery.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         if(liczbamatcher.matches())
@@ -503,7 +517,7 @@ public class Interpreter {
         Matcher rejestrmatchery = rejestr.matcher(y);
         if (!rejestrmatcherx.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         Pattern liczba = Pattern.compile("\\d+");
@@ -512,7 +526,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(y);
         if(!liczbamatcher.matches()&&!adresmatcher.matches()&&!rejestrmatchery.matches())
         {
-            System.out.println("Blad. Koniec programu");
+            System.out.println("Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
         }
         if(liczbamatcher.matches())
@@ -644,4 +658,11 @@ public class Interpreter {
 2) przepisywanie do plików wybranych wartości, sumowanie danych z pliku,
 
 Wg Moodle'a, jeszcze dopracuje
-3) różne sposoby komunikacji międzyprocesowej, odpowiedniki wait/exit???*/
+3) różne sposoby komunikacji międzyprocesowej, odpowiedniki wait/exit???
+
+Musze jeszcze ogarnac:
+.data i .text!
+User - skad? (potrzebuje do tworzenia plikow)
+ReadMessage - skad wielkosc wiadomosci ktora odczytuje
+Zapisywanie danych do pamieci*/
+
