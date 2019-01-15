@@ -31,4 +31,10 @@ public class FileSystem {
         }
         return freeB;
     }
+    
+    public void displayFAT(){
+        for(int i : FAT){
+            System.out.print(i + " ");
+        }System.out.println("");
+    }
 }

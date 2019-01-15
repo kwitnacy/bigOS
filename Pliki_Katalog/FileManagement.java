@@ -29,6 +29,10 @@ public class FileManagement {
     
     //metody do zarządzana plikami
     
+    public void printFAT(){
+        disk.fileSystem.displayFAT();
+    }
+    
     public void signalFile(String file_name)
     {
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
@@ -67,20 +71,6 @@ public class FileManagement {
            System.out.println();
     }
     
-    public int delete(String name) //usunięcie pliku
-    {
-        if(properFileName(name) == false){
-            return 1;   //niepoprawna nazwa pliku
-        }
-        if(disk.fileSystem.root.deleteFromRoot(name)==false){
-            System.out.println("File not found in the root.");
-            return 2;   //pliku o podanej nazwie nie ma w katalogu
-        }
-        disk.fileSystem.root.deleteFromRoot(name);      //usunięcie pliku o podanej nazwie z katalogu
-        return 0;   //poprawne usunięcie
-        
-    }
-    
     public int write(String name, String data) //zapis/dopisanie do pliku
     {
         int sizeBytes = data.length();   //tyle bajtów zajmuje
@@ -95,6 +85,7 @@ public class FileManagement {
         if(properFileName(name) == false && blocks > disk.fileSystem.checkFreeBlocks()) return 4;    //błędna nazwa i za duże dane
         
         File ftemp = disk.fileSystem.root.getFileByName(name);
+        
         ftemp.setSize(blocks);
 
         char[] dat = data.toCharArray();    //dane zapisane w tablicy char[]
@@ -108,15 +99,23 @@ public class FileManagement {
             if(freeB.size()==blocks) break;     //dzięki temu wektor będzie zawierał odpowiednią liczbę bloków potrzebnych dla danego pliku
         }
         
-        
         freeB.add(-1);
-        if(ftemp.getIndex() == -1) { ftemp.setIndex(freeB.getFirst()); }
-        int index = freeB.getFirst();
-        //zapis na pozostałe bloki dyskowe
+        int index;
+        if(ftemp.getIndex() == -1) { 
+            ftemp.setIndex(freeB.getFirst());
+            index = freeB.getFirst();
+        }
+        else{
+            index = ftemp.getIndex();
+            while(disk.fileSystem.FAT[index]!=-1){
+                index = disk.fileSystem.FAT[index];
+            }
+        }
+        
+        //zapis na bloki dyskowe
         int dataPos = 0;
         if(freeB.size()<0) System.out.println("DUPA");
         for(int i = 0; i < freeB.size(); i++){
-            
             disk.fileSystem.FAT[index] = freeB.get(i);  //następny wolny indeks
             index = freeB.get(i);
             if(index == -1) { break; }
@@ -142,7 +141,7 @@ public class FileManagement {
     {
         File ftemp = disk.fileSystem.root.getFileByName(fileName);
         String output = new String();  //tu będą zapisane zczytane dane
-        int size = ftemp.getSize();
+        //int size = ftemp.getSize();
         int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
         
@@ -180,16 +179,15 @@ public class FileManagement {
             readPosition++;
         }
 
-       
         return output;
     }
     
-    //zczytywanie zawartości całego pliku o podanej nazwie
+    //czytanie zawartości całego pliku o podanej nazwie
     public String readFile(String fileName) //odczytywanie wszystkich danych z dysku
     {
         File ftemp = disk.fileSystem.root.getFileByName(fileName);
         String output = new String();  //tu będą zapisane zczytane dane
-        int size = ftemp.getSize();
+        //int size = ftemp.getSize();
         int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
         
@@ -202,15 +200,54 @@ public class FileManagement {
         blocks.removeLast();
         
         System.out.println("Pobrane nr blokow: " + blocks);
-        String buffer = new String();
+        String buffer;
         
-        for(int i = blocks.getFirst(); i <= blocks.getLast(); i++){
+        for(int i : blocks){
            Double d = new Double(i);
            buffer = new String(disk.getBlock(d));
            output = output.concat(buffer);
         }
         System.out.println("Oto przeczytany plik: " + output);
         return output;
+    }
+    
+    public int delete(String name) //usunięcie pliku
+    {
+        if(properFileName(name) == false){
+            return 1;   //niepoprawna nazwa pliku
+        }
+        if(disk.fileSystem.root.checkExistance(name)==false){
+            System.out.println("File not found in the root.");
+            return 2;   //pliku o podanej nazwie nie ma w katalogu
+        }
+        
+        disk.fileSystem.root.printRoot();               
+        File ftemp = disk.fileSystem.root.getFileByName(name);
+        //int size = ftemp.getSize();
+        int tempindex = ftemp.getIndex();
+        LinkedList<Integer> blocks = new LinkedList();
+        
+        //Ściąganie indeksów bloków pliku z FAT
+        blocks.add(tempindex);
+        while(tempindex != -1){
+            tempindex = disk.fileSystem.FAT[tempindex];
+            blocks.add(tempindex);
+        }
+        blocks.removeLast();
+        
+        System.out.println("Pobrane nr blokow: " + blocks);
+        
+        for(int i : blocks){
+           Double d = new Double(i);
+           disk.clearBlock(d);
+            System.out.println("Opróżniono " + i + "ty blok.");
+        }
+        
+        disk.fileSystem.root.deleteFromRoot(name);      //usunięcie pliku o podanej nazwie z katalogu
+
+        
+        return 0;   //poprawne usunięcie
+        
     }
     
     public void readAll() //odczytywanie wszystkich danych z dysku

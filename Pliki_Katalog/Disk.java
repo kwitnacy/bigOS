@@ -26,4 +26,12 @@ public class Disk {
         }
         return block;
     }
+    
+    public void clearBlock(Double blockNr){
+        int blocknr = blockNr.intValue();
+        for(int i = blocknr*32; i <= (blockNr+1)*32 - 1; i++){
+            data[i] = ' ';
+        }
+    }
+        
 }

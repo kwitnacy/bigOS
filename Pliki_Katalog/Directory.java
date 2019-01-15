@@ -36,7 +36,7 @@ public class Directory {
     
     public boolean deleteFromRoot(String fileName){       //usuwanie pliku o podanej nazwie z katalogu
         for(File f : root){
-            if(this.checkExistance(fileName) == true){ 
+            if(checkExistance(fileName) == true && f.getName().equals(fileName)){ 
                 root.remove(f);
                 return true;    //poprawna nazwa i usunięcie FCB z katalogu
             }
@@ -48,7 +48,7 @@ public class Directory {
     public File getFileByName(String fName){
         if(checkExistance(fName) == true){
             for(File f : root){
-                if(f.getName() == fName) return f;  //zwraca żądany plik
+                if(f.getName().equals(fName)) return f;  //zwraca żądany plik
             }
         }
         return null;

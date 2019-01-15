@@ -34,6 +34,5 @@ public class File {
 
     public void setUserName(String userName) { this.userName = userName; }
      
-    public void setSize(Integer size) { this.size = size; }
-    
+    public void setSize(Integer size) { this.size += size; }
 }
