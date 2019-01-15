@@ -1,5 +1,7 @@
 package Procesy;
 
+import Processor.Scheduler;
+
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,11 +22,13 @@ public class Process_container {
     public Process_container(){
         counter = 1;
         processes = new ConcurrentHashMap<Integer, Process>();
-        taken_names = new Vector<>();
+        names = new ConcurrentHashMap<String, Integer>();
 
-        taken_names.add("dumpy");
-        Process temp = new Process("dumpy", "", 0, 0);
+        taken_names = new Vector<>();
+        taken_names.add("dummy");
+        Process temp = new Process("dummy", "d1", 0, 0);
         processes.put(0, temp);
+        Scheduler.add(temp);
     }
 
     public static void create_process(String name, String file_name, int priority){
@@ -132,22 +136,12 @@ public class Process_container {
 
     public static void delete(int PID){
         Process temp = get_by_PID(PID);
-
-        /*
-         *      USUWANIE Z CPU
-         */
-
         System.out.println("usuwanie " + temp.get_name());
         processes.values().remove(temp);
     }
 
-    void add_to_CPU(int PID){
-        boolean flag = false;
-
-        /*
-         *      DODAWNIE DO CPU
-         */
-
+    public static void add_to_CPU(int PID){
+        Scheduler.add(get_by_PID(PID));
     }
 
     int size(){
