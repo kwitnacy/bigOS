@@ -17,6 +17,10 @@ public class Disk {
         return 32*32;
     }
     
+    public char getByte(int index){
+        return data[index];
+    } 
+    
     public char[] getBlock(Double blockNr){
         int blocknr = blockNr.intValue();
         char[] block = new char[32];

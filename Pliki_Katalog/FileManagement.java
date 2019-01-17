@@ -86,7 +86,7 @@ public class FileManagement {
         
         File ftemp = disk.fileSystem.root.getFileByName(name);
         
-        ftemp.setSize(blocks);
+        ftemp.setSize(blocks*32);
 
         char[] dat = data.toCharArray();    //dane zapisane w tablicy char[]
         
@@ -156,26 +156,27 @@ public class FileManagement {
         System.out.println("Pobrane nr blokow: " + blocks);
         
         //Numer indeksu w pliku od którego mamy czytać
-        Double fromIndex = Math.floor(howMany/32);
+        Double fromIndex = Math.floor(from/32);
         
         //Końcowy indeks w pliku do którego mamy czytać
         Double toIndex = Math.floor((from+howMany)/32);
         
         //Pozycja czytania
-        int readPosition = fromIndex.intValue() + from;
+        int readPosition = blocks.get(fromIndex.intValue())*32 + from%32;
+        int stopPosition = blocks.get(toIndex.intValue())*32 +(from+howMany)%32;
         
-        String buffer = new String();
-        Double bufferIndex = new Double(-1);
+        //String buffer = new String();
+        //Double bufferIndex = new Double(-1);
         
         //Pętla czytania
-        while(readPosition < from + howMany){
+        while(readPosition < stopPosition){
             //Aktualizacja bufora
-            if(bufferIndex != Math.floor(readPosition/32)) {
-                bufferIndex = Math.floor(readPosition/32);
-                buffer = new String(disk.getBlock(bufferIndex));
-            }
+//            if(bufferIndex != Math.floor(readPosition/32)) {
+//                bufferIndex = Math.floor(readPosition/32);
+//                buffer = new String(disk.getBlock(bufferIndex));
+//            }
             
-            output = output.concat(Character.toString(buffer.charAt(readPosition%32)));
+            output = output.concat(Character.toString(disk.getByte(readPosition)));
             readPosition++;
         }
 

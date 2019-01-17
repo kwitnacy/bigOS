@@ -24,10 +24,15 @@ public class FileModule {
         filemanagement.printDisk();
         filemanagement.displayRoot();
         
-        String output = new String();
-        output = filemanagement.readFile("f1");
         
-        filemanagement.delete("f2");
+        System.out.println("");
+        System.out.println("");
+        
+        String output;
+        output = filemanagement.read("f1", 4, 20);
+        System.out.println(output);
+        
+        //filemanagement.delete("f2");
         filemanagement.printDisk();
         filemanagement.displayRoot();
     }
