@@ -1,5 +1,5 @@
  package Interpreter;
-import projekt_so.Scheduler;
+import Processor.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
 import filemodule.FileManagement;
@@ -22,8 +22,8 @@ public class Interpreter {
         }*/
         //else {
             //Scheduler.running.change_state(State.Running);
-            PID = projekt_so.Scheduler.running.get_PID();
-            base = projekt_so.Scheduler.running.get_base();
+            PID = Processor.Scheduler.running.get_PID();
+            base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
             A = Scheduler.running.get_AX();
             B = Scheduler.running.get_BX();

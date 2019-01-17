@@ -19,7 +19,6 @@ public class Process {
 
     //  Messages
     private Message last_message;               //  Ostatnia przeczytana wiadomosci
-    private int message_addr;                   //  Adres logiczny ostatnio przeczytanej wiadomości
     private Queue<Message> messages_queue;      //  Kolejka odebranych wiadomości
     private Semaphore messages_semaphore;       //  Semafor kontrolujący odczytywanie wiadomości
 
@@ -40,7 +39,6 @@ public class Process {
         this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
         this.last_message = new Message(-1,-1,null);
-        this.message_addr = -1;
 
         this.program_counter = 0;
 
@@ -61,7 +59,6 @@ public class Process {
         this.messages_queue = new ArrayDeque<Message>();
         this.messages_semaphore= new Semaphore(0);
         this.last_message = new Message(-1,-1,null);
-        this.message_addr = -1;
 
         this.program_counter = 0;
 
@@ -201,25 +198,31 @@ public class Process {
     }
 
     public boolean send_message(String receiverName,int size, int addres){
-        Process p = Process_container.get_by_name(receiverName);
-        /// wyszukiwanie procesu po imieniu
 
-        if(p!=null){
-            return send_message(p.get_PID(),size,addres);
-            /// znaleziono proces, podaj dalej do odpowiednej funkcji
+        if(Process_container.get_by_name(receiverName)!=null){
+            return send_message(Process_container.get_by_name(receiverName).get_PID(),size,addres);
+            /// odnaleziono proces, przekazano do odpowieniej funkcji
         }
-        return false;
-        /// nie ma takiego procesu
+        else{
+            System.out.println("[SM] Sending failure!");
+            System.out.println("[SM] Invalid receiver name!");
+            return false;
+            /// nie ma takiego procesu
+        }
     }
     public boolean send_message(int receiverPID,int size, int addres){
-
         String text="";
-
         int counter=0;
-        while(Memory.readMemory(addres+1+counter)!='\0'){
-            text+=Memory.readMemory(addres+1+counter);
-            counter++;
-        }
+
+//        while(Message.read_ram(addres+1+counter)!='$'){
+//            text+=Message.read_ram(addres+1+counter);
+//            counter++;
+//            if(addres+1+counter>=128){
+//                System.out.println("[SM] Sending failure!");
+//                System.out.println("[SM] Invalid initial addres!");
+//                return false;
+//            }
+//        }
         /// wczytaj tekst wiadomości
 
         return send_message(receiverPID,size,text);
@@ -227,61 +230,85 @@ public class Process {
     }
 
     public boolean send_message(String receiverName,int size, String text){
-        Process p = Process_container.get_by_name(receiverName);
-        /// wyszukiwanie procesu po imieniu
 
-        if(p!=null){
-            return send_message(p.get_PID(),size,text);
-            /// znaleziono proces, podaj dalej do odpowiednej funkcji
-        }
-        return false;
-        /// nie ma takiego procesu
-    }
-    public boolean send_message(int receiverPID,int size, String text){
-
-        Process p= Process_container.get_by_PID(receiverPID);
-        Message msg=new Message(receiverPID,size,text);
-
-        if(p!=null){
-            p.messages_queue.add(msg);
-            /// dodaj wiadomość do kolejki procesu odbiorcy
-
-            p.get_messages_semaphore().signal_s();
-            /// wykonaj signal na semaforze odbiotcy aby pokazać że jest wiadomość do przeczytania
-
-            System.out.println("[SEND] PID:"+msg.get_sender_PID()+" Size:"+msg.get_size()+" Text:"+msg.get_text());
-            /// wyswietlanie budowy wysyłanej wiadomości
-
-            return true;
-            /// wysylanie wiadomosci powiodlo sie
+        if(Process_container.get_by_name(receiverName)!=null){
+            return send_message(Process_container.get_by_name(receiverName).get_PID(),size,text);
+            /// odnaleziono proces, podaj dalej do odpowiednej funkcji
         }
         else{
+            System.out.println("[SM] Sending failure!");
+            System.out.println("[SM] Invalid receiver name!");
             return false;
-            ///błąd, nie znaleziono procesu
+            /// nie ma takiego procesu
         }
     }
+    public boolean send_message(int receiverPID,int size, String text){
+        Process p;
+        if(Process_container.get_by_PID(receiverPID)!=null){
+            p = Process_container.get_by_PID(receiverPID);
+            /// odnaleziono proces
+        }
+        else{
+            System.out.println("[SM] Sending failure!");
+            System.out.println("[SM] Invalid receiver PID!");
+            return false;
+            /// nie ma takiego procesu
+        }
+        Message msg=new Message(this.PID,size,text);
 
-    public void read_message(int size){
+        if(text.contains("$")){
+            System.out.println("[SM] Sending failure!");
+            System.out.println("[SM] Invalid character in text!");
+            return false;
+        }
+
+        p.messages_queue.add(msg);
+        /// dodaj wiadomość do kolejki procesu odbiorcy
+
+        p.get_messages_semaphore().signal_s();
+        /// wykonaj signal na semaforze odbiotcy aby pokazać że jest wiadomość do przeczytania
+
+        System.out.println("[SM] Succesfully sent message!");
+        System.out.println("[SM] PID:"+msg.get_sender_PID()+" Size:"+msg.get_size()+" Text:"+msg.get_text());
+        /// wyswietlanie budowy wysyłanej wiadomości
+        return true;
+    }
+
+    public boolean read_message(int size, int addres){
 
         this.messages_semaphore.wait_s(this.PID);
         /// operacja na semaforze (sprawdza czy są wiadomości do odebrania, jeżeli nie ma to robi czekanko)
 
+        if(this.state==State.Waiting) {
+            System.out.println("[RM] Reading failure!");
+            System.out.println("[RM] There are no messages to read!");
+            return false;
+        }
         this.last_message=this.messages_queue.poll();
         /// wyciąganie wiadomości z kolejki z usunięciem do zmiennej PCB last_message
 
-        this.message_addr=this.limit-size-2;
-        /// koniec pamięci procesu - rozmiar wiadomości -2(PID nadawcy i znak końca stringa)
-
-        String ram_msg = (char)last_message.get_sender_PID() + last_message.get_text() + '\0';
+        String ram_msg = (char)last_message.get_sender_PID()+last_message.get_text()+'$';
         /// przykładowy zapis wiadomości o treści "bigos" pochodzącej od procesu o pid 12
-        /// [char 12][b][i][g][o][s][\0]
+        /// [char 12][b][i][g][o][s][$]
 
         for(int i=0; i<ram_msg.length();i++){
-            //write(msessage_addr+i,ram_msg.charAt(i));
+            if(addres+i>=128){
+                System.out.println("[RM] Reading failure!");
+                System.out.println("[RM] Reached end of memory!");
+                return false;
+            }
+            else{
+                //Message.write_to_ram(addres+i,ram_msg.charAt(i));
+            }
         }
         /// pętla zapisująca wiadomość
 
-        System.out.println("[RM FUNCTION] Sender: "+ram_msg.charAt(0)+" Text: "+ram_msg.substring(1,ram_msg.length()));
+        int written_pid=ram_msg.charAt(0);
+        /// trzeba zrobić taką zmienną żeby sie dobrze wyświetlało
+
+        System.out.println("[RM] Succesfully read message!");
+        System.out.println("[RM] Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
         ///wyświetlanie budowy wiadomości, identycznie powinna wyglądać w RAM'ie
+        return true;
     }
 }
