@@ -92,19 +92,21 @@ public class Memory {
     }
 
     public static void printMemory(){
-        for(int i=0;i<32;i++){
+		int free,filled;
+	  for(int i=0;i<32;i++){
             //if(!(memory[i]==' ' && memory[i+1]==' '))
             System.out.println(i + ": " + memory[i] + "\t\t"
                     + (i+32) + ": " + memory[i+32]+ "\t\t"
                     + (i+64) + ": " + memory[i+64]+ "\t\t"
                     + (i+96) + ": " + memory[i+96]);
+					
         }
     }
 
     //przesuwanie blokow
     public static void move(){
     }
-
+	
     public static void main(String[] args){
                  Arrays.fill(memory,' ');
                  memory[127]='s';
