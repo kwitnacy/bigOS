@@ -6,14 +6,19 @@ import java.util.Scanner;
 import java.io.FileNotFoundException;
 import static java.lang.Math.toIntExact;
 
+/*TODO: 1: dodawanie względem map
+        2: usuwanie   --chyba jest
+        3: przesuwanie
+        4: wiadomosci
+*/
 public class Memory {
 
     public static char[] memory = new char[256];
 
-    public static Map<Integer,Integer> filledSpace = new HashMap<>();
-    public static Map<Integer,Integer> freeSpace = new HashMap<>();
+    private static Map<Integer,Integer> filledSpace = new HashMap<>();
+    private static Map<Integer,Integer> freeSpace = new HashMap<>();
 
-    public static Integer check(Integer size){   //czy jest miejsce na proces
+    private static Integer check(Integer size){
         Integer licznik=0,index=-1;
 
         for(int i=0;i<256;i++) {
@@ -24,23 +29,21 @@ public class Memory {
             if(licznik==size+10){
                 index= i - licznik + 1;
                 //filledSpace.put(index,size+10);
-                //System.out.println(filledSpace.entrySet());
                 return index;
             }
         }
         return index;
     }
 
-    //zapis do pamieci
     public static void loadProgram(String fileName){
-
         File file = new File(fileName);
         long length = file.length();
         int check = check(toIntExact(length)+10);
+        Integer next=0;
         if (check >= 0) {
             try{
                 Scanner skaner= new Scanner(file);
-                int next=0;
+
                 while(skaner.hasNextLine()){
                     String line= skaner.nextLine();
 
@@ -53,18 +56,19 @@ public class Memory {
             }catch(FileNotFoundException e){
                 e.printStackTrace();
             }
-        }
-
+        }filledSpace.put(check,next);
+        System.out.println(filledSpace.entrySet());
     }
-    //odczyt z pamieci
     public static char readMemory(Integer adress){
         return memory[adress];
     }
-    public static void removeMemory(Integer base,Integer limit) {
-        for(int i=base;i<base+limit;i++){
-            memory[i] = ' ';
+
+    public static void removeProgram(Integer base) {
+        int limit = filledSpace.get(base);
+        for(int i=base;i<base + limit; i++){
+            memory[i]=' ';
         }
-        // list freeSpace
+        filledSpace.remove(base);
     }
 
     public static void printMemory(){
@@ -75,14 +79,11 @@ public class Memory {
                     + (i+128) + ": " + memory[i+128]+ "\t\t\t"
                     + (i+192) + ": " + memory[i+192]);
         }
-        for(int i=0;i<128;i++){
-            int wolne=0,zajete=0;
-            //if()
 
-        }
+        int zajete = filledSpace.values().stream().reduce(0, Integer::sum);
+        System.out.println("Wolne miejsce: " + (256-zajete) + "\nZajete miejsce: " + zajete);
     }
 
-    //przesuwanie blokow
     public static void move(){
     }
 
@@ -91,6 +92,9 @@ public class Memory {
 
                     loadProgram("src/p1.txt");
                     loadProgram("src/p0.txt");
+                    loadProgram("src/p2.txt");
+                    loadProgram("src/p3.txt");
+                    //removeProgram(0);
                  printMemory();
     }
 
