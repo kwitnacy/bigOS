@@ -1,84 +1,60 @@
-package RAM;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.io.File;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
+import static java.lang.Math.toIntExact;
 
 public class Memory {
-    public class Pair {
-        private Integer base;
-        private Integer limit;
 
-        public Pair(Integer base, Integer limit) {
-            this.base = base;
-            this.limit = limit;
-        }
+    public static char[] memory = new char[256];
 
-        public Integer getBase() {
-            return base;
-        }
-
-        public Integer getLimit() {
-            return limit;
-        }
-
-        public void setBase(Integer base) {
-            this.base = base;
-        }
-
-        public void setLimit(Integer limit) {
-            this.limit = limit;
-        }
-    }
-
-    //tablica ram11
-    public static char[] memory = new char[128];
-
-
-    List<Pair> filledSpace = new ArrayList<>();
-    List<Pair> freeSpace = new ArrayList<>();
-    Pair tmp = new Pair(5,4);
-
+    public static Map<Integer,Integer> filledSpace = new HashMap<>();
+    public static Map<Integer,Integer> freeSpace = new HashMap<>();
 
     public static Integer check(Integer size){   //czy jest miejsce na proces
-
         Integer licznik=0,index=-1;
 
-        for(int i=0;i<128;i++) {
+        for(int i=0;i<256;i++) {
             if (memory[i] == ' ') {
                 licznik++;
-            } else {////do poprawy
-                if (licznik >= size + 10) {
-                    index = i - licznik;
-                    return index;
-                }
+              //  System.out.println(licznik);
+            }else licznik=0;
+            if(licznik==size+10){
+                index= i - licznik + 1;
+                //filledSpace.put(index,size+10);
+                //System.out.println(filledSpace.entrySet());
+                return index;
             }
         }
-
         return index;
     }
 
     //zapis do pamieci
-    public static void writeMemory(String value) {
-        Integer check = check(value.length());
-        //System.out.println(check);
-        //System.out.println(value.length());
-        if (check >= 0) {
-            int index=0;
-            for (int i = check; i < value.length() + check; i++) {
-                memory[i] = value.charAt(index);
-                index++;
-            }
-            //filed.add ?luyi!?kuk!?jyt!?!??fafasdsd!?!?@?1#?2E?A?Fsdnfuizdsbfokad
+    public static void loadProgram(String fileName){
 
-        } else {
-            move();
-            if (check > 0) {
-                for (int i = check; i <= value.length(); i++) {
-                    memory[i] = value.charAt(i);
+        File file = new File(fileName);
+        long length = file.length();
+        int check = check(toIntExact(length)+10);
+        if (check >= 0) {
+            try{
+                Scanner skaner= new Scanner(file);
+                int next=0;
+                while(skaner.hasNextLine()){
+                    String line= skaner.nextLine();
+
+                    int index=0;
+                    for(int i=check + next ;i< check +next + line.length();i++){
+                        memory[i]=line.charAt(index);
+                        index++;
+                    }next+=line.length();
                 }
-            } else System.out.println("Error"); //semafor wait
+            }catch(FileNotFoundException e){
+                e.printStackTrace();
+            }
         }
+
     }
     //odczyt z pamieci
     public static char readMemory(Integer adress){
@@ -92,28 +68,29 @@ public class Memory {
     }
 
     public static void printMemory(){
-		int free,filled;
-	  for(int i=0;i<32;i++){
+        for(int i=0;i<64;i++){
             //if(!(memory[i]==' ' && memory[i+1]==' '))
-            System.out.println(i + ": " + memory[i] + "\t\t"
-                    + (i+32) + ": " + memory[i+32]+ "\t\t"
-                    + (i+64) + ": " + memory[i+64]+ "\t\t"
-                    + (i+96) + ": " + memory[i+96]);
-					
+            System.out.println(i + ": " + memory[i] + "\t\t\t"
+                    + (i+64) + ": " + memory[i+64]+ "\t\t\t"
+                    + (i+128) + ": " + memory[i+128]+ "\t\t\t"
+                    + (i+192) + ": " + memory[i+192]);
+        }
+        for(int i=0;i<128;i++){
+            int wolne=0,zajete=0;
+            //if()
+
         }
     }
 
     //przesuwanie blokow
     public static void move(){
     }
-	
+
     public static void main(String[] args){
                  Arrays.fill(memory,' ');
-                 memory[127]='s';
-                 writeMemory("bamboszek");
-                 writeMemory("JM 144");
-                 writeMemory("MO 15 26");
 
+                    loadProgram("src/p1.txt");
+                    loadProgram("src/p0.txt");
                  printMemory();
     }
 
