@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import Procesy.Process;
+import Procesy.State;
 
 public class Scheduler
 {
@@ -46,17 +48,17 @@ public class Scheduler
 		}
 		else
 		{
-		queuesPCB.get(toAdd.get_temp_priority()-1).add(toAdd);
-		if(toAdd.get_base_priority() == toAdd.get_temp_priority())
-		{
-			System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID() 
-			+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
-		}
-		else 														// nie wiem czy pisać że dodałem proces do kolejki, skoro to reorganizacja
-		{
-//			System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID() 
-//			+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
-		}
+			queuesPCB.get(toAdd.get_temp_priority()-1).add(toAdd);
+			if(toAdd.get_base_priority() == toAdd.get_temp_priority())
+			{
+				System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
+				+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
+			}
+			else 														// nie wiem czy pisać że dodałem proces do kolejki, skoro to reorganizacja
+			{
+	//			System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
+	//			+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
+			}
 		}
 
 		if(toAdd.get_temp_priority() > running.get_temp_priority() || running.get_state() == State.Terminated)
@@ -140,8 +142,7 @@ public class Scheduler
 						System.out.println("Procesor: Wywlaszczylem procesor dla procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 						+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
 						running.change_state(State.Ready);
-						if(running.get_temp_priority() != 0)
-						{
+						if(running.get_temp_priority() != 0){
 							add(running); //skoro dodajemy running do kolejki procesów gotowych to czy jej liczniki zostały zapisane?
 						}
 						running = block;
@@ -158,7 +159,7 @@ public class Scheduler
 			running.change_state(State.Running);
 			System.out.println("Procesor: Przydzielilem procesor do procesu Dummy");
 		}
-		return;
+
 	}
 	
 	public void showReadyProcesses()								// wyswietlanie procesow gotowych - coś tu się ewidentnie popsuło, musze naprawić :<

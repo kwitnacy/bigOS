@@ -75,7 +75,7 @@ public class Process_container {
         Scheduler.add(temp);
     }
 
-    public void show_all_processes(){
+    public static void show_all_processes(){
         System.out.println("+-----------------------------------------+");
         for(int i = 0 ; i < processes.size() ; i++) {
             Process temp = processes.get(i);
