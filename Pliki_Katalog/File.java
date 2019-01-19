@@ -8,7 +8,7 @@ public class File {
     //public Semaphore s;
     private String name;                    //nazwa pliku
     private String userName;                //nazwa użytkownika
-    private Integer size, index;            //rozmiar pliku (bloki) i index początku pliku w tablicy FAT
+    private Integer size, index;            //rozmiar pliku (bajty) i index początku pliku w tablicy FAT
     
     public File() {
         this.name = "";       //format nazwy pliku: pierwsza mała litera, potem cyfra
