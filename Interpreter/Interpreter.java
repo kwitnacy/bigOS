@@ -1,4 +1,4 @@
- package Interpreter;
+package Interpreter;
 import Processor.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
@@ -9,6 +9,7 @@ import filemodule.FileManagement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Memory.loadProgram;
 import static Memory.readMemory;
 //Procesor tworzy obiekt i wywoluje funkcje executeProgram()
 public class Interpreter {
@@ -19,12 +20,17 @@ public class Interpreter {
     private Semaphore semaphore;
     public Interpreter(FileManagement fileManagement, Semaphore semaphore)
     {
-        /*if (!loadToMemory(filename)){
+            this.fileManagement = fileManagement;
+            this.semaphore = semaphore;
+            //tutaj pierwszy rozkaz programu
+    }
+    private void start(String filename) {
+        if (!loadProgram(filename)) {
             System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
             Scheduler.running.change_state(State.Terminated);
-        }*/
-        //else {
-            //Scheduler.running.change_state(State.Running);
+        } else {
+            Scheduler.running.change_state(State.Running);
+            program_counter = 0;
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -32,11 +38,8 @@ public class Interpreter {
             B = Scheduler.running.get_BX();
             C = Scheduler.running.get_CX();
             D = Scheduler.running.get_DX();
-            program_counter = 0;
-            this.fileManagement = fileManagement;
-            this.semaphore = semaphore;
-            getOrder(); //tutaj pierwszy rozkaz programu
-        //}
+            getOrder();
+        }
     }
     private void updateProcessor()
     {
@@ -77,11 +80,12 @@ public class Interpreter {
         }
         System.out.println("wykonywany rozkaz: "+rozkaz);
     }
-    public void executeProgram() //te funkcje powinien wywolywac procesor po stworzeniu obiektu
+    public void executeProgram(String filename) //te funkcje powinien wywolywac procesor po stworzeniu obiektu
     {
+        start(filename);
         while(!rozkaz.equals("HT"))
         {
-            //pierwszy rozkaz jest pobierany juz w konstruktorze
+            //pierwszy rozkaz jest pobierany juz w start()
             if(!executeOrder())
             {
                 return;
