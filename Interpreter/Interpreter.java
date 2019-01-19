@@ -1,20 +1,23 @@
  package Interpreter;
-import projekt_so.Scheduler;
+import Processor.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
+
+import Semaphore.Semaphore;
 import filemodule.FileManagement;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static RAM.Memory.readMemory;
+import static Memory.readMemory;
 //Procesor tworzy obiekt i wywoluje funkcje executeProgram()
 public class Interpreter {
 
     private int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
-    public Interpreter(FileManagement fileManagement)
+    private Semaphore semaphore;
+    public Interpreter(FileManagement fileManagement, Semaphore semaphore)
     {
         /*if (!loadToMemory(filename)){
             System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
@@ -22,8 +25,8 @@ public class Interpreter {
         }*/
         //else {
             //Scheduler.running.change_state(State.Running);
-            PID = projekt_so.Scheduler.running.get_PID();
-            base = projekt_so.Scheduler.running.get_base();
+            PID = Processor.Scheduler.running.get_PID();
+            base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
             A = Scheduler.running.get_AX();
             B = Scheduler.running.get_BX();
@@ -31,6 +34,7 @@ public class Interpreter {
             D = Scheduler.running.get_DX();
             program_counter = 0;
             this.fileManagement = fileManagement;
+            this.semaphore = semaphore;
             getOrder(); //tutaj pierwszy rozkaz programu
         //}
     }
@@ -78,14 +82,17 @@ public class Interpreter {
         while(!rozkaz.equals("HT"))
         {
             //pierwszy rozkaz jest pobierany juz w konstruktorze
-            executeOrder(); //wykonanie rozkazu
+            if(!executeOrder())
+            {
+                return;
+            }
             Scheduler.makeOlder(); //postarzanie procesu
             updateProcessor(); //zapisanie zmienionych wartosci rejestru
             display(); //wypisanie stanu procesora
             getOrder(); //odczytanie rozkazu z pamieci
         }
     }
-    private void executeOrder() {
+    private boolean executeOrder() {
         Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
         Matcher dane2matcher = dane2.matcher(calyRozkaz);
         String x = "", y = "", z = "", xx="";
@@ -117,19 +124,30 @@ public class Interpreter {
         Matcher etykietamatcher = etykieta.matcher(calyRozkaz);
         switch (rozkaz) {
             case "AD": {
-                add(x, y);
+                if(!add(x, y))
+                {
+                    return false;
+                }
                 break;
             }
             case "MO": {
-                mov(x, y);
+                if(!mov(x, y))
+                {
+                    return false;
+                }
                 break;
             }
             case "IC": {
-                increment(x);
+                if(!increment(x)){
+                 return false;
+                }
                 break;
             }
             case "JP": {
-                jump(x);
+                if (!jump(x))
+                {
+                 return false;
+                }
                 break;
             }
             case "HT": {
@@ -139,16 +157,19 @@ public class Interpreter {
             }
             case "CF": {
                 fileManagement.create(x, user);
-                //?????????????????? skad usera mam miec
+                // usera mam miec
                 program_counter++;
                 break;
             }
             case "WF": {
+                semaphore.wait_s(PID);
                 fileManagement.write(x, y);
+                semaphore.signal_s();
                 program_counter++;
                 break;
             }
             case "RF": {
+                semaphore.wait_s(PID);
                 if (xx.equals("")) {
                 System.out.println(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));}
                 else {
@@ -156,6 +177,11 @@ public class Interpreter {
                     Matcher rejestrmatcher = rejestr.matcher(xx);
                     if (rejestrmatcher.matches())
                     {
+                        if (fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z))==null)
+                        {
+                            Scheduler.running.change_state(State.Terminated);
+                            return false;
+                        }
                         if(x.equals("A"))
                         {
                             A = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
@@ -176,13 +202,17 @@ public class Interpreter {
                     else {
                         System.out.println("Bledny rozkaz - czwarty argument niezgodny. Koniec programu");
                         Scheduler.running.change_state(State.Terminated);
+                        return false;
                     }
                 }
+                semaphore.signal_s();
                 program_counter++;
                 break;
             }
             case "DF": {
+                semaphore.wait_s(PID);
                 fileManagement.delete(x);
+                semaphore.signal_s();
                 program_counter++;
                 break;
             }
@@ -229,14 +259,19 @@ public class Interpreter {
             }
             case "DI":
             {
-                div(x);
+                if(!div(x))
+                {
+                    return false;
+                }
                 break;
             }
             case "JC":
             {
                 if (C == 0)
                 {
-                    jump(String.valueOf(etykietka));
+                    if(!jump(String.valueOf(etykietka))){
+                     return false;
+                    }
                     break;
                 }
             }
@@ -246,12 +281,14 @@ public class Interpreter {
                 } else {
                     System.out.println("Bledny rozkaz. Koniec programu");
                     Scheduler.running.change_state(State.Terminated);
+                    return false;
                 }
                 break;
             }
         }
+        return true;
     }
-    private void div(String x)
+    private boolean div(String x)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcher = rejestr.matcher(x);
@@ -261,6 +298,7 @@ public class Interpreter {
         {
             System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         if(rejestrmatcher.matches())
         {
@@ -290,13 +328,15 @@ public class Interpreter {
             if (readMemory(Integer.parseInt(x))==0){
                 System.out.println("Blad. Proba dzielenia przez zero. Koniec programu");
                 Scheduler.running.change_state(State.Terminated);
+                return false;
             }
             A = A/readMemory(Integer.parseInt(x));
             D = D%readMemory(Integer.parseInt(x));
         }
         program_counter++;
+        return true;
     }
-    private void increment(String x)
+    private boolean increment(String x)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcher = rejestr.matcher(x);
@@ -306,6 +346,7 @@ public class Interpreter {
         {
             System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         if (rejestrmatcher.matches()) {
             switch (x) {
@@ -333,6 +374,7 @@ public class Interpreter {
             {
                 System.out.println("Blad. Proba wyjscoa poza pamiec programu. Koniec programu");
                 Scheduler.running.change_state(State.Terminated);
+                return false;
             }
             else
             {
@@ -341,8 +383,9 @@ public class Interpreter {
             }
         }
         program_counter++;
+        return true;
     }
-    private void jump(String x)
+    private boolean jump(String x)
     {
         Pattern jump = Pattern.compile("\\d+");
         Matcher jumpmatcher = jump.matcher(x);
@@ -350,18 +393,21 @@ public class Interpreter {
         {
             System.out.println("Bledny rozkaz. Niezgodny argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         if (base+Integer.parseInt(x) > base + limit)
         {
             System.out.println("Blad. Proba wyjscoa poza pamiec programu. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         else
         {
             program_counter = Integer.parseInt(x);
         }
+        return true;
     }
-    private void mov(String x, String y)
+    private boolean mov(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
@@ -375,11 +421,13 @@ public class Interpreter {
         {
             System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         if(!liczbamatcher.matches()&&!adresmatchery.matches()&&!rejestrmatchery.matches())
         {
             System.out.println("Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         if(liczbamatcher.matches())
         {
@@ -509,8 +557,9 @@ public class Interpreter {
             }
         }
         program_counter++;
+        return true;
     }
-    private void add(String x, String y)
+    private boolean add(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
@@ -519,6 +568,7 @@ public class Interpreter {
         {
             System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         Pattern liczba = Pattern.compile("\\d+");
         Matcher liczbamatcher = liczba.matcher(y);
@@ -528,6 +578,7 @@ public class Interpreter {
         {
             System.out.println("Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
+            return false;
         }
         if(liczbamatcher.matches())
         {
@@ -651,6 +702,7 @@ public class Interpreter {
             }
         }
         program_counter++;
+        return true;
     }
 }
 /* Dzialanie poszczegolnych programow
