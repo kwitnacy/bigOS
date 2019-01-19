@@ -6,10 +6,8 @@ import java.util.Scanner;
 import java.io.FileNotFoundException;
 import static java.lang.Math.toIntExact;
 
-/*TODO: 1: dodawanie względem map
-        2: usuwanie   --chyba jest
-        3: przesuwanie
-        4: wiadomosci
+/*TODO: 1: przesuwanie
+        2: wiadomosci
 */
 public class Memory {
 
@@ -37,6 +35,8 @@ public class Memory {
             if(value>=size+10){
                 writeMemory(fileName,i);
                 return true;
+            }else{
+
             }
         }
        // System.out.println("[RAM]: za malo miejsca dla programu");
@@ -83,7 +83,7 @@ public class Memory {
                 if(i==(preBase+preLimit)) {
                     freeSpace.remove(preBase);
                     freeSpace.remove(i);
-                    freeSpace.put(preBase,i+limit);
+                    freeSpace.put(preBase,i+limit-preBase);
                 }
             preLimit=limit;
             preBase=i;
@@ -132,6 +132,7 @@ public class Memory {
                 loadProgram("src/p2.txt");
                 loadProgram("src/p0.txt");
                 removeProgram(46);
+                removeProgram(124);
                 printMemory();
     }
 
