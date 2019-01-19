@@ -18,7 +18,7 @@ public class Directory {
     
     public boolean checkExistance(String fileName){
         for(File f : root){
-            if(f.getName() == fileName) return true;    //w katalogu jest plik o podanej nazwie
+            if(f.getName().equals(fileName)) return true;    //w katalogu jest plik o podanej nazwie
         }
         return false;       //w katalogu nie ma pliku o podanej nazwie
     }
@@ -30,7 +30,7 @@ public class Directory {
             }
         }
         this.root.add(file);
-        System.out.println("File added to root.");
+        System.out.println("[File Module]: File " + file.getName() + " added to the root.");
         return true;   //dodanie do katalogu
     }
     
@@ -41,7 +41,7 @@ public class Directory {
                 return true;    //poprawna nazwa i usunięcie FCB z katalogu
             }
         }
-        System.out.println("File not found.");
+        System.out.println("[File Module]: File " + fileName + " not found in the root.");
         return false;   //niepoprawna nazwa
     }
     
@@ -56,7 +56,7 @@ public class Directory {
     
     public void replacebyName (File newFile){
         for(int i = 0; i < root.size(); i++){
-            if(newFile.getName() == root.get(i).getName()){
+            if(newFile.getName().equals(root.get(i).getName())){
                 root.set(i, newFile);   //podmienia plik na ten podnay w argumenice
             }
         }

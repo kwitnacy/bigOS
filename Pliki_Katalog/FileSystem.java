@@ -16,7 +16,7 @@ public class FileSystem {
         this.FAT = new Integer[32];
         
         for(int i = 0; i < 32; i++) 
-            FAT[i] = 0;         //wypełnia FAT zerami    
+            FAT[i] = -1;         //wypełnia FAT wartościami -1  
         
         for(int i = 0; i < 32; i++) 
             this.freeBlocks.set(i, false); //wszystkie wolne

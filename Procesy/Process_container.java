@@ -2,6 +2,7 @@ package Procesy;
 
 import Processor.Scheduler;
 
+import java.awt.desktop.SystemEventListener;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,17 +34,18 @@ public class Process_container {
 
     public static void create_process(String name, String file_name, int priority){
         if (priority > 15 || priority < 1){
-            System.out.println("Process Manager: Wrong priority");
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". Wrong priority.");
             return;
         }
 
         if (taken_names.contains(name)){
-            System.out.println("Process Manager: Name taken");
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". Wrong name.");
             return;
         }
 
-        System.out.println("Stworzenie nowe procesu o nazwie: " + name);
+        System.out.println("[Process_Manager]: Created process " + name + ".");
         Process temp = new Process(name, file_name, priority, counter);
+
         processes.put(counter, temp);
         names.put(name, counter);
         taken_names.add(name);
@@ -54,16 +56,16 @@ public class Process_container {
 
     public static void create_process(String name, String file_name, int priority, int limit){
         if (priority > 15 || priority < 1){
-            System.out.println("Process Manager: Wrong priority");
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". Wrong priority.");
             return;
         }
 
         if (taken_names.contains(name)){
-            System.out.println("Process Manager: Name taken");
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". Wrong name.");
             return;
         }
 
-        System.out.println("Stworzenie nowe procesu o nazwie: " + name);
+        System.out.println("[Process_Manager]: Created process " + name + ".");
         Process temp = new Process(name, file_name, priority, counter, limit);
         processes.put(counter, temp);
         names.put(name, counter);
@@ -85,40 +87,21 @@ public class Process_container {
     }
 
     public void show_process_by_name(String name){
-        for(int i = 0 ; i < processes.size() ; i++) {
-            Process temp = processes.get(i);
-            if(temp.state == State.Terminated) {
-                System.out.println("Process: " + temp.name + " is terminated");
-                break;
-            }
-            else if (temp.name.equals(name)) {
-                System.out.println("+-----------------------------------------+");
-                temp.display_process();
-                System.out.println("+-----------------------------------------+");
-                break;
-            }
+        try {
+            get_by_name(name).display_process();
+        }
+        catch (NullPointerException e){
+            System.out.println("[Process_Manager]: No process called " + name + " to display.");
         }
     }
 
     public void show_process_by_PID(int PID){
-        for(int i = 0 ; i < processes.size() ; i++) {
-            Process temp = processes.get(i);
-
-            if(temp.state == State.Terminated){
-                System.out.println("Process: " + temp.name + " is terminated");
-                break;
-            }
-            else if (temp.PID == PID) {
-                System.out.println("+-----------------------------------------+");
-                temp.display_process();
-                System.out.println("+-----------------------------------------+");
-                break;
-            }
+        try {
+            get_by_PID(PID).display_process();
         }
-    }
-
-    public void set_mess(int idx, String s){
-        /*processes.get(idx).get_mess(s);*/
+        catch (NullPointerException e){
+            System.out.println("[Process_Manager]: No process with PID " + PID + " to display.");
+        }
     }
 
     public static Process get_by_PID(int idx){
@@ -126,25 +109,46 @@ public class Process_container {
     }
 
     public static Process get_by_name(String name){
-        if(names.containsValue(name))
-            return get_by_PID(names.get(name));
+        if(taken_names.contains(name)) {
+            System.out.println("hejo");
+            return processes.get(names.get(name));
+        }
         else
-            System.out.println("Process: ERROR no process named: " + name);
+            System.out.println("[Process_Manager]: No process called: " + name + ".");
 
         return null;
     }
 
     public static void delete(int PID){
+        System.out.println("[Process_Manager]: Trying to delete process with PID " + PID + ".");
         Process temp = get_by_PID(PID);
-        System.out.println("usuwanie " + temp.get_name());
-        processes.values().remove(temp);
+        if(temp != null) {
+            processes.values().remove(temp);
+            System.out.println("[Process_Manager]: Deleted process called " + temp.name + ".");
+        }
+        else
+            System.out.println("[Process_Manager]: Deleting cancelled NullPointer");
+    }
+
+    public static void delete(String name){
+        System.out.println("[Process_Manager]: Trying to delete process called " + name + ".");
+        Process temp = get_by_name(name);
+        if(temp != null) {
+            processes.values().remove(temp);
+            System.out.println("[Process_Manager]: Deleted process called " + temp.name + ".");
+        }
+        else
+            System.out.println("[Process_Manager]: Deleting cancelled NullPointer");
     }
 
     public static void add_to_CPU(int PID){
         Scheduler.add(get_by_PID(PID));
     }
 
-    int size(){
-        return processes.size();
+    public static int size(){
+        for(String s : taken_names) {
+            System.out.println(s);
+        }
+        return 0;
     }
 }

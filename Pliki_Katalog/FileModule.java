@@ -13,28 +13,22 @@ public class FileModule {
         filemanagement.create("f2", "marmolada");
         filemanagement.create("f3", "marmolada");
         
-//        filemanagement.displayFreeBlocks();
-//        filemanagement.printDisk();
-//        filemanagement.displayRoot();
-        
         filemanagement.write("f1", "klapki babci GITARA SIEMA pfffff meh");
+        filemanagement.printFileSystem();
         filemanagement.write("f2", "elo tutaj spuderswinia");
         filemanagement.write("f1", "DUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupa");
         filemanagement.write("f3", "wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!");
-        filemanagement.printDisk();
-        filemanagement.displayRoot();
-        
-        
-        System.out.println("");
-        System.out.println("");
+        filemanagement.printFileSystem();
         
         String output;
-        output = filemanagement.read("f1", 4, 20);
+        output = filemanagement.read("f3", 0, 40);
         System.out.println(output);
-        
-        //filemanagement.delete("f2");
-        filemanagement.printDisk();
-        filemanagement.displayRoot();
+      
+        filemanagement.delete("f2");
+        filemanagement.printFileSystem();
+        filemanagement.displayFCB("f3");
+        filemanagement.displayFCB("f1");
+    
     }
     
 }

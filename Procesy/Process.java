@@ -143,21 +143,22 @@ public class Process {
         System.out.println("AX, BX, CX, DX: " + this.AX + " " + this.BX + " " + this.CX + " " + this.DX);
         System.out.println("Piority (base): " + this.base_priority);
         System.out.println("Piority (temp): " + this.temp_priority);
-        System.out.println("Message: " + this.last_message);
+        System.out.println("Message: " + this.last_message.get_text());
     }
 
     public void change_state(State state){
         this.state = state;
 
         if(this.state == State.Running)
-            System.out.println("Biegnie");
+            System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Running");
 
         if(this.state == State.Terminated){
             Process_container.delete(this.PID);
-            System.out.println("Usuniecie procesu: " + this.name);
+            System.out.println("[Process_Manager]: Deleted process " + this.name);
         }
 
         if(this.state == State.Waiting){
+            System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Waiting");
             Scheduler.schedule();
         }
     }
