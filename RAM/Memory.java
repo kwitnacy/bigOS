@@ -16,7 +16,7 @@ public class Memory {
     private static Map<Integer,Integer> filledSpace = new HashMap<>();
     private static Map<Integer,Integer> freeSpace =  new HashMap<>();
 
-    private static Boolean loadProgram(String fileName){
+    public static Boolean loadProgram(String fileName){
         Integer size=0,value=0;
         File file = new File(fileName);
         try{

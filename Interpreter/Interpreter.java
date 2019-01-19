@@ -1,4 +1,4 @@
- package Interpreter;
+package Interpreter;
 import Processor.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
@@ -9,6 +9,7 @@ import filemodule.FileManagement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Memory.loadProgram;
 import static Memory.readMemory;
 //Procesor tworzy obiekt i wywoluje funkcje executeProgram()
 public class Interpreter {
@@ -17,14 +18,14 @@ public class Interpreter {
     private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
     private Semaphore semaphore;
-    public Interpreter(FileManagement fileManagement, Semaphore semaphore)
+    public Interpreter(FileManagement fileManagement, Semaphore semaphore, String filename)
     {
-        /*if (!loadToMemory(filename)){
+        if (!loadProgram(filename)){
             System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
             Scheduler.running.change_state(State.Terminated);
-        }*/
-        //else {
-            //Scheduler.running.change_state(State.Running);
+        }
+        else {
+            Scheduler.running.change_state(State.Running);
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -36,7 +37,7 @@ public class Interpreter {
             this.fileManagement = fileManagement;
             this.semaphore = semaphore;
             getOrder(); //tutaj pierwszy rozkaz programu
-        //}
+        }
     }
     private void updateProcessor()
     {
