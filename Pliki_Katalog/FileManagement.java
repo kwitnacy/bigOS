@@ -9,7 +9,7 @@ import java.util.LinkedList;
 public class FileManagement {
     private static Disk disk;
 
-    public FileManagement() {
+    static {
         disk = new Disk();
     }
     
@@ -17,18 +17,16 @@ public class FileManagement {
     
     //sprawdza czy wprowadzona nazwa pliku jest poprawna
     private static boolean properFileName(String name){
-        if(name.isEmpty() || name.length()>2 || name.length()<0)
-            return false;
-
-        return true;
+        if(name.isEmpty() || name.length()>2 || name.length()<0) return false;
+        else return true;
     }
     
     //wyświetla wektor bitowy
     public static void displayFreeBlocks(){
            for(int i = 0; i < 32; i++){
-               if(disk.fileSystem.freeBlocks.get(i))    //jeżeli zajety wyświetla 1
+               if(disk.fileSystem.freeBlocks.get(i) == true)    //jeżeli zajety wyświetla 1
                     System.out.print("1 ");
-               else if (!disk.fileSystem.freeBlocks.get(i))   //jeżeli wolny wyswietla 0
+               else if (disk.fileSystem.freeBlocks.get(i) == false)   //jeżeli wolny wyswietla 0
                     System.out.print("0 ");
            }
            System.out.println();
@@ -82,10 +80,7 @@ public class FileManagement {
     
     public static boolean signalFile(String file_name)
     {
-        if(!disk.fileSystem.root.checkExistance(file_name)) {
-            System.out.println("[File Module]: File not found in the root.");
-            return false;
-        }
+        if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         //if(properFileName(file_name) == false) {System.out.println("[File Module]: Incorrect file name."); return false;}   //niepoprawna nazwa pliku
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
         //ftemp.s.signal();    
@@ -95,10 +90,7 @@ public class FileManagement {
     
     public static boolean waitFile(String file_name, int PID)
     {
-        if(!disk.fileSystem.root.checkExistance(file_name)) {
-            System.out.println("[File Module]: File not found in the root.");
-            return false;
-        }
+        if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
         //ftemp.s.wait(PID);    
         disk.fileSystem.root.replacebyName(ftemp);
@@ -106,10 +98,7 @@ public class FileManagement {
     }
     
     public static boolean printSem(String file_name){
-        if(!disk.fileSystem.root.checkExistance(file_name)) {
-            System.out.println("[File Module]: File not found in the root.");
-            return false;
-        }
+        if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
         //ftemp.s.print();
         return true;
@@ -117,16 +106,10 @@ public class FileManagement {
     
     //tworzenie pliku
     
-    public static boolean create(String name, String user){
-        if(!properFileName(name)) {
-            System.out.println("[File Module]: Incorrect file name.");
-            return false;
-        }
-
-        if(disk.fileSystem.root.checkExistance(name)) {
-            System.out.println("[File Module]: File already exists.");
-            return false;
-        }
+    public static boolean create(String name, String user) 
+    {
+        if(properFileName(name) == false) {System.out.println("[File Module]: Incorrect file name."); return false;}   //niepoprawna nazwa pliku
+        if(disk.fileSystem.root.checkExistance(name) == true) { System.out.println("[File Module]: File already exists."); return false;} //jest już taki plik w katalogu
         else{
             File file = new File();
             file.setName(name);
@@ -140,24 +123,16 @@ public class FileManagement {
     
     //zapis/dopisywanie do pliku
     
-    public static boolean write(String name, String data) {
-        if(!disk.fileSystem.root.checkExistance(name)) {
-            System.out.println("[File Module]: File not found in the root.");
-            return false;
-        }
+    public static boolean write(String name, String data)
+    {
+        if(disk.fileSystem.root.checkExistance(name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         
         int sizeBytes = data.length();   //tyle bajtów zajmuje
         int blocks = (int) Math.ceil(sizeBytes / 32.0); //tyle bloków zajmie
         System.out.println("[File Module]: Number of blocks needed for data: " + blocks);
 
-        if(!properFileName(name) && blocks > disk.fileSystem.checkFreeBlocks()){
-            System.out.println("[File Module]: Incorrect file name and not enough space on the disk.");
-            return false;
-        }
-        if(blocks > disk.fileSystem.checkFreeBlocks()) {
-            System.out.println("[File Module]: Not enough space on the disk.");
-            return false;
-        }
+        if(properFileName(name) == false && blocks > disk.fileSystem.checkFreeBlocks()){ System.out.println("[File Module]: Incorrect file name and not enough space on the disk."); return false;}   //błędna nazwa i za duże dane
+        if(blocks > disk.fileSystem.checkFreeBlocks()) { System.out.println("[File Module]: Not enough space on the disk."); return false; } //nie ma wystarczająco wolnych bloków
         
         File ftemp = disk.fileSystem.root.getFileByName(name);
         
@@ -209,7 +184,7 @@ public class FileManagement {
     //zczytywanie określonej liczby bajtów (nazwa pliku z którego zczytujemy, od którego bajtu zaczynamy zczytywanie, ile bajtów zczytujemy)
     //zwraca String zawierający zczytane bajty
     
-    public static String read(String fileName, int from, int howMany)
+    public static String read(String fileName, int from, int howMany) 
     {
         if(disk.fileSystem.root.checkExistance(fileName) == false) { System.out.println("[File Module]: File not found in the root."); return null;} //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(fileName);
@@ -262,15 +237,9 @@ public class FileManagement {
     
     public static String readFile(String fileName) //odczytywanie wszystkich danych z dysku
     {
-        if(!disk.fileSystem.root.checkExistance(fileName)) {                    //nie ma pliku w katalogu
-            System.out.println("[File Module]: File not found in the root.");
-            return null;
-        }
-        File ftemp = disk.fileSystem.root.getFileByName(fileName);              //plik nie ma danych zapisanych na dysku
-        if(ftemp.getSize() == 0) {
-            System.out.println("[File Module]: File doesn't contain any data on the disk.");
-            return null;
-        }
+        if(disk.fileSystem.root.checkExistance(fileName) == false) { System.out.println("[File Module]: File not found in the root."); return null;} //nie ma pliku w katalogu
+        File ftemp = disk.fileSystem.root.getFileByName(fileName);
+        if(ftemp.getSize() == 0) { System.out.println("[File Module]: File doesn't contain any data on the disk."); return null; }  //plik nie ma danych zapisanych na dysku
         
         String output = new String();  //tu będą zapisane zczytane dane
         int tempindex = ftemp.getIndex();
@@ -297,12 +266,9 @@ public class FileManagement {
     
     //usunięcie pliku
     
-    public static boolean delete(String name)
+    public static boolean delete(String name) 
     {
-        if(!disk.fileSystem.root.checkExistance(name)) {                        //pliku o podanej nazwie nie ma w katalogu
-            System.out.println("[File Module]: File " + name + " not found in the root.");
-            return false;
-        }
+        if(disk.fileSystem.root.checkExistance(name)==false) { System.out.println("[File Module]: File " + name + " not found in the root."); return false;}  //pliku o podanej nazwie nie ma w katalogu
         
         File ftemp = disk.fileSystem.root.getFileByName(name);
         int tempindex = ftemp.getIndex();
