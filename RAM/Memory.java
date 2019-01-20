@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.io.FileNotFoundException;
 import static java.lang.Math.toIntExact;
 
-/*TODO: 1: przesuwanie
+/*TODO: 1: przesuwanie -prawie
         2: wiadomosci
 */
 public class Memory {
@@ -30,15 +30,25 @@ public class Memory {
             e.printStackTrace();
         }
         for(int i=0;i<256;i++) {
-           if(freeSpace.get(i)!=null)
+            if(freeSpace.get(i)!=null)
             value = freeSpace.get(i);
             if(value>=size+10){
                 writeMemory(fileName,i);
                 return true;
-            }else{
-
             }
         }
+          /*  Integer free=0;
+            for(int j=0;j<256;j++){
+                if(freeSpace.get(j)!=null){
+                    free+=freeSpace.get(j);
+                }
+            }
+            if(free>=size+10) {
+                //       move();
+                System.out.println("Przesuwanie@!#$!");
+                //writeMemory(fileName,i);
+                return true;
+            }*/
        // System.out.println("[RAM]: za malo miejsca dla programu");
         return false;
     }
@@ -73,13 +83,11 @@ public class Memory {
     }
 
     private static void mergeMaps(Map<Integer,Integer> map){
-        System.out.println("Tura: ");
         Integer preBase=0,preLimit=0,
                 base=0,limit;
         for(int i=0;i<256;i++){
             limit = map.get(i);
             if(limit!=null) {
-                System.out.println(i + " " + (i+limit));
                 if(i==(preBase+preLimit)) {
                     freeSpace.remove(preBase);
                     freeSpace.remove(i);
@@ -92,7 +100,7 @@ public class Memory {
     }
     public static void removeProgram(Integer base) {
         int limit = filledSpace.get(base);
-        for(int i=base;i<base + limit; i++){
+        for(int i=base;i<filledSpace.get(base) + base; i++){
             memory[i]=' ';
         }
         Integer tmp = filledSpace.get(base);
@@ -119,20 +127,47 @@ public class Memory {
     }
 
     public static void move(){
+        Integer tmp=0,limit=0,thisLimit=0,j=0,k=0;
+        Boolean flag=true;
+        for(int i=0;i<256;i++){
+            if(filledSpace.get(i)!=null){
+                if(flag){
+                    limit=filledSpace.get(i)+i;
+                    i+=filledSpace.get(i);
+                    flag=false;
+                }else {
+                    thisLimit=filledSpace.get(i);
+                    for(j=i;j>limit;j--){
+                        for(k=0;k<thisLimit;k++){
+                            memory[j+k-1]=memory[j+k];
+                            if(k==thisLimit-1){
+                                memory[j+k]=' ';
+                            }
+                        }
+                    }
+                    filledSpace.remove(i);
+                    filledSpace.put(j,k);
+                    tmp=freeSpace.get(j);
+                    freeSpace.remove(j);
+                    freeSpace.put(j+k,tmp);
+                    mergeMaps(freeSpace);
+                    flag=true;
+
+                }
+            }
+
+        }
     }
 
     public static void main(String[] args){
                 Arrays.fill(memory,' ');
                 freeSpace.put(0,256);
-                loadProgram("src/p3.txt");
-                loadProgram("src/p0.txt");
-                removeProgram(0);
-                loadProgram("src/p2.txt");
-                loadProgram("src/p2.txt");
-                loadProgram("src/p2.txt");
-                loadProgram("src/p0.txt");
-                removeProgram(46);
-                removeProgram(124);
+        loadProgram("src/p0.txt");
+        loadProgram("src/p0.txt");
+        loadProgram("src/p1.txt");
+        removeProgram(4);
+        move();
+
                 printMemory();
     }
 
