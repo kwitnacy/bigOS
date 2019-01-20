@@ -154,6 +154,11 @@ public class Process {
 
         if(this.state == State.Running)
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Running");
+		
+        if(this.state == State.Ready){
+            System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Ready");
+            Process_container.add_to_CPU(this.PID);
+        }
 
         if(this.state == State.Terminated){
             Process_container.delete(this.PID);

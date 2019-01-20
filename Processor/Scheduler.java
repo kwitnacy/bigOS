@@ -133,7 +133,7 @@ public class Scheduler
 		}
 		else //wywłaszczanie
 		{
-			for (int i = 14 ; i > running.get_temp_priority() ; i--)
+			for (int i = 14 ; i >= running.get_temp_priority() ; i--)
 			{
 				for (Process block : queuesPCB.get(i))
 				{
