@@ -6,8 +6,8 @@ import java.util.Scanner;
 import java.io.FileNotFoundException;
 import static java.lang.Math.toIntExact;
 
-/*TODO: 1: przesuwanie -prawie
-        2: wiadomosci
+/*TODO:     1: wiadomosci (dodawanie, zajmowanie obszaru+10)
+            2: poprawki kosmetyczno-bamboszkowe
 */
 public class Memory {
 
@@ -37,25 +37,22 @@ public class Memory {
                 return true;
             }
         }
-          /*  Integer free=0;
+            Integer free=0;
             for(int j=0;j<256;j++){
                 if(freeSpace.get(j)!=null){
                     free+=freeSpace.get(j);
                 }
             }
             if(free>=size+10) {
-                //       move();
-                System.out.println("Przesuwanie@!#$!");
-                //writeMemory(fileName,i);
-                return true;
-            }*/
-       // System.out.println("[RAM]: za malo miejsca dla programu");
+                move();
+                loadProgram(fileName);
+            }
+        System.out.println("[RAM]: za malo miejsca dla programu");
         return false;
     }
 
     public static void writeMemory(String fileName,Integer base){
         File file = new File(fileName);
-     //   System.out.println(base);
         Integer next=0;
             try{
                 Scanner skaner= new Scanner(file);
@@ -72,7 +69,7 @@ public class Memory {
                 e.printStackTrace();
             }
             filledSpace.put(base,next);
-           // System.out.println("[RAM]: Program zostal umieszczony w pamieci w adresach " + base + " " + (base+next-1));
+            System.out.println("[RAM]: Program zostal umieszczony w pamieci w adresach " + base + "-" + (base+next-1));
             Integer tmp = freeSpace.get(base);
             freeSpace.remove(base);
             Integer limit = tmp;
@@ -105,7 +102,7 @@ public class Memory {
         }
         Integer tmp = filledSpace.get(base);
         filledSpace.remove(base);
-        //System.out.println("[RAM]: usunieto program rozpoczynajacy sie w adresie " + base);
+        System.out.println("[RAM]: usunieto program rozpoczynajacy sie w adresie " + base);
         freeSpace.put(base,tmp);
         mergeMaps(freeSpace);
     }
@@ -118,24 +115,25 @@ public class Memory {
                     + (i+128) + ": " + memory[i+128]+ "\t\t\t"
                     + (i+192) + ": " + memory[i+192]);
         }
-
         int zajete = filledSpace.values().stream().reduce(0, Integer::sum);
-        System.out.println("Wolne miejsce: " + (256-zajete) + "\nZajete miejsce: " + zajete);
-        System.out.println("Zajete: " + filledSpace.entrySet());
-        System.out.println("Wolne : " + freeSpace.entrySet());
-
+        System.out.println("Ilosc wolnego miejsca: " + (256-zajete) + "\nIlosc zajetego miejsca: " + zajete);
+        System.out.println("Zajete obszary: " + filledSpace.entrySet());
+        System.out.println("Wolne obszary: " + freeSpace.entrySet());
     }
 
     public static void move(){
+        System.out.println("[RAM]: Przesuwanie obszarow");
         Integer tmp=0,limit=0,thisLimit=0,j=0,k=0;
         Boolean flag=true;
         for(int i=0;i<256;i++){
             if(filledSpace.get(i)!=null){
-                if(flag){
+                while(flag){
                     limit=filledSpace.get(i)+i;
                     i+=filledSpace.get(i);
+                    if(filledSpace.get(i)==null)
                     flag=false;
-                }else {
+                }
+
                     thisLimit=filledSpace.get(i);
                     for(j=i;j>limit;j--){
                         for(k=0;k<thisLimit;k++){
@@ -151,24 +149,19 @@ public class Memory {
                     freeSpace.remove(j);
                     freeSpace.put(j+k,tmp);
                     mergeMaps(freeSpace);
-                    flag=true;
-
-                }
+                    limit=j+k;
             }
-
         }
     }
 
     public static void main(String[] args){
                 Arrays.fill(memory,' ');
                 freeSpace.put(0,256);
-        loadProgram("src/p0.txt");
-        loadProgram("src/p0.txt");
-        loadProgram("src/p1.txt");
-        removeProgram(4);
-        move();
-
+                loadProgram("src/p0.txt");
+                loadProgram("src/p1.txt");
+                loadProgram("src/p0.txt");
+                removeProgram(4);
+                move();
                 printMemory();
     }
-
 }
