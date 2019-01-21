@@ -31,6 +31,12 @@ public class Interpreter {
             getOrder();
         //}
     }
+    static int addresToliczba(String address)
+    {
+        Pattern liczba = Pattern.compile("(\\d+)");
+        Matcher matcher = liczba.matcher(address);
+        return Integer.parseInt(matcher.group(1));
+    }
     private void set_user()
     {
 
@@ -217,41 +223,95 @@ public class Interpreter {
                 break;
             }
             case "SM": {
+                             //x           //y    //z
                 //SM <nazwa/PID odbiorcy> <tekst>
                 //SM <nazwa/PID odbiorcy> <size> [adres]
                 //SM <nazwa/PID odbiorcy> [adres]
                 Pattern adres = Pattern.compile("\\[\\d+]");
-                Matcher adresmatcher = adres.matcher(z);
-                Pattern pid = Pattern.compile("\\d+");
-                Matcher pidmatcher = pid.matcher(x);
-                if (adresmatcher.matches())
+                Pattern liczba = Pattern.compile("\\d+");
+                Matcher pidmatcher = liczba.matcher(x);
+                Matcher sizematcher = liczba.matcher(y);
+                Matcher adresmatchery = adres.matcher(y);
+                Matcher adresmatcherz = adres.matcher(z);
+                if (dane2matcher.matches())
                 {
-                    if (pidmatcher.matches()) {
-                        Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z));
+                    if (adresmatchery.matches()) //SM <PID odbiorcy> [adres]
+                    {
+                        if (pidmatcher.matches()) {
+                            Scheduler.running.send_message(Integer.parseInt(x), addresToliczba(y));
+                        }
+                        else //SM <nazzwa odbiorcy> [adres]
+                        {
+                            Scheduler.running.send_message(x, addresToliczba(y));
+                        }
                     }
-                    else{
-                        Scheduler.running.send_message(x, Integer.parseInt(y), Integer.parseInt(z));
-
+                    else { ////SM <nazwa/PID odbiorcy> <tekst>
+                        if(pidmatcher.matches())
+                        {
+                        Scheduler.running.send_message(Integer.parseInt(x), z);}
+                        else
+                        {
+                            Scheduler.running.send_message(x, z);
+                        }
                     }
                 }
-                else
+                if (dane3matcher.matches())
                 {
-                    if (pidmatcher.matches()) {
-                        Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), z);
+                    if (!sizematcher.matches())
+                    {
+                        System.out.println("Blad. Niezgodny drugi argument. Koniec programu");
+                        Scheduler.running.change_state(State.Terminated);
+                        return false;
                     }
-                    else{
-                        Scheduler.running.send_message(x, Integer.parseInt(y), z);
-
+                    if (adresmatcherz.matches())
+                    {
+                        if (pidmatcher.matches()) { //SM <PID odbiorcy> <size> [adres]
+                        Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), addresToliczba(z));
+                        }
+                        else{ //SM <nazwa odbiorcy> <size> [adres]
+                            Scheduler.running.send_message(x, Integer.parseInt(y), addresToliczba(z));
+                        }
+                    }
+                    else {
+                        System.out.println("Bledny rozkaz. Niezgodny trzeci argument. Koniec programu");
+                        Scheduler.running.change_state(State.Terminated);
+                        return false;
                     }
                 }
                 break;
             }
             case "RM": {
-                int size=0;
-                //skad wielkosc odebranej wiadomosci
-                Scheduler.running.read_message(size);
-                //RM [nazwa\PID procesu który ma odczytać wiadomość] [rozmiar wiadomości]
-                break;
+                Pattern adres = Pattern.compile("\\[\\d+]");
+                Pattern liczba = Pattern.compile("\\d+");
+                Matcher sizematcher = liczba.matcher(x);
+                Matcher adresmatchery = adres.matcher(y);
+                Matcher adresmatcherx = adres.matcher(y);
+                if (dane2matcher.matches()) //RM <size> [adres]
+                {
+                    if (sizematcher.matches()&&adresmatchery.matches())
+                    {
+                        Scheduler.running.read_message(Integer.parseInt(x),addresToliczba(y));
+                    }
+                    else
+                    {
+                        System.out.println("Blad! Argumenty sa niezgodne. Koniec programu");
+                        Scheduler.running.change_state(State.Terminated);
+                        return false;
+                    }
+                }
+                if(dane1matcher.matches())//RM [adres]
+                {
+                    if (adresmatcherx.matches())
+                    {
+                        Scheduler.running.read_message(addresToliczba(x));
+                    }
+                    else
+                    {
+                        System.out.println("Blad! Argument jest niezgodny. Koniec programu");
+                        Scheduler.running.change_state(State.Terminated);
+                        return false;
+                    }
+                }
             }
             case "DI":
             {
@@ -321,13 +381,13 @@ public class Interpreter {
         }
         else if(adresmatcher.matches())
         {
-            if (readMemory(Integer.parseInt(x))==0){
+            if (readMemory(addresToliczba(x))==0){
                 System.out.println("Blad. Proba dzielenia przez zero. Koniec programu");
                 Scheduler.running.change_state(State.Terminated);
                 return false;
             }
-            A = A/readMemory(Integer.parseInt(x));
-            D = D%readMemory(Integer.parseInt(x));
+            A = A/readMemory(addresToliczba(x));
+            D = D%readMemory(addresToliczba(x));
         }
         program_counter++;
         return true;
@@ -366,9 +426,9 @@ public class Interpreter {
         }
         else if (adresmatcher.matches())
         {
-            if(Integer.parseInt(x)>base + limit)
+            if(addresToliczba(x)>base + limit)
             {
-                System.out.println("Blad. Proba wyjscoa poza pamiec programu. Koniec programu");
+                System.out.println("Blad. Proba wyjscia poza pamiec programu. Koniec programu");
                 Scheduler.running.change_state(State.Terminated);
                 return false;
             }
@@ -445,13 +505,13 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
-                //do pamieci o danym adresie = Integer.parseInt(y);
+                //do pamieci o danym adresie = addresToliczba(y);
             }
         }
         if(adresmatchery.matches())
         {
             int dana = 0;
-            dana = readMemory(Integer.parseInt(y));
+            dana = readMemory(addresToliczba(y));
             switch(x){
                 case "A":
                 {
@@ -604,7 +664,7 @@ public class Interpreter {
         }
         if(adresmatcher.matches())
         {
-            int dana = readMemory(Integer.parseInt(y));
+            int dana = readMemory(addresToliczba(x));
             switch(x){
                 case "A":
                 {

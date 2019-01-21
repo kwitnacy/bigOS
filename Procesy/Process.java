@@ -226,7 +226,7 @@ public class Process {
     }
 
 
-    boolean send_message(String receiverName, int addres){
+    public boolean send_message(String receiverName, int addres){
         if(Process_container.get_by_name(receiverName)!=null){
             return send_message(Process_container.get_by_name(receiverName).get_PID(),addres);
         }
@@ -235,7 +235,7 @@ public class Process {
             return false;
         }
     }
-    boolean send_message(String receiverName, int size, int addres){
+    public boolean send_message(String receiverName, int size, int addres){
         if(Process_container.get_by_name(receiverName)!=null){
             return send_message(Process_container.get_by_name(receiverName).get_PID(),size,addres);
         }
@@ -244,7 +244,7 @@ public class Process {
             return false;
         }
     }
-    boolean send_message(String receiverName, String text){
+    public boolean send_message(String receiverName, String text){
         if(Process_container.get_by_name(receiverName)!=null){
             return send_message(Process_container.get_by_name(receiverName).get_PID(),text);
         }
@@ -255,7 +255,7 @@ public class Process {
     }
 
 
-    boolean send_message(int receiverPID, int addres){
+    public boolean send_message(int receiverPID, int addres){
         String text="";
         int counter=0;
 
@@ -272,7 +272,7 @@ public class Process {
 
         return send_message(receiverPID,text);
     }
-    boolean send_message(int receiverPID, int size, int addres){
+    public boolean send_message(int receiverPID, int size, int addres){
         String text="";
 
         for(int i=0; i<size; i++){
@@ -286,7 +286,7 @@ public class Process {
         }
         return send_message(receiverPID,text);
     }
-    boolean send_message(int receiverPID, String text){
+    public boolean send_message(int receiverPID, String text){
         if(Process_container.get_by_PID(receiverPID)==null){
             System.out.println("[IPC] Sending failure, invalid receiver PID.");
             return false;
@@ -312,7 +312,7 @@ public class Process {
     }
 
 
-    boolean read_message(int size, int addres){
+    public boolean read_message(int size, int addres){
         this.messages_semaphore.wait_s(this.PID);
 
         if(this.state==State.Waiting) {
@@ -340,7 +340,7 @@ public class Process {
         System.out.println("[IPC] Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
         return true;
     }
-    boolean read_message(int addres){
+    public boolean read_message(int addres){
         this.messages_semaphore.wait_s(this.PID);
 
         if(this.state==State.Waiting) {
