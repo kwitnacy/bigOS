@@ -7,19 +7,20 @@ import java.util.List;
 import java.util.Queue;
 import Procesy.Process;
 import Procesy.State;
+import RAM.Memory;
 
 public class Scheduler
 {
-	private static final int waitingLimit = 2;						// maskymalny czas oczekiwania (po tylu rozkazach postarzamy procses
+	private static final int waitingLimit = 2;						// maskymalny czas oczekiwania (po tylu rozkazach postarzamy proces)
 	private static List<Queue<Process>> queuesPCB; 						// lista kolejek PCB w stanie ready
 	private static Process dummy;											// proces dummy o priorytecie 0
 	public static Process running;									// aktualnie wykonywany proces
 	
-	public Scheduler(Process dummy) 												// sprawdzić czy wszystko działa
+	public Scheduler(Process dummy)
 	{
 		Scheduler.dummy = dummy;					// inicjalizacja pustego procesu dummy
 		
-		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla każdedgo priorytetu
+		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla kazdedgo priorytetu
 		
 		for (int i=0 ; i<15 ; i++)
 		{
@@ -30,13 +31,13 @@ public class Scheduler
 	}
 	
 	public Scheduler(){
-		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla ka�dedgo priorytetu
+		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla kazdego priorytetu
 
 		for (int i=0 ; i<15 ; i++){
 			queuesPCB.add(new LinkedList<Process>());
 		}
 	}
-
+	
 	static {
 		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla ka�dedgo priorytetu
 
@@ -44,7 +45,7 @@ public class Scheduler
 			queuesPCB.add(new LinkedList<Process>());
 		}
 	}
-
+	
 	public static void add(Process toAdd) 									// dodawanie procesu do odpowiedniej kolejki
 	{
 		if(toAdd.get_name().equals("dummy")){
@@ -62,7 +63,7 @@ public class Scheduler
 				System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
 				+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
 			}
-			else 														// nie wiem czy pisać że dodałem proces do kolejki, skoro to reorganizacja
+			else 														// nie wiem czy pisac ze dodalem proces do kolejki, skoro to reorganizacja
 			{
 	//			System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
 	//			+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
@@ -76,7 +77,7 @@ public class Scheduler
 		return;
 	}
 	
-	public static void remove() 											// usuwanie z kolejek procesów które nie są ready
+	public static void remove() 											// usuwanie z kolejek procesow ktore nie sa ready
 	{
 		for(Queue<Process> qq : queuesPCB)
 			{
@@ -94,7 +95,7 @@ public class Scheduler
 			}
 	}
 	
-	public static void makeOlder() 										// postarzanie procesów, oraz inkrementacja licznika czekania procesów
+	public static void makeOlder() 										// postarzanie procesow, oraz inkrementacja licznika czekania procesow
 	{
 		for (Queue<Process> qq : queuesPCB)
 		{
@@ -123,23 +124,34 @@ public class Scheduler
 	
 	public static void schedule() 											// planista
 	{
-		if(running.get_state() == State.Terminated || running.get_temp_priority() == 0) //zwykły przydział procesora
+		Process temp = running;
+		if(running.get_state() == State.Terminated || running.get_temp_priority() == 0) //zwykly przydzial procesora
 		{
+			if(running.get_state() == State.Terminated)
+			{
+				Memory.removeProgram();
+			}
 			for (int i = 14 ; i > -1 ; i--)
 			{
 				for (Process block : queuesPCB.get(i))
 				{
-
-						running = block;
-						running.change_state(State.Running);
-						queuesPCB.get(i).remove(block);
-						System.out.println("Procesor: Przydzielilem procesor do procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
-						+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
-						break;
+					running = block;
+						if(Memory.loadProgram())
+						{
+							running.change_state(State.Running);
+							queuesPCB.get(i).remove(block);
+							System.out.println("Procesor: Przydzielilem procesor do procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
+							+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
+							break;
+						}
+						else
+						{
+							//ZMIENIC NA WAITING I USUNAC OD SIEBIE - CHYBA
+						}
 				}
 			}			
 		}
-		else //wywłaszczanie
+		else //wywlaszczanie
 		{
 			for (int i = 14 ; i >= running.get_temp_priority() ; i--)
 			{
@@ -147,30 +159,44 @@ public class Scheduler
 				{
 					if(block.get_temp_priority() > running.get_temp_priority())
 					{
-						System.out.println("Procesor: Wywlaszczylem procesor dla procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
-						+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
-						running.change_state(State.Ready);
-						if(running.get_temp_priority() != 0){
-							add(running); //skoro dodajemy running do kolejki procesów gotowych to czy jej liczniki zostały zapisane?
-						}
 						running = block;
-						running.change_state(State.Running);
-						queuesPCB.get(i).remove(block);
-						break;
+						if(Memory.loadProgram())
+						{
+							System.out.println("Procesor: Wywlaszczylem procesor dla procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
+							+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
+							temp.change_state(State.Ready);
+							if(running.get_temp_priority() != 0){
+								add(temp); //skoro dodajemy running do kolejki procesow gotowych to czy jej liczniki zostaly zapisane?
+							}
+							running.change_state(State.Running);
+							queuesPCB.get(i).remove(block);
+							break;
+						}
+						else
+						{
+							//ZMIENIC NA WAITING I USUNAC OD SIEBIE - CHYBA
+						}
 					}
 				}
 			}
 		}
-		if(running.get_state() == State.Terminated) // sprawdzamy czy po przeleceniu kolejek jakiś został przydzielony
+		if(running.get_state() == State.Waiting) // sprawdzamy czy po przeleceniu kolejek jakis zostal� przydzielony
 		{
-			running = dummy;
-			running.change_state(State.Running);
-			System.out.println("Procesor: Przydzielilem procesor do procesu Dummy");
+			if(temp.get_state() != State.Terminated)
+			{
+				running = temp;
+			}
+			else
+			{
+				running = dummy;
+				running.change_state(State.Running);
+				System.out.println("Procesor: Przydzielilem procesor do procesu Dummy");
+			}
 		}
 
 	}
 	
-	public void showReadyProcesses()								// wyswietlanie procesow gotowych - coś tu się ewidentnie popsuło, musze naprawić :<
+	public void showReadyProcesses() // wyswietlanie ready
 	{
 		System.out.println("Procesor: Procesy w stanie gotowosci to:");
 		System.out.println("Nazwa ; PID ; Priorytet bazowy ; Priorytet Tymczasowy");
