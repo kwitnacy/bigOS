@@ -7,7 +7,7 @@ import java.util.Scanner;
 import java.io.FileNotFoundException;
 import static java.lang.Math.toIntExact;
 
-/*TODO:     1: wiadomosci (dodawanie, zajmowanie obszaru+10)
+/*TODO:     1: wiadomosci (dodawanie)
             2: poprawki kosmetyczno-bamboszkowe
 */
 public class Memory {
@@ -32,49 +32,51 @@ public class Memory {
         }
         for(int i=0;i<256;i++) {
             if(freeSpace.get(i)!=null)
-            value = freeSpace.get(i);
+                value = freeSpace.get(i);
             if(value>=size+10){
                 writeMemory(fileName,i);
                 return true;
             }
         }
-            Integer free=0;
-            for(int j=0;j<256;j++){
-                if(freeSpace.get(j)!=null){
-                    free+=freeSpace.get(j);
-                }
+        Integer free=0;
+        for(int j=0;j<256;j++){
+            if(freeSpace.get(j)!=null){
+                free+=freeSpace.get(j);
             }
-            if(free>=size+10) {
-                move();
-                loadProgram(fileName);
-            }
+        }
+        if(free>=size+10) {
+            move();
+            loadProgram(fileName);
+        }
         System.out.println("[RAM]: za malo miejsca dla programu");
         return false;
     }
+    public static void writeMemory(char value,Integer index){
 
-    public static void writeMemory(String fileName,Integer base){
+    }
+    private static void writeMemory(String fileName,Integer base){
         File file = new File(fileName);
         Integer next=0;
-            try{
-                Scanner skaner= new Scanner(file);
-                while(skaner.hasNextLine()){
-                    String line= skaner.nextLine();
+        try{
+            Scanner skaner= new Scanner(file);
+            while(skaner.hasNextLine()){
+                String line= skaner.nextLine();
 
-                    int index=0;
-                    for(int i=base + next ;i< base +next + line.length();i++){
-                        memory[i]=line.charAt(index);
-                        index++;
-                    }next+=line.length();
-                }
-            }catch(FileNotFoundException e){
-                e.printStackTrace();
+                int index=0;
+                for(int i=base + next ;i< base +next + line.length();i++){
+                    memory[i]=line.charAt(index);
+                    index++;
+                }next+=line.length();
             }
-            filledSpace.put(base,next);
-            System.out.println("[RAM]: Program zostal umieszczony w pamieci w adresach " + base + "-" + (base+next-1));
-            Integer tmp = freeSpace.get(base);
-            freeSpace.remove(base);
-            Integer limit = tmp;
-            freeSpace.put(base+next,tmp-next);
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
+        filledSpace.put(base,next+10);
+        System.out.println("[RAM]: Program zostal umieszczony w pamieci w adresach " + base + "-" + (base+next-1));
+        Integer tmp = freeSpace.get(base);
+        freeSpace.remove(base);
+        Integer limit = tmp;
+        freeSpace.put(base+next+10,tmp-next-10);
     }
     public static char readMemory(Integer adress){
         return memory[adress];
@@ -91,13 +93,13 @@ public class Memory {
                     freeSpace.remove(i);
                     freeSpace.put(preBase,i+limit-preBase);
                 }
-            preLimit=limit;
-            preBase=i;
+                preLimit=limit;
+                preBase=i;
             }
         }
     }
     public static void removeProgram(Integer base) {
-        int limit = filledSpace.get(base);
+//        int limit = filledSpace.get(base);
         for(int i=base;i<filledSpace.get(base) + base; i++){
             memory[i]=' ';
         }
@@ -132,37 +134,37 @@ public class Memory {
                     limit=filledSpace.get(i)+i;
                     i+=filledSpace.get(i);
                     if(filledSpace.get(i)==null)
-                    flag=false;
+                        flag=false;
                 }
 
-                    thisLimit=filledSpace.get(i);
-                    for(j=i;j>limit;j--){
-                        for(k=0;k<thisLimit;k++){
-                            memory[j+k-1]=memory[j+k];
-                            if(k==thisLimit-1){
-                                memory[j+k]=' ';
-                            }
+                thisLimit=filledSpace.get(i);
+                for(j=i;j>limit;j--){
+                    for(k=0;k<thisLimit;k++){
+                        memory[j+k-1]=memory[j+k];
+                        if(k==thisLimit-1){
+                            memory[j+k]=' ';
                         }
                     }
-                    filledSpace.remove(i);
-                    filledSpace.put(j,k);
-                    tmp=freeSpace.get(j);
-                    freeSpace.remove(j);
-                    freeSpace.put(j+k,tmp);
-                    mergeMaps(freeSpace);
-                    limit=j+k;
+                }
+                filledSpace.remove(i);
+                filledSpace.put(j,k);
+                tmp=freeSpace.get(j);
+                freeSpace.remove(j);
+                freeSpace.put(j+k,tmp);
+                mergeMaps(freeSpace);
+                limit=j+k;
             }
         }
     }
 
     public static void main(String[] args){
-                Arrays.fill(memory,' ');
-                freeSpace.put(0,256);
-                loadProgram("src/p0.txt");
-                loadProgram("src/p1.txt");
-                loadProgram("src/p0.txt");
-                removeProgram(4);
-                move();
-                printMemory();
+        Arrays.fill(memory,' ');
+        freeSpace.put(0,256);
+        loadProgram("src/p0.txt");
+        loadProgram("src/p1.txt");
+        loadProgram("src/p0.txt");
+        removeProgram(14);
+        move();
+        printMemory();
     }
 }
