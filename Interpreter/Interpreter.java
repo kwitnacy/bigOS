@@ -1,11 +1,10 @@
 package Interpreter;
 import Processor.Scheduler;
+import Procesy.Process;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
-
+import static filemodule.FileManagement.*;
 import Semaphore.Semaphore;
-import filemodule.File;
-import filemodule.FileManagement;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,10 +14,10 @@ import static RAM.Memory.readMemory;
 //Procesor tworzy obiekt i wywoluje funkcje executeProgram()
 public class Interpreter {
 
-    private int A,B,C,D, program_counter, base, limit, PID, etykietka;
-    private String rozkaz, calyRozkaz, user;
-    private FileManagement fileManagement;
-    private Semaphore semaphore;
+    private static int A,B,C,D, program_counter, base, limit, PID, etykietka;
+    private static String rozkaz, calyRozkaz;
+    private static String user;
+    private  static Semaphore semaphore;
 
 	/*
     public Interpreter(FileManagement fileManagement, Semaphore semaphore) {
@@ -31,13 +30,13 @@ public class Interpreter {
 		// [KWITNONCY]: TEN TAK
 	}
 
-    private void start(String filename) {
-        if (!loadProgram(filename)) {
+    private static void start(String filename) {
+        if (!loadProgram(filename)) { //ladowac na pocz!!
             System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
             Scheduler.running.change_state(State.Terminated);
         } else {
-            Scheduler.running.change_state(State.Running);
-            program_counter = 0;
+            //Scheduler.running.change_state(State.Running);
+            program_counter = Processor.Scheduler.running.get_program_counter;
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -48,14 +47,19 @@ public class Interpreter {
             getOrder();
         }
     }
-    private void updateProcessor()
+    private void set_user()
+    {
+
+    }
+    private static void updateProcessor()
     {
         Scheduler.running.set_AX(A);
         Scheduler.running.set_BX(B);
         Scheduler.running.set_CX(C);
         Scheduler.running.set_DX(D);
+        Scheduler.running.set_program_counter(program_counter);
     }
-    private void display()
+    private static void display()
     {
         System.out.println("Stan po wykonanym rozkazie ");
         System.out.println("PID: "+PID);
@@ -65,7 +69,7 @@ public class Interpreter {
         System.out.println("rejestr D: "+D);
         System.out.println("program_counter: "+ program_counter);
     }
-    private void getOrder() //odczytywanie rozkazu z pamieci
+    private static void getOrder() //odczytywanie rozkazu z pamieci
     {
         int i =0;
         char newPart, nastepny1, nastepny2;
@@ -87,10 +91,10 @@ public class Interpreter {
         }
         System.out.println("wykonywany rozkaz: "+rozkaz);
     }
-    public void executeProgram(String filename) //te funkcje powinien wywolywac procesor po stworzeniu obiektu
+    public static void go(int how_many) //
     {
-        start(filename);
-        while(!rozkaz.equals("HT"))
+        start(Scheduler.running.get_file_name());
+        for (int i = 0;i<how_many||!rozkaz.equals("HT");i++)
         {
             //pierwszy rozkaz jest pobierany juz w start()
             if(!executeOrder())
@@ -99,11 +103,9 @@ public class Interpreter {
             }
             Scheduler.makeOlder(); //postarzanie procesu
             updateProcessor(); //zapisanie zmienionych wartosci rejestru
-            display(); //wypisanie stanu procesora
-            getOrder(); //odczytanie rozkazu z pamieci
         }
     }
-    private boolean executeOrder() {
+    private static boolean executeOrder() {
         Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
         Matcher dane2matcher = dane2.matcher(calyRozkaz);
         String x = "", y = "", z = "", xx="";
@@ -167,14 +169,14 @@ public class Interpreter {
                 break;
             }
             case "CF": {
-                fileManagement.create(x, user);
+                create(x, user);
                 // usera mam miec
                 program_counter++;
                 break;
             }
             case "WF": {
                 semaphore.wait_s(PID);
-                fileManagement.write(x, y);
+                write(x, y);
                 semaphore.signal_s();
                 program_counter++;
                 break;
@@ -182,32 +184,32 @@ public class Interpreter {
             case "RF": {
                 semaphore.wait_s(PID);
                 if (xx.equals("")) {
-                System.out.println(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));}
+                System.out.println(read(x,Integer.parseInt(y),Integer.parseInt(z)));}
                 else {
                     Pattern rejestr = Pattern.compile("[A-D]");
                     Matcher rejestrmatcher = rejestr.matcher(xx);
                     if (rejestrmatcher.matches())
                     {
-                        if (fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z))==null)
+                        if (read(x,Integer.parseInt(y),Integer.parseInt(z))==null)
                         {
                             Scheduler.running.change_state(State.Terminated);
                             return false;
                         }
                         if(x.equals("A"))
                         {
-                            A = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                            A = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
                         if(x.equals("B"))
                         {
-                            B = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                            B = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
                         if(x.equals("C"))
                         {
-                            C = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                            C = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
                         if(x.equals("D"))
                         {
-                            D = Integer.parseInt(fileManagement.read(x,Integer.parseInt(y),Integer.parseInt(z)));
+                            D = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
                     }
                     else {
@@ -222,7 +224,7 @@ public class Interpreter {
             }
             case "DF": {
                 semaphore.wait_s(PID);
-                fileManagement.delete(x);
+                delete(x);
                 semaphore.signal_s();
                 program_counter++;
                 break;
@@ -299,7 +301,7 @@ public class Interpreter {
         }
         return true;
     }
-    private boolean div(String x)
+    private static boolean div(String x)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcher = rejestr.matcher(x);
@@ -347,7 +349,7 @@ public class Interpreter {
         program_counter++;
         return true;
     }
-    private boolean increment(String x)
+    private static boolean increment(String x)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcher = rejestr.matcher(x);
@@ -396,7 +398,7 @@ public class Interpreter {
         program_counter++;
         return true;
     }
-    private boolean jump(String x)
+    private static boolean jump(String x)
     {
         Pattern jump = Pattern.compile("\\d+");
         Matcher jumpmatcher = jump.matcher(x);
@@ -418,7 +420,7 @@ public class Interpreter {
         }
         return true;
     }
-    private boolean mov(String x, String y)
+    private static boolean mov(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
@@ -570,7 +572,7 @@ public class Interpreter {
         program_counter++;
         return true;
     }
-    private boolean add(String x, String y)
+    private static boolean add(String x, String y)
     {
         Pattern rejestr = Pattern.compile("[A-D]");
         Matcher rejestrmatcherx = rejestr.matcher(x);
