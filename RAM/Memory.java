@@ -22,7 +22,10 @@ public class Memory {
         freePartitions.put(0,256);
     }
 
-    public static Boolean loadProgram(String fileName){
+    public static Boolean loadProgram(){
+		String fileName;
+        fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
+        System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         try{
@@ -53,7 +56,7 @@ public class Memory {
             move();
             loadProgram(fileName);
         }
-        System.out.println("[RAM]: there is no space to load the program");
+        System.out.println("[RAM]: there is not enough space to load the program.");
         return false;
     }
     public static void writeMemory(char value,Integer address){
@@ -120,7 +123,7 @@ public class Memory {
         }
         Integer tmp = allocatedPartitions.get(base);
         allocatedPartitions.remove(base);
-        System.out.println("[RAM]: program has been deleted " + base);
+        System.out.println("[RAM]: program has been deleted.");
         freePartitions.put(base,tmp);
         mergeMaps(freePartitions);
     }
