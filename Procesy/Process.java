@@ -42,6 +42,8 @@ public class Process {
 
         this.program_counter = 0;
 
+        this.file_name = file_name;
+
         this.state = State.Ready;
     }
 
@@ -61,6 +63,8 @@ public class Process {
         this.last_message = new Message(-1,-1,null);
 
         this.program_counter = 0;
+
+        this.file_name = file_name;
 
         this.state = State.Ready;
     }
@@ -223,6 +227,24 @@ public class Process {
     }
     public Semaphore get_messages_semaphore(){
         return this.messages_semaphore;
+    }
+    public void display_messages_queue(){
+        Queue<Message> display=this.messages_queue;
+        System.out.println("Process "+this.get_PID()+" received messages:");
+        if(display.isEmpty()){
+            System.out.println("Messages queue is empty.");
+        }
+        else{
+            int counter=1;
+            while(!display.isEmpty()){
+                Message m=display.poll();
+                System.out.println("Message "+counter+": Sender PID:"+m.get_sender_PID()+" Size:"+m.get_size()+" Text:"+m.get_text());
+            counter++;
+            }
+        }
+    }
+	public void display_messages_semaphore(){
+        System.out.println("Process "+this.get_PID()+" messages semaphore value is: "+messages_semaphore.getValue());
     }
 
 
