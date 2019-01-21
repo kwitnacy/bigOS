@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package bigOS;
 
-import Processor.Scheduler;
-import Procesy.Process;
+
 import Procesy.Process_container;
 import RAM.Memory;
 import filemodule.FileManagement;
@@ -34,11 +29,8 @@ public class Shell {
     void system()
     {
         system=true;
+        System.out.println("[Interface]: Rozpoczecie pracy interfejsu");
         start();
-        FileManagement fileManagement = new FileManagement();
-        Scheduler scheduler = new Scheduler();
-        Process_container process_container = new Process_container();
-        Memory memory = new Memory();
         while(system)
         {
 
@@ -48,6 +40,7 @@ public class Shell {
                 Scanner sc = new Scanner(System.in);
                 System.out.print("bigOS:\\User>");
                 command=sc.nextLine();
+                System.out.println("[Interface]: Przechwycenie bufforu");
                 for(int i=0;i<command.length();i++)
                 {
                     if((int)command.charAt(i)<=90&&(int)command.charAt(i)>=65)
@@ -58,6 +51,7 @@ public class Shell {
                         command=newCommand;
                     }
                 }
+                System.out.println("[Interface]: Podzielenie bufforu na komendy i parametry");
                 cut();
                 execute();
             }
@@ -88,7 +82,7 @@ public class Shell {
     }
     void start()
     {
-        System.out.println("Tu jest logo bigOS");
+        System.out.println("\n \t\t        bigOS 1.0\n\t***NAJSMACZNIESZY SYSTEM OPERACYJNY***");
     }
     void login()
     {
@@ -113,31 +107,108 @@ public class Shell {
             case "help":
             {
                 if(parts.size()==1)
-                    System.out.println("help");
+                {
+                    System.out.println("[Interface]: Wypisanie dostepnych komend");
+                    System.out.println(""
+                            + "GO                       - WYKONANIE PRZEZ INTERPRETER JEDNEGO ROZKAZU ASSEMBLEROWEGO;*czekam na funkcje*\n"
+                            + "DIR                      - WYSWIETLA WSZYSTKIE PLIKI W SCIEZCE;\n"
+                            + "SHUTDOWN                 - KONCZY PRACE SYSTEMU;\n"
+                            + "SHUTDOWN -L              - WYLOGOWANIE KLIENTA;\n"
+                            + "CP [P1] [P2] [P3]        - TWORZY PROCES [P1] Z PLIKU [P2] O PRIORYTECIE [P3];\n"
+                            + "CP [P1] [P2] [P3] [P4]   - TWORZY PROCES [P1] Z PLIKU [P2] O PRIORYTECIE [P3] ZAJMUJACY [P4] BAJTOW W PAMIECI RAM;\n"
+                            + "CF [P1]                  - TWORZY PLIK O NAZWIE P1;\n"
+                            + "WF [P1] [P2] ... [PN]    - DOPISUJE DO PLIKU [P1] ZAWARTOSC KOLEJNYCH PARAMETROW;\n"
+                            + "DF [P1]                  - USUWA PLIK [P1];\n"
+                            + "TASKLIST                 - WYSWIETLA WSZYSTKIE PROCESY;\n"
+                            + "TASKLIST /PID [P1]       - WYSWIETLA PROCES O PID [P1];\n"
+                            + "TASKLIST /IM [P1]        - WYSWIETLA PROCES O NAZWIE [P1];\n"
+                            + "TASKKILL                 - USUWA WSZYSTKIE PROCESY;\n"
+                            + "TASKKILL /PID [P1]       - USUWA PROCES O PID [P1];\n"
+                            + "TASKKILL /IM [P1]        - USUWA PROCES O NAZWIE [P1];\n"
+                            + "TYPE [P1]                - WYSWIETLA ZAWARTOSC PLIKU [P1];\n"
+                            + "TYPE [P1] >> [P2]        - TWORZY NOWY PLIK [P2] Z ZAWARTOSCIA PLIKU [P1];\n"
+                            + "TYPE [P1] > [P2]         - DOPISUJE DO PLIKU [P2] ZAWARTOSC PLIKU [P1];\n"
+                            + "FAT                      - WYSWIETLA ZAWARTOSC MODULU PLIKOW;\n"
+                            + "FCB [P1]                 - WYSWIETLA FCB PLIKU [P1];\n"
+                            + "SEM [P1]                 - WYSWIETLA WARTOSC SEMAFORA PLIKU [P1];\n"
+                            + "PRINT_MEMORY             - WYSWIETLA INFORMACJE NA TEMAT RAMU;\n");
+                }
                 else
-                    System.out.println("dir, shutdown, cp, cf, wf, df, tasklist, type");
+                    System.out.println("[Interface]: Bledne argumenty");
+                break;
+            }
+            case "print_memory":
+            {
+                if(parts.size()==1)
+                {
+                    System.out.println("[Interface]: Wywolanie funkcji wypisujacej informacje na temat RAM'u");
+                    Memory.printMemory();
+                }
+                else
+                    System.out.println("[Interface]: Bledne argumenty");
+                
+                break;
+            }
+            case "fat":
+            {
+                if(parts.size()==1)
+                {
+                    System.out.println("[Interface]: Wywolanie funkcji wypisujacej zawartość modułu plikow");
+                    FileManagement.printFileSystem();
+                }
+                else
+                    System.out.println("[Interface]: Bledne argumenty");
+                break;
+            }
+            case "fcb":
+                    {
+                        if(parts.size()==2)
+                        {
+                            System.out.println("[Interface]: Wywolanie funkcji wypisujacej FCB pliku "+parts.get(1));
+                            FileManagement.displayFCB(parts.get(1));
+                        }
+                        else
+                            System.out.println("[Interface]: Bledne argumenty");
+                        break;
+                    }
+            case "sem":
+            {
+                if(parts.size()==2)
+                        {
+                            System.out.println("[Interface]: Wywolanie funkcji wypisujacej wartosc semafora pliku" + parts.get(1));
+                            FileManagement.displayFCB(parts.get(1));
+                        }
+                        else
+                            System.out.println("[Interface]: Bledne argumenty");
                 break;
             }
             case "dir":
             {
                 if(parts.size()==1)
+                {
+                    System.out.println("[Interface]: Wywolanie funkcji wypisujacej wszystkie pliki");
                     // Zabezpieczeniowiec sprawdza
                     FileManagement.displayRoot();
+                }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
                 break;
             }
             case "shutdown":
             {
                 if(parts.size()==1)
                 {
+                    System.out.println("[Interface]: Zamkniecie systemu");
                     session=false;
                     system = false;
                 }
                 else if(parts.size()==2 && parts.get(1).equals("-l"))
+                {
+                    System.out.println("[Interface]: Wylogowanie uzytkownika");
                     session=false;
+                }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
                 break;
             }
             case "df":
@@ -147,15 +218,15 @@ public class Shell {
                     // Zabezpieczeniowiec -> sprawdza
                     boolean blad = FileManagement.delete(parts.get(1));
                     if(blad)
-                        System.out.println("Usunieto "+parts.get(1));
+                        System.out.println("[Interface]: Wywolanie funkcji usuwajacej plik o nazwie "+parts.get(1));
                     else
                     {
-                        System.out.println("Blad "+blad);
+                        System.out.println("[Interface]: Blad "+blad);
                     }
 
                 }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
 
                 break;
             }
@@ -163,20 +234,20 @@ public class Shell {
             {
                 if(parts.size()==2)
                 {
+                    System.out.println("[Interface]: Wywolanie funkcji tworzacej plik o nazwie "+parts.get(1));
                     boolean blad = FileManagement.create(parts.get(1),user);
                     if(blad)
                     {
-                        System.out.println("Stworzono "+parts.get(1));
+                        
                         // Zabezpieczeniowiec wpisuje
                     }
                     else
                     {
-                        System.out.println("Blad "+blad);
                     }
 
                 }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
 
                 break;
             }
@@ -190,28 +261,64 @@ public class Shell {
                     // Zabezpieczeniowiec sprawdza czy mozna wpisac
                     boolean blad = FileManagement.write(parts.get(1),buffor);
                     if(blad){
-                        System.out.println("Dopisano "+buffor);
+                        System.out.println("[Interface]: Dopisano "+buffor);
 
                     }
                     else
                     {
-                        System.out.println("Blad "+blad);
+                        System.out.println("[Interface]: Blad "+blad);
                     }
 
                 }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
+                break;
+            }
+            case "taskkill":
+            {
+                if(parts.size()==3)
+                {
+                    if(parts.get(1).equals("/pid"))
+                    {
+                        System.out.println("[Interface]: Wywolanie funkcji usuwajacej proces o PID "+parts.get(2));
+                        Process_container.delete(Integer.parseInt(parts.get(2)));
+                    }
+                    else if(parts.get(1).equals("/im"))
+                    {
+                        System.out.println("[Interface]: Wywolanie funkcji usuwajacej proces o nazwie "+parts.get(2));
+                        Process_container.delete(parts.get(2));
+                    }
+                    else
+                        System.out.println("[Interface]:Bledne argumenty");
+                }
+                else
+                    System.out.println("[Interface]:Bledne argumenty");
                 break;
             }
             case "tasklist":
             {
                 if(parts.size()==1)
                 {
-                    System.out.println("Wyswietla procesy");
+                    System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej wszystkie procesy");
                     Process_container.show_all_processes();
                 }
+                else if(parts.size()==3)
+                {
+                    if(parts.get(1).equals("/pid"))
+                    {
+                        System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej proces o PID "+parts.get(2));
+                        Process_container.get_by_PID(Integer.parseInt(parts.get(2)));
+                    }
+                    else if(parts.get(1).equals("/im"))
+                    {
+                        System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej proces o nazwie "+parts.get(2));
+                        Process_container.get_by_name(parts.get(2));
+                    }
+                    else
+                        System.out.println("[Interface]:Bledne argumenty");
+                }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]:Bledne argumenty");
                 break;
             }
             case "cp":
@@ -221,7 +328,8 @@ public class Shell {
                     for(int i=0;i<parts.get(3).length();i++) {
                         if (Character.isDigit(parts.get(3).charAt(i))) ;
                         else {
-                            System.out.println("Bledne argumenty");
+                            System.out.println("[Interface]: Bledne argumenty");
+                            break;
                         }
                     }
 
@@ -232,26 +340,27 @@ public class Shell {
                     for(int i=0;i<parts.get(3).length();i++) {
                         if (Character.isDigit(parts.get(3).charAt(i))) ;
                         else {
-                            System.out.println("Bledne argumenty");
+                            System.out.println("[Interface]: Bledne argumenty");
                         }
                     }
                     for(int i=0;i<parts.get(4).length();i++) {
                         if (Character.isDigit(parts.get(4).charAt(i))) ;
                         else {
-                            System.out.println("Bledne argumenty");
+                            System.out.println("[Interface]: Bledne argumenty");
                         }
                     }
                     Process_container.create_process(parts.get(1),parts.get(2),Integer.parseInt(parts.get(3)),Integer.parseInt(parts.get(4)));
                 }
                 else
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
                 break;
             }
             case "type":
             {
                 if(parts.size()==2)
                 {
-                    //Wypisanie zawartosci pliku parts[2]
+                    System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej zawartosc pliku "+ parts.get(1));
+                    FileManagement.readFile(parts.get(1));
                 }
                 else if(parts.size()==4)
                 {
@@ -260,24 +369,30 @@ public class Shell {
                         {
                             if((int)parts.get(2).charAt(1)==62)
                             {
-                                // utworzenie nowego pliku parts[4] z zawartoscia pliku parts[2]
+                    System.out.println("[Interface]: Wywolanie funkcji tworzacych nowy plik "+ parts.get(3)+ " z zawartoscia pliku "+parts.get(3));
+                    String x = FileManagement.readFile(parts.get(1));
+                    FileManagement.create(x, user);
+                    // Zabezpieczeniowiec!!!
                             }
                             else
-                                System.out.println("Bledne argumenty");
+                                System.out.println("[Interface]: Bledne argumenty");
                         }
                         else if (parts.get(2).length()==1)
                         {
-                            // wpisanie zawartosci pliku parts[2] do istniejacego pliku parts[4]
+                    System.out.println("[Interface]: Wywolanie funkcji dopisujacych do pliku "+ parts.get(3)+ " zawartosc pliku "+parts.get(3));
+                    String x = FileManagement.readFile(parts.get(2));
+                    FileManagement.write(x, parts.get(3));
+                    // Zabezpieczeniowiec!!!
                         }
                         else
-                            System.out.println("Bledne argumenty");
+                            System.out.println("[Interface]: Bledne argumenty");
                     else {
-                        System.out.println("Bledne argumenty");
+                        System.out.println("[Interface]: Bledne argumenty");
                     }
                 }
                 else
                 {
-                    System.out.println("Bledne argumenty");
+                    System.out.println("[Interface]: Bledne argumenty");
                 }
                 break;
             }
@@ -300,7 +415,7 @@ public class Shell {
                             }
                             else
                             {
-                                System.out.println("Bledne argumenty");
+                                System.out.println("[Interface]: Bledne argumenty");
                             }
                         }
                         else if(parts.size()==5)
@@ -311,18 +426,18 @@ public class Shell {
                             }
                             else
                             {
-                                System.out.println("Bledne argumenty");
+                                System.out.println("[Interface]: Bledne argumenty");
                             }
                         }
                         else
                         {
-                            System.out.println("Bledne argumenty");
+                            System.out.println("[Interface]: Bledne argumenty");
                         }
 
                     }
                     else
                     {
-                        System.out.println("Bledne argumenty");
+                        System.out.println("[Interface]: Bledne argumenty");
                     }
                 }
                 else
@@ -334,7 +449,7 @@ public class Shell {
             default:
             {
 
-                System.out.println("'"+command+ "' jest nieznana komenda.");
+                System.out.println("[Interface]: '"+command+ "' jest nieznana komenda.");
                 break;
             }
         }
