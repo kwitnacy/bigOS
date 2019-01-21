@@ -259,12 +259,13 @@ public class Process {
         String text="";
         int counter=0;
 
-        while(Message.read_ram(addres+counter+1)!='$'){
+        while(Memory.readMemory(addres+counter+1)!='$'){
 
-            text+=Message.read_ram(addres+counter+1);
+            text+=Memory.readMemory(addres+counter+1);
 
             counter++;
-            if(Message.read_ram(addres+counter+1)==null){
+
+            if(Memory.readMemory(addres+counter+1)==null){
                 System.out.println("[IPC] Sending failure, memory error.");
                 return false;
             }
@@ -276,8 +277,8 @@ public class Process {
         String text="";
 
         for(int i=0; i<size; i++){
-            if(Message.read_ram(addres+i)!=null){
-                text+=Message.read_ram(addres+i);
+            if(Memory.readMemory(addres+i)!=null){
+                text+=Memory.readMemory(addres+i);
             }
             else{
                 System.out.println("[IPC] Sending failure, memory error.");
@@ -327,12 +328,11 @@ public class Process {
         this.last_message=this.messages_queue.peek();
         String ram_msg = (char)last_message.get_sender_PID()+last_message.get_text().substring(0,size)+'$';
 
-        for(int i=0; i<ram_msg.length();i++){
-            if(!Message.write_to_ram(addres+i,ram_msg.charAt(i))){
-                System.out.println("[IPC] Reading failure, memory error.");
-                return false;
-            }
+        if(!Memory.writeMessage(this,ram_msg,addres)){
+            System.out.println("[IPC] Reading failure, memory error.");
+            return false;
         }
+
         this.messages_queue.poll();
         int written_pid=ram_msg.charAt(0);
 
@@ -351,12 +351,11 @@ public class Process {
         this.last_message=this.messages_queue.peek();
         String ram_msg = (char)last_message.get_sender_PID()+last_message.get_text()+'$';
 
-        for(int i=0; i<ram_msg.length();i++){
-            if(!Message.write_to_ram(addres+i,ram_msg.charAt(i))){
-                System.out.println("[IPC] Reading failure, memory error.");
-                return false;
-            }
+        if(!Memory.writeMessage(this,ram_msg,addres)){
+            System.out.println("[IPC] Reading failure, memory error.");
+            return false;
         }
+
         this.messages_queue.poll();
         int written_pid=ram_msg.charAt(0);
 

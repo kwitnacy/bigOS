@@ -78,7 +78,11 @@ public class Memory {
         Integer limit = tmp;
         freeSpace.put(base+next+10,tmp-next-10);
     }
-    public static char readMemory(Integer adress){
+    public static Character readMemory(Integer adress){
+        if(adress<0||adress>256){
+            System.out.println("[RAM] Invalid addres.");
+            return null;
+        }
         return memory[adress];
     }
 
@@ -157,6 +161,17 @@ public class Memory {
         }
     }
 
+    public static boolean writeMessage(Procesy.Process proc, String message, int addres){
+        if(addres+message.length()>proc.get_limit()-proc.get_base()||addres<0){
+            System.out.println("[RAM] Attempt of writing outside process memory.");
+            return false;
+        }
+
+        for(int i=0; i<message.length(); i++){
+            memory[proc.get_base()+addres+i]=message.charAt(i);
+        }
+        return true;
+    }
     public static void main(String[] args){
         Arrays.fill(memory,' ');
         freeSpace.put(0,256);
