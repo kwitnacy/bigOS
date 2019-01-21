@@ -1,21 +1,26 @@
 package RAM;
+import Processor.Scheduler;
+import Procesy.Process;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
-import static java.lang.Math.toIntExact;
 
-/*TODO:     1: wiadomosci (dodawanie)
-            2: poprawki kosmetyczno-bamboszkowe
+/*TODO:    poprawki kosmetyczno-bamboszkowe
 */
 public class Memory {
 
     public static char[] memory = new char[256];
 
-    private static Map<Integer,Integer> filledSpace = new HashMap<>();
-    private static Map<Integer,Integer> freeSpace =  new HashMap<>();
+    private static Map<Integer,Integer> allocatedPartitions = new HashMap<>();
+    private static Map<Integer,Integer> freePartitions =  new HashMap<>();
+
+    public static void memoryInit(){
+        Arrays.fill(memory,' ');
+        freePartitions.put(0,256);
+    }
 
     public static Boolean loadProgram(String fileName){
         Integer size=0,value=0;
@@ -31,8 +36,8 @@ public class Memory {
             e.printStackTrace();
         }
         for(int i=0;i<256;i++) {
-            if(freeSpace.get(i)!=null)
-                value = freeSpace.get(i);
+            if(freePartitions.get(i)!=null)
+                value = freePartitions.get(i);
             if(value>=size+10){
                 writeMemory(fileName,i);
                 return true;
@@ -40,19 +45,20 @@ public class Memory {
         }
         Integer free=0;
         for(int j=0;j<256;j++){
-            if(freeSpace.get(j)!=null){
-                free+=freeSpace.get(j);
+            if(freePartitions.get(j)!=null){
+                free+=freePartitions.get(j);
             }
         }
         if(free>=size+10) {
             move();
             loadProgram(fileName);
         }
-        System.out.println("[RAM]: za malo miejsca dla programu");
+        System.out.println("[RAM]: there is no space to load the program");
         return false;
     }
-    public static void writeMemory(char value,Integer index){
-
+    public static void writeMemory(char value,Integer address){
+        Integer base = Scheduler.running.get_base();
+        memory[base+address]=value;
     }
     private static void writeMemory(String fileName,Integer base){
         File file = new File(fileName);
@@ -71,15 +77,23 @@ public class Memory {
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }
-        filledSpace.put(base,next+10);
-        System.out.println("[RAM]: Program zostal umieszczony w pamieci w adresach " + base + "-" + (base+next-1));
-        Integer tmp = freeSpace.get(base);
-        freeSpace.remove(base);
+        allocatedPartitions.put(base,next+10);
+        //Scheduler.running.ser_base(base);
+       // Scheduler.running.ser_limit(next+10);
+
+        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next-1));
+        Integer tmp = freePartitions.get(base);
+        freePartitions.remove(base);
         Integer limit = tmp;
-        freeSpace.put(base+next+10,tmp-next-10);
+        freePartitions.put(base+next+10,tmp-next-10);
     }
-    public static char readMemory(Integer adress){
-        return memory[adress];
+    public static Character readMemory(Integer address){
+        if(address<0||address>256){
+            System.out.println("[RAM]: Invalid address.");
+            return null;
+        }
+        Integer base= Scheduler.running.get_base();
+        return memory[base+address];
     }
 
     private static void mergeMaps(Map<Integer,Integer> map){
@@ -89,25 +103,26 @@ public class Memory {
             limit = map.get(i);
             if(limit!=null) {
                 if(i==(preBase+preLimit)) {
-                    freeSpace.remove(preBase);
-                    freeSpace.remove(i);
-                    freeSpace.put(preBase,i+limit-preBase);
+                    freePartitions.remove(preBase);
+                    freePartitions.remove(i);
+                    freePartitions.put(preBase,i+limit-preBase);
                 }
                 preLimit=limit;
                 preBase=i;
             }
         }
     }
-    public static void removeProgram(Integer base) {
+    public static void removeProgram() {
+        Integer base= Scheduler.running.get_base();
 //        int limit = filledSpace.get(base);
-        for(int i=base;i<filledSpace.get(base) + base; i++){
+        for(int i=base;i<allocatedPartitions.get(base) + base; i++){
             memory[i]=' ';
         }
-        Integer tmp = filledSpace.get(base);
-        filledSpace.remove(base);
-        System.out.println("[RAM]: usunieto program rozpoczynajacy sie w adresie " + base);
-        freeSpace.put(base,tmp);
-        mergeMaps(freeSpace);
+        Integer tmp = allocatedPartitions.get(base);
+        allocatedPartitions.remove(base);
+        System.out.println("[RAM]: program has been deleted " + base);
+        freePartitions.put(base,tmp);
+        mergeMaps(freePartitions);
     }
 
     public static void printMemory(){
@@ -118,26 +133,26 @@ public class Memory {
                     + (i+128) + ": " + memory[i+128]+ "\t\t\t"
                     + (i+192) + ": " + memory[i+192]);
         }
-        int zajete = filledSpace.values().stream().reduce(0, Integer::sum);
-        System.out.println("Ilosc wolnego miejsca: " + (256-zajete) + "\nIlosc zajetego miejsca: " + zajete);
-        System.out.println("Zajete obszary: " + filledSpace.entrySet());
-        System.out.println("Wolne obszary: " + freeSpace.entrySet());
+        int zajete = allocatedPartitions.values().stream().reduce(0, Integer::sum);
+        System.out.println("Free space: " + (256-zajete) + "\nAllocated space: " + zajete);
+        System.out.println("Allocated partitions: " + allocatedPartitions.entrySet());
+        System.out.println("Free partitions: " + freePartitions.entrySet());
     }
 
     public static void move(){
-        System.out.println("[RAM]: Przesuwanie obszarow");
+        System.out.println("[RAM]: Doing compaction");
         Integer tmp=0,limit=0,thisLimit=0,j=0,k=0;
         Boolean flag=true;
         for(int i=0;i<256;i++){
-            if(filledSpace.get(i)!=null){
+            if(allocatedPartitions.get(i)!=null){
                 while(flag){
-                    limit=filledSpace.get(i)+i;
-                    i+=filledSpace.get(i);
-                    if(filledSpace.get(i)==null)
+                    limit=allocatedPartitions.get(i)+i;
+                    i+=allocatedPartitions.get(i);
+                    if(allocatedPartitions.get(i)==null)
                         flag=false;
                 }
 
-                thisLimit=filledSpace.get(i);
+                thisLimit=allocatedPartitions.get(i);
                 for(j=i;j>limit;j--){
                     for(k=0;k<thisLimit;k++){
                         memory[j+k-1]=memory[j+k];
@@ -146,24 +161,32 @@ public class Memory {
                         }
                     }
                 }
-                filledSpace.remove(i);
-                filledSpace.put(j,k);
-                tmp=freeSpace.get(j);
-                freeSpace.remove(j);
-                freeSpace.put(j+k,tmp);
-                mergeMaps(freeSpace);
+                allocatedPartitions.remove(i);
+                allocatedPartitions.put(j,k);
+                tmp=freePartitions.get(j);
+                freePartitions.remove(j);
+                freePartitions.put(j+k,tmp);
+                mergeMaps(freePartitions);
                 limit=j+k;
             }
         }
     }
 
+    public static boolean writeMessage(Procesy.Process proc, String message, int address){
+        if(address+message.length()>proc.get_limit()-proc.get_base()||address<0){
+            System.out.println("[RAM]: Attempt of writing outside process memory.");
+            return false;
+        }
+
+        for(int i=0; i<message.length(); i++){
+            memory[proc.get_base()+address+i]=message.charAt(i);
+        }
+        return true;
+    }
     public static void main(String[] args){
-        Arrays.fill(memory,' ');
-        freeSpace.put(0,256);
         loadProgram("src/p0.txt");
         loadProgram("src/p1.txt");
         loadProgram("src/p0.txt");
-        removeProgram(14);
         move();
         printMemory();
     }
