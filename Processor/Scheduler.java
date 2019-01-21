@@ -36,7 +36,15 @@ public class Scheduler
 			queuesPCB.add(new LinkedList<Process>());
 		}
 	}
-	
+
+	static {
+		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla ka�dedgo priorytetu
+
+		for (int i=0 ; i<15 ; i++){
+			queuesPCB.add(new LinkedList<Process>());
+		}
+	}
+
 	public static void add(Process toAdd) 									// dodawanie procesu do odpowiedniej kolejki
 	{
 		if(toAdd.get_name().equals("dummy")){

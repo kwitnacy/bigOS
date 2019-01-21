@@ -156,14 +156,16 @@ public class Process {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void display_process(){
-        System.out.println("Name: " + this.name);
-        System.out.println("State: " + this.state);
-        System.out.println("Memory_base: " + this.base);
-        System.out.println("Memory_limit: " + this.limit);
-        System.out.println("AX, BX, CX, DX: " + this.AX + " " + this.BX + " " + this.CX + " " + this.DX);
-        System.out.println("Piority (base): " + this.base_priority);
-        System.out.println("Piority (temp): " + this.temp_priority);
-        System.out.println("Message: " + this.last_message.get_text());
+        System.out.println("+-------------------------------------------------------+");
+        System.out.println("|Name: " + this.name);
+        System.out.println("|State: " + this.state);
+        System.out.println("|Memory_base: " + this.base);
+        System.out.println("|Memory_limit: " + this.limit);
+        System.out.println("|AX, BX, CX, DX: " + this.AX + " " + this.BX + " " + this.CX + " " + this.DX);
+        System.out.println("|Piority (base): " + this.base_priority);
+        System.out.println("|Piority (temp): " + this.temp_priority);
+        System.out.println("|Message: " + this.last_message.get_text());
+        System.out.println("+-------------------------------------------------------+");
     }
 
     public void change_state(State state){
@@ -172,10 +174,8 @@ public class Process {
         if(this.state == State.Running)
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Running");
 		
-		if(this.state == State.Ready){
+		if(this.state == State.Ready)
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Ready");
-            Process_container.add_to_CPU(this.PID);
-		}
 
         if(this.state == State.Terminated){
             Process_container.delete(this.PID);
