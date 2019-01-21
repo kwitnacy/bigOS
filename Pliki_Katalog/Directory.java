@@ -30,7 +30,7 @@ public class Directory {
             }
         }
         this.root.add(file);
-        System.out.println("[File Module]: File " + file.getName() + " added to the root.");
+        //System.out.println("[File Module]: File " + file.getName() + " added to the root.");
         return true;   //dodanie do katalogu
     }
     

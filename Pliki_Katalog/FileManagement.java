@@ -50,6 +50,18 @@ public class FileManagement {
         disk.fileSystem.root.printRoot();
     }
     
+    //metody do zarządzana plikami
+    
+    //wyswietla tablice FAT, wektor bitowy i dysk
+    public static void printFileSystem(){
+        System.out.println("[File Module]:");
+        System.out.println("FAT: ");disk.fileSystem.displayFAT();
+        System.out.println("Bit vecotr: ");
+        displayFreeBlocks();
+        System.out.println("Disk: ");
+        printDisk();
+    }
+    
     //wyswietla FCB pliku
     public static boolean displayFCB(String fileName)
     {
@@ -65,23 +77,11 @@ public class FileManagement {
         return true;
     }
     
-    //metody do zarządzana plikami
-    
-    public static void printFileSystem(){
-        System.out.println("[File Module]:");
-        System.out.println("FAT: ");disk.fileSystem.displayFAT();
-        System.out.println("Bit vecotr: ");
-        displayFreeBlocks();
-        System.out.println("Disk: ");
-        printDisk();
-    }
-    
     //metody do zarządzania semaforami w plikach
     
     public static boolean signalFile(String file_name)
     {
         if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
-        //if(properFileName(file_name) == false) {System.out.println("[File Module]: Incorrect file name."); return false;}   //niepoprawna nazwa pliku
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
         //ftemp.s.signal();    
         disk.fileSystem.root.replacebyName(ftemp);
@@ -114,9 +114,9 @@ public class FileManagement {
             File file = new File();
             file.setName(name);
             file.setUserName(user);
-            System.out.println("[File Module]: User " + user + " created a file named " + name);
+            //System.out.println("[File Module]: User " + user + " created a file named " + name);
             disk.fileSystem.root.addToRoot(file);
-            System.out.println("[File Module]: File " + name + " created by " + user + " added to the root.");
+            //System.out.println("[File Module]: File " + name + " created by " + user + " added to the root.");
             return true;
         }
     }
@@ -129,7 +129,7 @@ public class FileManagement {
         
         int sizeBytes = data.length();   //tyle bajtów zajmuje
         int blocks = (int) Math.ceil(sizeBytes / 32.0); //tyle bloków zajmie
-        System.out.println("[File Module]: Number of blocks needed for data: " + blocks);
+        //System.out.println("[File Module]: Number of blocks needed for data: " + blocks);
 
         if(properFileName(name) == false && blocks > disk.fileSystem.checkFreeBlocks()){ System.out.println("[File Module]: Incorrect file name and not enough space on the disk."); return false;}   //błędna nazwa i za duże dane
         if(blocks > disk.fileSystem.checkFreeBlocks()) { System.out.println("[File Module]: Not enough space on the disk."); return false; } //nie ma wystarczająco wolnych bloków
@@ -174,8 +174,8 @@ public class FileManagement {
                 dataPos++;
                 if(dataPos >= dat.length) { break; }
             }
-                    System.out.println("[File Module]: Setting " + freeB.get(i) + " block in bit vector.");
-                    disk.fileSystem.freeBlocks.set(freeB.get(i));   //blok zajęty
+            //System.out.println("[File Module]: Setting " + freeB.get(i) + " block in bit vector.");
+            disk.fileSystem.freeBlocks.set(freeB.get(i));   //blok zajęty
         }
         disk.fileSystem.root.replacebyName(ftemp);   //podmieniamy plik na ten ze zmodyfikowanym FCB
         return true;
@@ -191,7 +191,6 @@ public class FileManagement {
         if(ftemp.getSize() == 0) { System.out.println("[File Module]: File doesn't contain any data on the disk."); return null; }  //plik nie ma danych zapisanych na dysku
         
         String output = new String();  //tu będą zapisane zczytane dane
-        //int size = ftemp.getSize();
         int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
         
@@ -203,7 +202,7 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        System.out.println("[File Module]: Blocks that will be read: " + blocks);
+        //System.out.println("[File Module]: Blocks that will be read: " + blocks);
         
         //Numer indeksu w pliku od którego mamy czytać
         Double fromIndex = Math.floor(from/32);
@@ -215,17 +214,8 @@ public class FileManagement {
         int readPosition = blocks.get(fromIndex.intValue())*32 + from%32;
         int stopPosition = blocks.get(toIndex.intValue())*32 +(from+howMany)%32;
         
-        //String buffer = new String();
-        //Double bufferIndex = new Double(-1);
-        
         //Pętla czytania
         while(readPosition < stopPosition){
-            //Aktualizacja bufora
-//            if(bufferIndex != Math.floor(readPosition/32)) {
-//                bufferIndex = Math.floor(readPosition/32);
-//                buffer = new String(disk.getBlock(bufferIndex));
-//            }
-            
             output = output.concat(Character.toString(disk.getByte(readPosition)));
             readPosition++;
         }
@@ -253,7 +243,7 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        System.out.println("[File Module]: Blocks that will be read: " + blocks);
+        //System.out.println("[File Module]: Blocks that will be read: " + blocks);
         String buffer;
         
         for(int i : blocks){
@@ -282,11 +272,13 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        System.out.println("[File Module]: Blocks that will be deleated: " + blocks);
+        //System.out.println("[File Module]: Blocks that will be deleated: " + blocks);
         for(int i : blocks){
            Double d = new Double(i);
            disk.clearBlock(d);
-            System.out.println("[File Module]: Block number " + i + " deleated.");
+           disk.fileSystem.freeBlocks.set(i, false);
+           disk.fileSystem.FAT[i] = -1;
+            //System.out.println("[File Module]: Block number " + i + " deleated.");
         }
         disk.fileSystem.root.deleteFromRoot(name);      //usunięcie pliku o podanej nazwie z katalogu
         return true;

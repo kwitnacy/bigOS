@@ -12,15 +12,14 @@ public class Message{
     }
 
     /// funkcje get
-    public int get_sender_PID(){
-        return this.senderPID;
-    }
+    public int get_sender_PID(){ return this.senderPID; }
     public String get_text(){
         return this.text;
     }
     public int get_size(){
         return this.size;
     }
+
     /// funkcje set
     public void set_sender_PID(int PID){
         this.senderPID=PID;
@@ -33,14 +32,61 @@ public class Message{
     }
 
     public static void main(String[] arg){
-        Message msg=new Message(69,5,"abcde");
-        char ram_msg[]=msg.get_text().toCharArray();
-        ///zapisywanie do RAM od adresu licznika rozkazów w formacie [ilość znaków +1][znaki]...
-        /// przykład: [PID jako char][b][i][g][O][S]
-//        for(int i=0; i<ram_msg.length();i++){
-//            //write(++program_counter,ram_msg.charAt(i));
-//        }
-        //System.out.println((int) ram_msg.charAt(0));
-        System.out.println("[READ] Sender: "+ram_msg[0]+" Text: "+ram_msg.length);
+        for (int i=0; i<128; i++) {
+            write_to_ram(i,'.');
+        }
+        /// $ ma numer 36
+        Process_container cont= new Process_container();
+        cont.create_process("p1","proc1_txt",5);
+        cont.create_process("p2","proc2_txt",5);
+
+
+        display_ram();
+//        cont.get_by_PID(1).send_message("p2",2,0);
+//        cont.get_by_PID(2).read_message(0,100);
+
+//        cont.get_by_PID(1).send_message("p2",0);
+//        cont.get_by_PID(2).read_message(10);
+//        cont.get_by_PID(1).send_message("p2",3,11);
+//        cont.get_by_PID(2).read_message(20);
+//        cont.get_by_PID(1).send_message(2,"qutaz");
+//        cont.get_by_PID(2).read_message(30);
+//        cont.get_by_PID(1).send_message(2,30);
+//        cont.get_by_PID(2).read_message(40);
+//        cont.get_by_PID(1).send_message(2,3,41);
+//        cont.get_by_PID(2).read_message(50);
+        display_ram();
+
+        if(cont.get_by_PID(2).state==State.Ready){ System.out.println("ready"); }
+        else{ System.out.println("non ready"); }
+        cont.get_by_PID(2).read_message(30);
+        if(cont.get_by_PID(2).state==State.Waiting){ System.out.println("waiting"); }
+        else{ System.out.println("non waiting"); }
+        cont.get_by_PID(1).send_message(2,"qutaz");
+        if(cont.get_by_PID(2).state==State.Ready){ System.out.println("ready"); }
+        else{ System.out.println("non ready"); }
+        display_ram();
+    }
+    public static char[] ram = new char [128];
+    public static boolean write_to_ram(int addres,char c){
+        if(addres<0||addres>128){
+            return false;
+        }
+        else{
+            Message.ram[addres]=c;
+            return true;
+        }
+
+    }
+    static Character read_ram(int addres){
+        if(addres<0||addres>=128){
+            return null;
+        }
+        else {
+            return ram[addres];
+        }
+    }
+    static void  display_ram(){
+        System.out.println(ram);
     }
 }
