@@ -13,9 +13,9 @@ public class FileModule {
         FileManagement.create("f3", "marmolada");
         FileManagement.create("f4", "marmolada");
         
-        FileManagement.write("f1", "klapki babci GITARA SIEMA pfffff meh");
+        FileManagement.write("f1", "gITARA SIEMA");
         FileManagement.printFileSystem();
-        FileManagement.write("f2", "elo tutaj spuderswinia");
+        FileManagement.write("f2", "spuderswinia");
         FileManagement.write("f1", "DUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupa");
         FileManagement.write("f3", "wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!");
         FileManagement.printFileSystem();
@@ -24,11 +24,15 @@ public class FileModule {
         output = FileManagement.read("f4", 0, 40);
         System.out.println(output);
       
-        FileManagement.delete("f2");
+        FileManagement.delete("f3");
         FileManagement.printFileSystem();
-        FileManagement.displayFCB("f3");
-        FileManagement.displayFCB("f1");
-    
+        
+        FileManagement.create("f1", "marmolada");
+        FileManagement.write("f1", "czekoladaCZEKOLADAczekoladaCZEKOLADAczekoladaCZEKOLADAczekoladaCZEKOLADA");
+        FileManagement.printFileSystem();
+        
+        output = FileManagement.readFile("f1");
+        System.out.println(output);
     }
     
 }
