@@ -1,33 +1,24 @@
 package Interpreter;
 import Processor.Scheduler;
-import Procesy.Process;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
 import static filemodule.FileManagement.*;
 import Semaphore.Semaphore;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static RAM.Memory.loadProgram;
 import static RAM.Memory.readMemory;
-//Procesor tworzy obiekt i wywoluje funkcje executeProgram()
+
 public class Interpreter {
 
     private static int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private static String rozkaz, calyRozkaz;
     private static String user;
-    private  static Semaphore semaphore;
 	
 	public Interpreter(){
-		// [KWITNONCY]: TEN TAK
+
 	}
 
     private static void start(String filename) {
-        /*if (!loadProgram(filename)) { //ladowac na pocz!!
-            System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
-            Scheduler.running.change_state(State.Terminated);
-        } else {*/
             Scheduler.running.change_state(State.Running);
             program_counter = Processor.Scheduler.running.get_program_counter();
             PID = Processor.Scheduler.running.get_PID();
@@ -51,16 +42,6 @@ public class Interpreter {
         Scheduler.running.set_CX(C);
         Scheduler.running.set_DX(D);
         Scheduler.running.set_program_counter(program_counter);
-    }
-    private static void display()
-    {
-        System.out.println("Stan po wykonanym rozkazie ");
-        System.out.println("PID: "+PID);
-        System.out.println("rejestr A: "+A);
-        System.out.println("rejestr B: "+B);
-        System.out.println("rejestr C: "+C);
-        System.out.println("rejestr D: "+D);
-        System.out.println("program_counter: "+ program_counter);
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
@@ -89,7 +70,6 @@ public class Interpreter {
         start(Scheduler.running.get_file_name());
         for (int i = 0;i<how_many||!rozkaz.equals("HT");i++)
         {
-            //pierwszy rozkaz jest pobierany juz w start()
             if(!executeOrder())
             {
                 return;
@@ -162,20 +142,26 @@ public class Interpreter {
                 break;
             }
             case "CF": {
-                create(x, user);
+                if(!create(x, user))
+                {
+                    return false;
+                }
                 // usera mam miec
                 program_counter++;
                 break;
             }
             case "WF": {
-                semaphore.wait_s(PID);
-                write(x, y);
-                semaphore.signal_s();
+                waitFile(x,PID);
+                if(!write(x, y))
+                {
+                    return false;
+                }
+                signalFile(x);
                 program_counter++;
                 break;
             }
             case "RF": {
-                semaphore.wait_s(PID);
+                waitFile(x,PID);
                 if (xx.equals("")) {
                 System.out.println(read(x,Integer.parseInt(y),Integer.parseInt(z)));}
                 else {
@@ -188,19 +174,19 @@ public class Interpreter {
                             Scheduler.running.change_state(State.Terminated);
                             return false;
                         }
-                        if(x.equals("A"))
+                        else if(x.equals("A"))
                         {
                             A = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
-                        if(x.equals("B"))
+                        else if(x.equals("B"))
                         {
                             B = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
-                        if(x.equals("C"))
+                        else if(x.equals("C"))
                         {
                             C = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
-                        if(x.equals("D"))
+                        else if(x.equals("D"))
                         {
                             D = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
@@ -211,14 +197,17 @@ public class Interpreter {
                         return false;
                     }
                 }
-                semaphore.signal_s();
+                signalFile(x);
                 program_counter++;
                 break;
             }
             case "DF": {
-                semaphore.wait_s(PID);
-                delete(x);
-                semaphore.signal_s();
+                waitFile(x,PID);
+                if(!delete(x))
+                {
+                    return false;
+                }
+                signalFile(x);
                 program_counter++;
                 break;
             }
@@ -228,8 +217,9 @@ public class Interpreter {
                 break;
             }
             case "SM": {
-                //SM [nazwa/PID procesu odbiorcy] [rozmiar wiadomości] [wiadomość]
-                //SM [nazwa/PID procesu odbiorcy] [rozmiar wiadomości] [adres]
+                //SM <nazwa/PID odbiorcy> <tekst>
+                //SM <nazwa/PID odbiorcy> <size> [adres]
+                //SM <nazwa/PID odbiorcy> [adres]
                 Pattern adres = Pattern.compile("\\[\\d+]");
                 Matcher adresmatcher = adres.matcher(z);
                 Pattern pid = Pattern.compile("\\d+");
