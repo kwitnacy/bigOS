@@ -18,25 +18,18 @@ public class Interpreter {
     private static String rozkaz, calyRozkaz;
     private static String user;
     private  static Semaphore semaphore;
-
-	/*
-    public Interpreter(FileManagement fileManagement, Semaphore semaphore) {
-            //tutaj pierwszy rozkaz programu
-			// [KWITNONCY]: TEN KONSTRUKTOR SIE NIE PRZYDA 
-    }
-	*/
 	
 	public Interpreter(){
 		// [KWITNONCY]: TEN TAK
 	}
 
     private static void start(String filename) {
-        if (!loadProgram(filename)) { //ladowac na pocz!!
+        /*if (!loadProgram(filename)) { //ladowac na pocz!!
             System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");
             Scheduler.running.change_state(State.Terminated);
-        } else {
-            //Scheduler.running.change_state(State.Running);
-            program_counter = Processor.Scheduler.running.get_program_counter;
+        } else {*/
+            Scheduler.running.change_state(State.Running);
+            program_counter = Processor.Scheduler.running.get_program_counter();
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -45,7 +38,7 @@ public class Interpreter {
             C = Scheduler.running.get_CX();
             D = Scheduler.running.get_DX();
             getOrder();
-        }
+        //}
     }
     private void set_user()
     {
