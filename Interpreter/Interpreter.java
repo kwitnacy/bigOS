@@ -4,13 +4,14 @@ import Procesy.State;
 import static Procesy.Process.make_porocess;
 
 import Semaphore.Semaphore;
+import filemodule.File;
 import filemodule.FileManagement;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static Memory.loadProgram;
-import static Memory.readMemory;
+import static RAM.Memory.loadProgram;
+import static RAM.Memory.readMemory;
 //Procesor tworzy obiekt i wywoluje funkcje executeProgram()
 public class Interpreter {
 
@@ -18,12 +19,18 @@ public class Interpreter {
     private String rozkaz, calyRozkaz, user;
     private FileManagement fileManagement;
     private Semaphore semaphore;
-    public Interpreter(FileManagement fileManagement, Semaphore semaphore)
-    {
-            this.fileManagement = fileManagement;
-            this.semaphore = semaphore;
+
+	/*
+    public Interpreter(FileManagement fileManagement, Semaphore semaphore) {
             //tutaj pierwszy rozkaz programu
+			// [KWITNONCY]: TEN KONSTRUKTOR SIE NIE PRZYDA 
     }
+	*/
+	
+	public Interpreter(){
+		// [KWITNONCY]: TEN TAK
+	}
+
     private void start(String filename) {
         if (!loadProgram(filename)) {
             System.out.println("Blad! Nie udalo sie zaladowac programu do pamieci");

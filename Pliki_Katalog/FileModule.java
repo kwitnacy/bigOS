@@ -8,26 +8,26 @@ public class FileModule {
 
     public static void main(String[] args) {
         
-        FileManagement filemanagement = new FileManagement();
-        filemanagement.create("f1", "marmolada");
-        filemanagement.create("f2", "marmolada");
-        filemanagement.create("f3", "marmolada");
+        FileManagement.create("f1", "marmolada");
+        FileManagement.create("f2", "marmolada");
+        FileManagement.create("f3", "marmolada");
+        FileManagement.create("f4", "marmolada");
         
-        filemanagement.write("f1", "klapki babci GITARA SIEMA pfffff meh");
-        filemanagement.printFileSystem();
-        filemanagement.write("f2", "elo tutaj spuderswinia");
-        filemanagement.write("f1", "DUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupa");
-        filemanagement.write("f3", "wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!");
-        filemanagement.printFileSystem();
+        FileManagement.write("f1", "klapki babci GITARA SIEMA pfffff meh");
+        FileManagement.printFileSystem();
+        FileManagement.write("f2", "elo tutaj spuderswinia");
+        FileManagement.write("f1", "DUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupaDUPAdupa");
+        FileManagement.write("f3", "wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!wifi daje raka plodom!");
+        FileManagement.printFileSystem();
         
         String output;
-        output = filemanagement.read("f3", 0, 40);
+        output = FileManagement.read("f4", 0, 40);
         System.out.println(output);
       
-        filemanagement.delete("f2");
-        filemanagement.printFileSystem();
-        filemanagement.displayFCB("f3");
-        filemanagement.displayFCB("f1");
+        FileManagement.delete("f2");
+        FileManagement.printFileSystem();
+        FileManagement.displayFCB("f3");
+        FileManagement.displayFCB("f1");
     
     }
     
