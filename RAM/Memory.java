@@ -54,7 +54,7 @@ public class Memory {
             move();
             loadProgram();
         }
-        System.out.println("[RAM]: there is no space to load the program");
+        System.out.println("[RAM]: there is not enough space to load the program");
         return false;
     }
     public static void writeMemory(char value,Integer address){
@@ -120,7 +120,7 @@ public class Memory {
         }
         Integer tmp = allocatedPartitions.get(base);
         allocatedPartitions.remove(base);
-        System.out.println("[RAM]: program has been deleted " + base);
+        System.out.println("[RAM]: program has been deleted.");
         freePartitions.put(base,tmp);
         mergeMaps(freePartitions);
     }
