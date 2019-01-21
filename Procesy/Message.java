@@ -5,7 +5,7 @@ public class Message{
     private int size;           // rozmiar
     private String text;        // maksymalnie 8B
 
-    Message(int senderPID,int size,String text){
+    public Message(int senderPID,int size,String text){
         this.senderPID=senderPID;
         this.size=size;
         this.text=text;
