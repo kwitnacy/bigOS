@@ -42,6 +42,8 @@ public class Process {
 
         this.program_counter = 0;
 
+        this.file_name = file_name;
+
         this.state = State.Ready;
     }
 
@@ -61,6 +63,8 @@ public class Process {
         this.last_message = new Message(-1,-1,null);
 
         this.program_counter = 0;
+
+        this.file_name = file_name;
 
         this.state = State.Ready;
     }
