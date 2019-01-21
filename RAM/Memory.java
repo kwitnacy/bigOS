@@ -8,8 +8,6 @@ import java.io.File;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 
-/*TODO:    poprawki kosmetyczno-bamboszkowe
-*/
 public class Memory {
 
     public static char[] memory = new char[256];
@@ -23,8 +21,8 @@ public class Memory {
     }
 
     public static Boolean loadProgram(){
-		String fileName;
-        fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
+        String fileName;
+        fileName= "src/Interpreter/" + Scheduler.running.get_file_name();
         System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
@@ -54,9 +52,9 @@ public class Memory {
         }
         if(free>=size+10) {
             move();
-            loadProgram(fileName);
+            loadProgram();
         }
-        System.out.println("[RAM]: there is not enough space to load the program.");
+        System.out.println("[RAM]: there is no space to load the program");
         return false;
     }
     public static void writeMemory(char value,Integer address){
@@ -81,8 +79,8 @@ public class Memory {
             e.printStackTrace();
         }
         allocatedPartitions.put(base,next+10);
-        //Scheduler.running.ser_base(base);
-       // Scheduler.running.ser_limit(next+10);
+        Scheduler.running.ser_base(base);
+        Scheduler.running.ser_limit(next+10);
 
         System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next-1));
         Integer tmp = freePartitions.get(base);
@@ -117,20 +115,18 @@ public class Memory {
     }
     public static void removeProgram() {
         Integer base= Scheduler.running.get_base();
-//        int limit = filledSpace.get(base);
         for(int i=base;i<allocatedPartitions.get(base) + base; i++){
             memory[i]=' ';
         }
         Integer tmp = allocatedPartitions.get(base);
         allocatedPartitions.remove(base);
-        System.out.println("[RAM]: program has been deleted.");
+        System.out.println("[RAM]: program has been deleted " + base);
         freePartitions.put(base,tmp);
         mergeMaps(freePartitions);
     }
 
     public static void printMemory(){
         for(int i=0;i<64;i++){
-            //if(!(memory[i]==' ' && memory[i+1]==' '))
             System.out.println(i + ": " + memory[i] + "\t\t\t"
                     + (i+64) + ": " + memory[i+64]+ "\t\t\t"
                     + (i+128) + ": " + memory[i+128]+ "\t\t\t"
@@ -185,12 +181,5 @@ public class Memory {
             memory[proc.get_base()+address+i]=message.charAt(i);
         }
         return true;
-    }
-    public static void main(String[] args){
-        loadProgram("src/p0.txt");
-        loadProgram("src/p1.txt");
-        loadProgram("src/p0.txt");
-        move();
-        printMemory();
     }
 }
