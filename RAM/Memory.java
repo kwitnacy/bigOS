@@ -38,6 +38,18 @@ public class Memory {
         catch(FileNotFoundException e){
             e.printStackTrace();
         }
+        int tmp=Scheduler.running.get_base(),licznik = 0;
+        String check="";
+        for(int i=tmp;i<tmp+size;i++){
+            check+=memory[i];
+        }
+        //System.out.println(program);
+        //System.out.println(check);
+        if(program.equals(check)){
+          //  System.out.println("rowne");
+            return true;
+        }
+
         for(int i=0;i<256;i++) {
             if(freePartitions.get(i)!=null)
                 value = freePartitions.get(i);
