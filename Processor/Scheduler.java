@@ -116,6 +116,7 @@ public class Scheduler
 						{
 							System.out.println("Procesor: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
+							Memory.removeProgram(PID);
 							iteratorkolejek.remove();
 						}
 					}
