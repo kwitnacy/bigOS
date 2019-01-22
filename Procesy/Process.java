@@ -175,10 +175,10 @@ public class Process {
     public void change_state(State state){
         this.state = state;
 
-        if(this.state == State.Running)
+        if(this.state == State.Running && !this.name.equals("dummy"))
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Running");
 		
-		if(this.state == State.Ready)
+		if(this.state == State.Ready && !this.name.equals("dummy"))
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Ready");
 
         if(this.state == State.Terminated){
