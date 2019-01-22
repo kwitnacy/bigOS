@@ -89,7 +89,7 @@ public class Scheduler
 						{
 							System.out.println("Procesor: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
-							Memory.removeProgram(block.get_PID());
+						//	Memory.removeProgram(block.get_PID());
 							iteratorkolejek.remove();
 						}
 					}
@@ -99,7 +99,7 @@ public class Scheduler
 	public static void remove_running(int PID){
 		if(running.get_PID() == PID){
 			System.out.println("----------------------\"usuawanie\" running----------------------");
-			Memory.removeProgram(PID);
+		//	Memory.removeProgram(PID);
 			running = dummy;
 			running.change_state(State.Running);
 			schedule();
@@ -116,7 +116,7 @@ public class Scheduler
 						{
 							System.out.println("Procesor: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
-							Memory.removeProgram(PID);
+							//Memory.removeProgram(PID);
 							iteratorkolejek.remove();
 						}
 					}
@@ -159,7 +159,7 @@ public class Scheduler
 		{
 			if(running.get_state() == State.Terminated)
 			{
-				Memory.removeProgram(running.get_PID());
+			//	Memory.removeProgram(running.get_PID());
 			}
 			for (int i = 14 ; i > -1 ; i--)
 			{

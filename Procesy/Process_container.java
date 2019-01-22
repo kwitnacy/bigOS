@@ -1,6 +1,7 @@
 package Procesy;
 
 import Processor.Scheduler;
+import RAM.Memory;
 
 import java.util.Map;
 import java.util.Vector;
@@ -128,6 +129,7 @@ public class Process_container {
         System.out.println("[Process_Manager]: Trying to delete process with PID " + PID + ".");
         Process temp = get_by_PID(PID);
         if(temp != null) {
+            Memory.removeProgram(PID);
             processes.remove(PID);
             taken_names.remove(temp.get_name());
             names.remove(temp.name);
@@ -143,12 +145,14 @@ public class Process_container {
         System.out.println("[Process_Manager]: Trying to delete process called " + name + ".");
         Process temp = get_by_name(name);
         try{
+            Memory.removeProgram(temp.PID);
             names.remove(temp.name);
             taken_names.remove(temp.name);
             processes.remove(temp.PID);
             System.out.println("[Process_Manager]: Deleted process called " + temp.name + ".");
             Scheduler.remove();
             Scheduler.remove_running(temp.PID);
+
         }
         catch (Exception e) {
             System.out.println("[Process_Manager]: Deleting cancelled NullPointer");
