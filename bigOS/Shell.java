@@ -155,6 +155,16 @@ public class Shell {
         if(parts.size()!=0)
         switch(parts.get(0))
         {
+             case "move":
+            {
+                if(parts.size()==1)
+                {
+                    System.out.println("[Interface]: Wywolanie funkcji przesuwajacej bloki w pamieci RAM");
+                Memory.move();}
+                else
+                    System.out.println("[Interface]: Bledne argumenty");
+                break;
+            }
             case "show_run":
             {
                 if(parts.size()==1)
@@ -237,7 +247,8 @@ public class Shell {
                             + "SEM [P1]                 - WYSWIETLA WARTOSC SEMAFORA PLIKU [P1];\n"
                             + "PRINT_MEMORY             - WYSWIETLA INFORMACJE NA TEMAT RAMU;\n"
                             + "SHOW_RUN                 - WYSWIETLA INFORMACJE O AKTUALNIE PROCESIE RUNNING;\n"
-                            + "SHOW_READY               - WYSWIETLA PROCESY W STANIE READY\n");
+                            + "SHOW_READY               - WYSWIETLA PROCESY W STANIE READY\n"
+                            + "MOVE                     - PRZESUWA BLOKI W PAMIECI RAM\n");
                 }
                 else
                     System.out.println("[Interface]: Bledne argumenty");
