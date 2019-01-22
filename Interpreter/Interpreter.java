@@ -3,7 +3,7 @@ import Processor.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
 import static RAM.Memory.writeMemory;
-import static filemodule.FileManagement.*;
+import static FileModule.FileManagement.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static RAM.Memory.readMemory;
