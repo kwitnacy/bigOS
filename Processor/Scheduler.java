@@ -103,6 +103,24 @@ public class Scheduler
 			running.change_state(State.Running);
 			schedule();
 		}
+		else
+		{
+			for(Queue<Process> qq : queuesPCB)
+			{
+				Iterator<Process> iteratorkolejek = qq.iterator();
+				while (iteratorkolejek.hasNext())
+					{
+						Process block = iteratorkolejek.next();
+						if(block.get_PID() == PID)
+						{
+							block.change_state(State.Terminated);
+							System.out.println("Procesor: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
+							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
+							iteratorkolejek.remove();
+						}
+					}
+			}
+		}
 	}
 	
 	public static void makeOlder() 										// postarzanie procesow, oraz inkrementacja licznika czekania procesow
