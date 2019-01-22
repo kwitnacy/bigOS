@@ -156,7 +156,7 @@ public class Scheduler
 
 							if(dummy.get_state() != State.Ready)
 								dummy.change_state(State.Ready);
-
+							
 							break;
 						}
 						else
@@ -164,6 +164,8 @@ public class Scheduler
 							//ZMIENIC NA WAITING I USUNAC OD SIEBIE - CHYBA
 						}
 				}
+				if(running.get_state() == State.Running && running.get_base_priority() != 0)
+					break;
 			}			
 		}
 		else //wywlaszczanie
