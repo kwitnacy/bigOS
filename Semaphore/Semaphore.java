@@ -22,9 +22,12 @@ public class Semaphore{
     }
 
     public void print_queue(){
+        System.out.print("Kolejka semafora: ");
         for(Integer s : this.process_queue) {
-            System.out.println(s);
+            System.out.print(s);
+            System.out.print(" ");
         }
+        System.out.println();
     }
 
     public void wait_s(int pid){
