@@ -10,7 +10,7 @@ import static RAM.Memory.readMemory;
 
 public class Interpreter {
 
-    private static int A,B,C,D, program_counter, base, limit, PID, etykietka, memory_counter;
+    private static int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private static String rozkaz="", calyRozkaz;
     private static String user;
 	
@@ -49,7 +49,8 @@ public class Interpreter {
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
-        int i = memory_counter;
+        int i = program_counter;
+        System.out.println(i);
         int totwocounter=0;
         rozkaz = "";
         calyRozkaz = "";
@@ -57,27 +58,40 @@ public class Interpreter {
         String IfNew;
         Pattern newOrder = Pattern.compile("[A-Z][A-Z]");
         Matcher newOrderMatches = newOrder.matcher("");
+        Pattern slowo = Pattern.compile("\\w+");
         while(!newOrderMatches.matches())
         {
             newPart = readMemory(base + i);
             //odczytywanie calego rozkazu jako stringa
             calyRozkaz = calyRozkaz + newPart;
             if(totwocounter<2) rozkaz = rozkaz + newPart;
+            if(rozkaz.equals("JC"))
+            {
+                Matcher slowomatcher = slowo.matcher(calyRozkaz);
+                while (slowomatcher.matches()) {
+                    calyRozkaz = calyRozkaz + readMemory(i+1);
+                    i=i+1;
+                    program_counter = program_counter+1;
+                    slowomatcher = slowo.matcher(calyRozkaz);
+                }
+            }
             //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
-            nastepny1 = readMemory(base + i + 1);
-            nastepny2 = readMemory(base + i + 2);
+            nastepny1 = readMemory(base + i + 2);
+            nastepny2 = readMemory(base + i + 3);
             IfNew = ""+nastepny1 + nastepny2;
             newOrderMatches = newOrder.matcher(IfNew);
             totwocounter++;
             i++;
-            memory_counter++;
+            program_counter++;
         }
+        program_counter++;
         System.out.println(rozkaz);
         System.out.println("wykonywany rozkaz: "+calyRozkaz);
     }
     public static void go(int how_many) //
     {
-        memory_counter = base;
+        int start = base;
+        program_counter = start + program_counter;
         start(Scheduler.running.get_file_name());
         for (int i = 0;i<how_many&&!rozkaz.equals("HT");i++)
         {
@@ -131,6 +145,7 @@ public class Interpreter {
         }
         Pattern etykieta = Pattern.compile("\\w+:");
         Matcher etykietamatcher = etykieta.matcher(calyRozkaz);
+        System.out.println("parametry "+x+" "+y+" "+z+" "+xx);
         switch (rozkaz) {
             case "AD": {
                 if(!add(x, y))
@@ -170,7 +185,6 @@ public class Interpreter {
                     return false;
                 }
                 // usera mam miec
-                program_counter++;
                 break;
             }
             case "WF": {
@@ -180,7 +194,6 @@ public class Interpreter {
                     return false;
                 }
                 signalFile(x);
-                program_counter++;
                 break;
             }
             case "RF": {
@@ -221,7 +234,6 @@ public class Interpreter {
                     }
                 }
                 signalFile(x);
-                program_counter++;
                 break;
             }
             case "DF": {
@@ -231,7 +243,6 @@ public class Interpreter {
                     return false;
                 }
                 signalFile(x);
-                program_counter++;
                 break;
             }
             case "CP": {
@@ -340,13 +351,15 @@ public class Interpreter {
             }
             case "JC":
             {
-                if (C == 0)
+                if (C != 0)
                 {
+                    System.out.println("etykietka:"+String.valueOf(etykietka));
                     if(!jump(String.valueOf(etykietka))){
                      return false;
                     }
                     break;
                 }
+                return true;
             }
             default: {
                 if (etykietamatcher.matches()) {
@@ -406,7 +419,6 @@ public class Interpreter {
             A = A/readMemory(addresToliczba(x));
             D = D%readMemory(addresToliczba(x));
         }
-        program_counter++;
         return true;
     }
     private static boolean increment(String x)
@@ -465,7 +477,6 @@ public class Interpreter {
                 //spytac Macieja czy w ogole jest taka mozliwosc
             }
         }
-        program_counter++;
         return true;
     }
     private static boolean jump(String x)
@@ -639,7 +650,6 @@ public class Interpreter {
                 //do pamieci o danym adresie = D;
             }
         }
-        program_counter++;
         return true;
     }
     private static boolean add(String x, String y)
@@ -784,7 +794,6 @@ public class Interpreter {
                 default:break;
             }
         }
-        program_counter++;
         return true;
     }
 }
@@ -800,4 +809,3 @@ Musze jeszcze ogarnac:
 User - skad? (potrzebuje do tworzenia plikow)
 ReadMessage - skad wielkosc wiadomosci ktora odczytuje
 Zapisywanie danych do pamieci*/
-

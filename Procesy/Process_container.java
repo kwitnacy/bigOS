@@ -129,7 +129,11 @@ public class Process_container {
         Process temp = get_by_PID(PID);
         if(temp != null) {
             processes.remove(PID);
+            taken_names.remove(temp.get_name());
+            names.remove(temp.name);
             System.out.println("[Process_Manager]: Deleted process called " + temp.name + ".");
+            Scheduler.remove();
+            Scheduler.remove_running(PID);
         }
         else
             System.out.println("[Process_Manager]: Deleting cancelled NullPointer");
@@ -139,10 +143,12 @@ public class Process_container {
         System.out.println("[Process_Manager]: Trying to delete process called " + name + ".");
         Process temp = get_by_name(name);
         try{
-            names.remove(temp.get_PID());
-            taken_names.remove(temp.get_name());
+            names.remove(temp.name);
+            taken_names.remove(temp.name);
             processes.remove(temp.PID);
             System.out.println("[Process_Manager]: Deleted process called " + temp.name + ".");
+            Scheduler.remove();
+            Scheduler.remove_running(temp.PID);
         }
         catch (Exception e) {
             System.out.println("[Process_Manager]: Deleting cancelled NullPointer");

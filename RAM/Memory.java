@@ -23,24 +23,38 @@ public class Memory {
     public static Boolean loadProgram(){
         String fileName;
         fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
-        System.out.println("sciezka: " + fileName);
+      //  System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
+        String program="";
         try{
             Scanner skaner= new Scanner(file);
-
             while(skaner.hasNextLine()){
-                size+= skaner.nextLine().length();
+                program+=skaner.nextLine() + " ";
             }
+            program= program.substring(0,program.length()-1);
+            size = program.length();
         }
         catch(FileNotFoundException e){
             e.printStackTrace();
         }
+        int tmp=Scheduler.running.get_base(),licznik = 0;
+        String check="";
+        for(int i=tmp;i<tmp+size;i++){
+            check+=memory[i];
+        }
+        //System.out.println(program);
+        //System.out.println(check);
+        if(program.equals(check)){
+          //  System.out.println("rowne");
+            return true;
+        }
+
         for(int i=0;i<256;i++) {
             if(freePartitions.get(i)!=null)
                 value = freePartitions.get(i);
             if(value>=size+10){
-                writeMemory(fileName,i);
+                writeMemory(program,i);
                 return true;
             }
         }
@@ -62,7 +76,8 @@ public class Memory {
         memory[base+address]=value;
     }
     private static void writeMemory(String fileName,Integer base){
-        File file = new File(fileName);
+        /*File file = new File(fileName);
+
         Integer next=0;
         try{
             Scanner skaner= new Scanner(file);
@@ -77,16 +92,23 @@ public class Memory {
             }
         }catch(FileNotFoundException e){
             e.printStackTrace();
+        }*/
+        Integer next=0;
+        int index=0;
+        for(int i=base ;i< base + fileName.length() ;i++){
+            memory[i]=fileName.charAt(index);
+            index++;
         }
-        allocatedPartitions.put(base,next+10);
-        Scheduler.running.ser_base(base);
-        Scheduler.running.ser_limit(next+10);
 
-        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next+9));
+        allocatedPartitions.put(base,fileName.length()+10);
+        Scheduler.running.ser_base(base);
+        Scheduler.running.ser_limit(fileName.length()+10);
+
+        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+fileName.length()+9));
         Integer tmp = freePartitions.get(base);
         freePartitions.remove(base);
         Integer limit = tmp;
-        freePartitions.put(base+next+10,tmp-next-10);
+        freePartitions.put(base+fileName.length()+10,tmp-fileName.length()-10);
     }
     public static Character readMemory(Integer address){
         if(address<0||address>256){

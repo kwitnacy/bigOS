@@ -1,9 +1,9 @@
-MO A 10
-MO C 3
-POWT:
+MO A 13
+MO C 26
+PT:
 MO A C
 DI C
 MO C D
-JC POWT
+JC PT
 MO [99] A
 HT
