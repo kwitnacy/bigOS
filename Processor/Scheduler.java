@@ -158,7 +158,7 @@ public class Scheduler
 		{
 			if(running.get_state() == State.Terminated)
 			{
-				Memory.removeProgram(PID);
+				Memory.removeProgram(running.get_PID());
 			}
 			for (int i = 14 ; i > -1 ; i--)
 			{
