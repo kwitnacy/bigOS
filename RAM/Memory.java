@@ -23,7 +23,7 @@ public class Memory {
     public static Boolean loadProgram(){
         String fileName;
         fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
-        System.out.println("sciezka: " + fileName);
+      //  System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         String program="";
