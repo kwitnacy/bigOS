@@ -1,6 +1,6 @@
 package RAM;
 import Processor.Scheduler;
-import Procesy.Process;
+import Procesy.Process_container;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,7 +104,7 @@ public class Memory {
         Scheduler.running.ser_base(base);
         Scheduler.running.ser_limit(fileName.length()+10);
 
-        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+fileName.length()+9));
+        System.out.println("[RAM]: Program has been put in RAM at [" + base + "," + (base+fileName.length()+9) + "]");
         Integer tmp = freePartitions.get(base);
         freePartitions.remove(base);
         Integer limit = tmp;
@@ -135,8 +135,10 @@ public class Memory {
             }
         }
     }
-    public static void removeProgram() {
-        Integer base= Scheduler.running.get_base();
+    public static void removeProgram(int PID) {
+        Integer base = Process_container.get_by_PID(PID).get_base();
+//        Integer base= Scheduler.running.get_base();
+        System.out.println(base);
         for(int i=base;i<allocatedPartitions.get(base) + base; i++){
             memory[i]=' ';
         }
