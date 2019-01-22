@@ -1,8 +1,8 @@
-MO A 13
-MO C 26
+MO A 22
+MO B 66
 PT:
-MO A C
-DI C
+MO A B
+DI B
 MO C D
 JC PT
 MO [99] A

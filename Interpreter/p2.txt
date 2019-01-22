@@ -5,7 +5,7 @@ DF fa
 CF f2
 WF f2 8
 WF f2 5
-RF f2 1 1 A
-RF f2 2 1 B
+RF f2 0 1 A
+RF f2 1 1 B
 AD A B
 HT

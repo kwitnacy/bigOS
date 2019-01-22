@@ -135,13 +135,13 @@ public class Interpreter {
             y = dane3matcher.group(3);
             z = dane3matcher.group(4);
         }
-        Pattern dane4 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*\\s(\\[*\\w+]*))");
+        Pattern dane4 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
         Matcher dane4matcher = dane4.matcher(calyRozkaz);
         if (dane4matcher.matches()) {
-            x = dane3matcher.group(2);
-            y = dane3matcher.group(3);
-            z = dane3matcher.group(4);
-            xx = dane3matcher.group(5);
+            x = dane4matcher.group(2);
+            y = dane4matcher.group(3);
+            z = dane4matcher.group(4);
+            xx = dane4matcher.group(5);
         }
         Pattern etykieta = Pattern.compile("\\w+:");
         Matcher etykietamatcher = etykieta.matcher(calyRozkaz);
@@ -198,9 +198,9 @@ public class Interpreter {
             }
             case "RF": {
                 waitFile(x,PID);
-                if (xx.equals("")) {
+                if (dane3matcher.matches()) {
                 System.out.println(read(x,Integer.parseInt(y),Integer.parseInt(z)));}
-                else {
+                else if (dane4matcher.matches()){
                     Pattern rejestr = Pattern.compile("[A-D]");
                     Matcher rejestrmatcher = rejestr.matcher(xx);
                     if (rejestrmatcher.matches())
@@ -210,19 +210,19 @@ public class Interpreter {
                             Scheduler.running.change_state(State.Terminated);
                             return false;
                         }
-                        else if(x.equals("A"))
+                        else if(xx.equals("A"))
                         {
                             A = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
-                        else if(x.equals("B"))
+                        else if(xx.equals("B"))
                         {
                             B = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
-                        else if(x.equals("C"))
+                        else if(xx.equals("C"))
                         {
                             C = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
-                        else if(x.equals("D"))
+                        else if(xx.equals("D"))
                         {
                             D = Integer.parseInt(read(x,Integer.parseInt(y),Integer.parseInt(z)));
                         }
@@ -351,7 +351,7 @@ public class Interpreter {
             }
             case "JC":
             {
-                if (C != 0)
+                if (C == 0)
                 {
                     System.out.println("etykietka:"+String.valueOf(etykietka));
                     if(!jump(String.valueOf(etykietka))){
