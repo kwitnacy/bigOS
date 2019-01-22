@@ -1,4 +1,4 @@
-package filemodule;
+package FileModule;
 
 import java.util.LinkedList;
 import java.util.List;
