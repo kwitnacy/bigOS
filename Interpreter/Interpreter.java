@@ -23,6 +23,7 @@ public class Interpreter {
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
+            program_counter = Scheduler.running.get_program_counter();
             A = Scheduler.running.get_AX();
             B = Scheduler.running.get_BX();
             C = Scheduler.running.get_CX();
@@ -50,7 +51,7 @@ public class Interpreter {
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
         int i = program_counter;
-        System.out.println(i);
+        System.out.println("hhhh"+i);
         int totwocounter=0;
         rozkaz = "";
         calyRozkaz = "";
@@ -61,6 +62,7 @@ public class Interpreter {
         Pattern slowo = Pattern.compile("\\w+");
         while(!newOrderMatches.matches())
         {
+            System.out.println(calyRozkaz);
             newPart = readMemory(base + i);
             //odczytywanie calego rozkazu jako stringa
             calyRozkaz = calyRozkaz + newPart;
@@ -74,6 +76,10 @@ public class Interpreter {
                     program_counter = program_counter+1;
                     slowomatcher = slowo.matcher(calyRozkaz);
                 }
+            }
+            if (rozkaz.equals("HT"))
+            {
+                break;
             }
             //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
             nastepny1 = readMemory(base + i + 2);
@@ -90,20 +96,22 @@ public class Interpreter {
     }
     public static void go(int how_many) //
     {
+
         int start = base;
         program_counter = start + program_counter;
         start(Scheduler.running.get_file_name());
-        for (int i = 0;i<how_many&&!rozkaz.equals("HT");i++)
+        int i = 0;
+        do
         {
             getOrder();
-            if(!executeOrder())
-            {
+            if (!executeOrder()) {
                 return;
             }
             Scheduler.makeOlder(); //postarzanie procesu
             updateProcessor(); //zapisanie zmienionych wartosci rejestru
             display();
-        }
+            i++;
+        } while (i+1<how_many && !rozkaz.equals("HT"));
     }
     private static void display()
     {
@@ -177,7 +185,7 @@ public class Interpreter {
             case "HT": {
                 System.out.println("Koniec programu");
                 Scheduler.running.change_state(State.Terminated);
-                break;
+                return true;
             }
             case "CF": {
                 if(!create(x, user))
@@ -266,9 +274,10 @@ public class Interpreter {
                     if (adresmatchery.matches()) //SM <PID odbiorcy> [adres]
                     {
                         if (pidmatcher.matches()) {
+                            System.out.println(y);
                             Scheduler.running.send_message(Integer.parseInt(x), addresToliczba(y));
                         }
-                        else //SM <nazzwa odbiorcy> [adres]
+                        else //SM <nazwa odbiorcy> [adres]
                         {
                             Scheduler.running.send_message(x, addresToliczba(y));
                         }
@@ -465,16 +474,8 @@ public class Interpreter {
             {
                 int zmienna = readMemory(addresToliczba(x));
                 zmienna++;
-                if(zmienna<10) {
-                    char zmien = (char) (zmienna + '0');
-                    writeMemory(zmien, addresToliczba(x));
-                }
-                else
-                {
-                    //???????????????????????????
-                }
-                //miejsce w pamieci ++
-                //spytac Macieja czy w ogole jest taka mozliwosc
+                char zmien = (char) (zmienna + '0');
+                writeMemory(zmien, addresToliczba(x));
             }
         }
         return true;
@@ -543,7 +544,9 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
+                char c = y.charAt(0);
                 //do pamieci o danym adresie = addresToliczba(y);
+                writeMemory(c,addresToliczba(x));
             }
         }
         if(adresmatchery.matches())

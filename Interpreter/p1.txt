@@ -5,5 +5,5 @@ MO A B
 DI B
 MO C D
 JC PT
-MO [99] A
+MO [8] A
 HT
