@@ -31,7 +31,6 @@ public class Memory {
             Scanner skaner= new Scanner(file);
             while(skaner.hasNextLine()){
                 program+=skaner.nextLine() + " ";
-                System.out.println(program);
             }
             program= program.substring(0,program.length()-1);
             size = program.length();
