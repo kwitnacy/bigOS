@@ -21,19 +21,17 @@ public class Disk {
         return data[index];
     } 
     
-    public char[] getBlock(Double blockNr){
-        int blocknr = blockNr.intValue();
+    public char[] getBlock(int blockNr){
         char[] block = new char[32];
         int j = 0;
-        for(int i = blocknr*32; i < (blockNr+1)*32 - 1; i++){
+        for(int i = blockNr*32; i < (blockNr+1)*32 - 1; i++){
             block[j] = data[i]; j++;
         }
         return block;
     }
     
-    public void clearBlock(Double blockNr){
-        int blocknr = blockNr.intValue();
-        for(int i = blocknr*32; i <= (blockNr+1)*32 - 1; i++){
+    public void clearBlock(int blockNr){
+        for(int i = blockNr*32; i <= (blockNr+1)*32 - 1; i++){
             data[i] = ' ';
         }
     }

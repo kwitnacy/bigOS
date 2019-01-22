@@ -249,8 +249,7 @@ public class FileManagement {
         String buffer;
         
         for(int i : blocks){
-           Double d = new Double(i);
-           buffer = new String(disk.getBlock(d));
+           buffer = new String(disk.getBlock(i));
            output = output.concat(buffer);
         }
         return output;
@@ -276,8 +275,7 @@ public class FileManagement {
         
         //System.out.println("[File Module]: Blocks that will be deleated: " + blocks);
         for(int i : blocks){
-           Double d = new Double(i);
-           disk.clearBlock(d);
+           disk.clearBlock(i);
            disk.fileSystem.freeBlocks.set(i, false);
            disk.fileSystem.FAT[i] = -1;
             //System.out.println("[File Module]: Block number " + i + " deleated.");
