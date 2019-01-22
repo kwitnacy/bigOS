@@ -10,7 +10,7 @@ import static RAM.Memory.readMemory;
 
 public class Interpreter {
 
-    private static int A,B,C,D, program_counter, base, limit, PID, etykietka, memory_counter;
+    private static int A,B,C,D, program_counter, base, limit, PID, etykietka, memory_counter=0;
     private static String rozkaz="", calyRozkaz;
     private static String user;
 	
@@ -77,7 +77,9 @@ public class Interpreter {
     }
     public static void go(int how_many) //
     {
-        memory_counter = base;
+        int start = base;
+        System.out.println("memor:"  + memory_counter);
+        memory_counter = start + memory_counter;
         start(Scheduler.running.get_file_name());
         for (int i = 0;i<how_many&&!rozkaz.equals("HT");i++)
         {
