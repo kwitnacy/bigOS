@@ -98,6 +98,7 @@ public class Scheduler
 	public static void remove_running(int PID){
 		if(running.get_PID() == PID){
 			System.out.println("----------------------\"usuawanie\" running----------------------");
+			Memory.removeProgram();
 			running = dummy;
 			running.change_state(State.Running);
 			schedule();
