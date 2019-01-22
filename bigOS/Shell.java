@@ -3,6 +3,7 @@ package bigOS;
 
 
 import Interpreter.Interpreter;
+import Processor.Scheduler;
 import Procesy.Process_container;
 import RAM.Memory;
 import filemodule.FileManagement;
@@ -29,6 +30,8 @@ public class Shell {
     }
     void system()
     {
+        Scheduler pro = new Scheduler();                    //TO NIECH TU BEDZIE KOMU TO SZKODZI?
+        Process_container con = new Process_container();    //TO NIECH TU BEDZIE KOMU TO SZKODZI?
         system=true;
         System.out.println("[Interface]: Rozpoczecie pracy interfejsu");
         start();
@@ -105,7 +108,12 @@ public class Shell {
     void execute(){
         switch(parts.get(0))
         {
-
+            case "run":
+                Scheduler.showRunning();
+                break;
+            case "pqq":
+                Scheduler.showReadyProcesses();
+                break;
             case "help":
             {
                 if(parts.size()==1)
