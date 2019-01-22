@@ -58,28 +58,39 @@ public class Interpreter {
         String IfNew;
         Pattern newOrder = Pattern.compile("[A-Z][A-Z]");
         Matcher newOrderMatches = newOrder.matcher("");
+        Pattern slowo = Pattern.compile("\\w+");
         while(!newOrderMatches.matches())
         {
             newPart = readMemory(base + i);
             //odczytywanie calego rozkazu jako stringa
             calyRozkaz = calyRozkaz + newPart;
             if(totwocounter<2) rozkaz = rozkaz + newPart;
+            if(rozkaz.equals("JC"))
+            {
+                Matcher slowomatcher = slowo.matcher(calyRozkaz);
+                while (slowomatcher.matches()) {
+                    calyRozkaz = calyRozkaz + readMemory(i+1);
+                    i=i+1;
+                    program_counter = program_counter+1;
+                    slowomatcher = slowo.matcher(calyRozkaz);
+                }
+            }
             //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
-            nastepny1 = readMemory(base + i + 1);
-            nastepny2 = readMemory(base + i + 2);
+            nastepny1 = readMemory(base + i + 2);
+            nastepny2 = readMemory(base + i + 3);
             IfNew = ""+nastepny1 + nastepny2;
             newOrderMatches = newOrder.matcher(IfNew);
             totwocounter++;
             i++;
             program_counter++;
         }
+        program_counter++;
         System.out.println(rozkaz);
         System.out.println("wykonywany rozkaz: "+calyRozkaz);
     }
     public static void go(int how_many) //
     {
         int start = base;
-        System.out.println("memor:"  + program_counter);
         program_counter = start + program_counter;
         start(Scheduler.running.get_file_name());
         for (int i = 0;i<how_many&&!rozkaz.equals("HT");i++)
@@ -340,13 +351,15 @@ public class Interpreter {
             }
             case "JC":
             {
-                if (C == 0)
+                if (C != 0)
                 {
+                    System.out.println("etykietka:"+String.valueOf(etykietka));
                     if(!jump(String.valueOf(etykietka))){
                      return false;
                     }
                     break;
                 }
+                return true;
             }
             default: {
                 if (etykietamatcher.matches()) {

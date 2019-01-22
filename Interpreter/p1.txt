@@ -1,5 +1,5 @@
-MO A 10
-MO C 3
+MO A 13
+MO C 26
 PT:
 MO A C
 DI C
