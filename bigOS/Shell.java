@@ -46,24 +46,35 @@ public class Shell {
                 System.out.print("bigOS:\\User>");
                 command=sc.nextLine();
                 System.out.println("[Interface]: Przechwycenie bufforu");
-                for(int i=0;i<command.length();i++)
-                {
-                    if((int)command.charAt(i)<=90&&(int)command.charAt(i)>=65)
-                    {
-                        int help = (int)command.charAt(i);
-                        help=help+32;
-                        String newCommand = command.substring(0,i)+(char)help+command.substring(i+1);
-                        command=newCommand;
-                    }
-                }
+                
                 System.out.println("[Interface]: Podzielenie bufforu na komendy i parametry");
                 cut();
+                if(parts.size()!=0)
+                for(int i=0;i<parts.get(0).length();i++)
+                {
+                    if((int)parts.get(0).charAt(i)<=90&&(int)parts.get(0).charAt(i)>=65)
+                    {
+                        int help = (int)parts.get(0).charAt(i);
+                        help=help+32;
+                        String newCommand = parts.get(0).substring(0,i)+(char)help+parts.get(0).substring(i+1);
+                        parts.set(0, newCommand);
+                    }
+                }
+                else
+                {
+                   System.out.println("[Interface]: Brak komendy"); 
+                }
                 execute();
             }
         }
     }
     void cut()
     {
+        if(command.length()==0)
+        {
+            parts=new ArrayList<>();
+            return;
+        }
         parts.clear();
         String help="";
         for(int i=0;i<command.length();i++)
@@ -74,11 +85,13 @@ public class Shell {
             }
             else
             {
+                if(help!="")
                 parts.add(help);
                 help="";
             }
             if(i==command.length()-1)
             {
+                if(help!="")
                 parts.add(help);
             }
 
@@ -106,26 +119,33 @@ public class Shell {
         }
     }
     void execute(){
+        if(parts.size()!=0)
         switch(parts.get(0))
         {
-            case "run":
+            case "show_run":
+            {
+                if(parts.size()==1)
                 Scheduler.showRunning();
                 break;
-            case "pqq":
+            }
+            case "show_ready":
+            {
+                if(parts.size()==1)
                 Scheduler.showReadyProcesses();
                 break;
+            }
             case "help":
             {
                 if(parts.size()==1)
                 {
                     System.out.println("[Interface]: Wypisanie dostepnych komend");
                     System.out.println(""
-                            + "GO                       - WYKONANIE PRZEZ INTERPRETER JEDNEGO ROZKAZU ASSEMBLEROWEGO;*czekam na funkcje*\n"
+                            + "GO                       - WYKONANIE PRZEZ INTERPRETER JEDNEGO ROZKAZU ASSEMBLEROWEGO;\n"
+                            + "GO [P1]                  - WYKONANIE PRZEZ INTERPRETER [P1] ROZKAZÓW ASSEMBLEROWYCH;\n"
                             + "DIR                      - WYSWIETLA WSZYSTKIE PLIKI W SCIEZCE;\n"
                             + "SHUTDOWN                 - KONCZY PRACE SYSTEMU;\n"
                             + "SHUTDOWN -L              - WYLOGOWANIE KLIENTA;\n"
                             + "CP [P1] [P2] [P3]        - TWORZY PROCES [P1] Z PLIKU [P2] O PRIORYTECIE [P3];\n"
-                            + "CP [P1] [P2] [P3] [P4]   - TWORZY PROCES [P1] Z PLIKU [P2] O PRIORYTECIE [P3] ZAJMUJACY [P4] BAJTOW W PAMIECI RAM;\n"
                             + "CF [P1]                  - TWORZY PLIK O NAZWIE P1;\n"
                             + "WF [P1] [P2] ... [PN]    - DOPISUJE DO PLIKU [P1] ZAWARTOSC KOLEJNYCH PARAMETROW;\n"
                             + "DF [P1]                  - USUWA PLIK [P1];\n"
@@ -141,7 +161,9 @@ public class Shell {
                             + "FAT                      - WYSWIETLA ZAWARTOSC MODULU PLIKOW;\n"
                             + "FCB [P1]                 - WYSWIETLA FCB PLIKU [P1];\n"
                             + "SEM [P1]                 - WYSWIETLA WARTOSC SEMAFORA PLIKU [P1];\n"
-                            + "PRINT_MEMORY             - WYSWIETLA INFORMACJE NA TEMAT RAMU;\n");
+                            + "PRINT_MEMORY             - WYSWIETLA INFORMACJE NA TEMAT RAMU;\n"
+                            + "SHOW_RUN                 - WYSWIETLA INFORMACJE O AKTUALNIE PROCESIE RUNNING;\n"
+                            + "SHOW_READY               - WYSWIETLA PROCESY W STANIE READY\n");
                 }
                 else
                     System.out.println("[Interface]: Bledne argumenty");
@@ -342,24 +364,8 @@ public class Shell {
                             break;
                         }
                     }
-
+                    System.out.println("[Interface]: Wywolanie funkcji tworzacej proces "+parts.get(1)+" z pliku "+parts.get(2)+" o priorytecie "+parts.get(3));
                     Process_container.create_process(parts.get(1),parts.get(2),Integer.parseInt(parts.get(3)));
-                }
-                else if(parts.size()==5)
-                {
-                    for(int i=0;i<parts.get(3).length();i++) {
-                        if (Character.isDigit(parts.get(3).charAt(i))) ;
-                        else {
-                            System.out.println("[Interface]: Bledne argumenty");
-                        }
-                    }
-                    for(int i=0;i<parts.get(4).length();i++) {
-                        if (Character.isDigit(parts.get(4).charAt(i))) ;
-                        else {
-                            System.out.println("[Interface]: Bledne argumenty");
-                        }
-                    }
-                    Process_container.create_process(parts.get(1),parts.get(2),Integer.parseInt(parts.get(3)),Integer.parseInt(parts.get(4)));
                 }
                 else
                     System.out.println("[Interface]: Bledne argumenty");
@@ -458,12 +464,22 @@ public class Shell {
             }
             case "go":
             {
-                Interpreter.go(2);
+                if(parts.size()==2)
+                {
+                Interpreter.go(Integer.getInteger(parts.get(2)));
+                }
+                else if (parts.size()==1)
+                        {
+                            Interpreter.go(1);
+                        }
+                else
+                    System.out.println("[Interface]: Bledne argumenty");
+                    
             }
             default:
             {
-
-                System.out.println("[Interface]: '"+command+ "' jest nieznana komenda.");
+                System.out.println("[Interface]: Brak komendy"); 
+                System.out.println("'"+command+ "' jest nieznana komenda.");
                 break;
             }
         }
