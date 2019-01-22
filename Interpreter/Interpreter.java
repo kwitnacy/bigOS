@@ -32,9 +32,8 @@ public class Interpreter {
     }
     static int addresToliczba(String address)
     {
-        Pattern liczba = Pattern.compile("(\\d+)");
-        Matcher matcher = liczba.matcher(address);
-        return Integer.parseInt(matcher.group(1));
+        String ad = address.substring(1,address.length()-1);
+        return Integer.parseInt(ad);
     }
     private void set_user()
     {
@@ -271,10 +270,10 @@ public class Interpreter {
                 Matcher adresmatcherz = adres.matcher(z);
                 if (dane2matcher.matches())
                 {
+                    System.out.println("nananan");
                     if (adresmatchery.matches()) //SM <PID odbiorcy> [adres]
                     {
                         if (pidmatcher.matches()) {
-                            System.out.println(y);
                             Scheduler.running.send_message(Integer.parseInt(x), addresToliczba(y));
                         }
                         else //SM <nazwa odbiorcy> [adres]
@@ -285,7 +284,8 @@ public class Interpreter {
                     else { ////SM <nazwa/PID odbiorcy> <tekst>
                         if(pidmatcher.matches())
                         {
-                        Scheduler.running.send_message(Integer.parseInt(x), z);}
+                            Scheduler.running.send_message(Integer.parseInt(x), y);
+                        }
                         else
                         {
                             Scheduler.running.send_message(x, z);
@@ -322,7 +322,7 @@ public class Interpreter {
                 Pattern liczba = Pattern.compile("\\d+");
                 Matcher sizematcher = liczba.matcher(x);
                 Matcher adresmatchery = adres.matcher(y);
-                Matcher adresmatcherx = adres.matcher(y);
+                Matcher adresmatcherx = adres.matcher(x);
                 if (dane2matcher.matches()) //RM <size> [adres]
                 {
                     if (sizematcher.matches()&&adresmatchery.matches())
@@ -338,6 +338,7 @@ public class Interpreter {
                 }
                 if(dane1matcher.matches())//RM [adres]
                 {
+                    System.out.println("xxx:"+x);
                     if (adresmatcherx.matches())
                     {
                         Scheduler.running.read_message(addresToliczba(x));
