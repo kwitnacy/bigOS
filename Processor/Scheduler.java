@@ -94,6 +94,15 @@ public class Scheduler
 					}
 			}
 	}
+
+	public static void remove_running(int PID){
+		if(running.get_PID() == PID){
+			System.out.println("----------------------\"usuawanie\" running----------------------");
+			running = dummy;
+			running.change_state(State.Running);
+			schedule();
+		}
+	}
 	
 	public static void makeOlder() 										// postarzanie procesow, oraz inkrementacja licznika czekania procesow
 	{
@@ -116,6 +125,7 @@ public class Scheduler
 				{
 					block.inc_waiting_counter();
 				}
+
 			}
 		}
 		schedule();
@@ -142,6 +152,10 @@ public class Scheduler
 							queuesPCB.get(i).remove(block);
 							System.out.println("Procesor: Przydzielilem procesor do procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 							+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
+
+							if(dummy.get_state() != State.Ready)
+								dummy.change_state(State.Ready);
+
 							break;
 						}
 						else
@@ -170,6 +184,10 @@ public class Scheduler
 							}
 							running.change_state(State.Running);
 							queuesPCB.get(i).remove(block);
+
+							if(dummy.get_state() != State.Ready)
+								dummy.change_state(State.Ready);
+
 							break;
 						}
 						else
@@ -180,7 +198,7 @@ public class Scheduler
 				}
 			}
 		}
-		if(running.get_state() == State.Waiting) // sprawdzamy czy po przeleceniu kolejek jakis zostal‚ przydzielony
+		if(running.get_state() == State.Waiting || running.get_name().equals("dummy")) // sprawdzamy czy po przeleceniu kolejek jakis zostalï¿½ przydzielony
 		{
 			if(temp.get_state() != State.Terminated)
 			{
@@ -196,7 +214,7 @@ public class Scheduler
 
 	}
 	
-	public void showReadyProcesses() // wyswietlanie ready
+	public static void showReadyProcesses() // wyswietlanie ready
 	{
 		System.out.println("Procesor: Procesy w stanie gotowosci to:");
 		System.out.println("Nazwa ; PID ; Priorytet bazowy ; Priorytet Tymczasowy");
@@ -212,7 +230,7 @@ public class Scheduler
 		}
 	}
 
-	public void showRunning()										// wyswietlanie running
+	public static void showRunning()										// wyswietlanie running
 	{
 		System.out.println("Procesor: Aktualnie wykonywany proces to: (Nazwa ; PID ; Priorytet bazowy ; Priorytet tymczasowy)");
 		System.out.println(running.get_name() + " ; " + running.get_PID() + " ; " + running.get_base_priority() + " ; " + running.get_temp_priority());
