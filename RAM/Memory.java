@@ -22,7 +22,7 @@ public class Memory {
 
     public static Boolean loadProgram(){
         String fileName;
-        fileName= "Interpreter/" + Scheduler.running.get_file_name() + ".txt";
+        fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
         System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
@@ -82,7 +82,7 @@ public class Memory {
         Scheduler.running.ser_base(base);
         Scheduler.running.ser_limit(next+10);
 
-        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next-1)+10);
+        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next+9));
         Integer tmp = freePartitions.get(base);
         freePartitions.remove(base);
         Integer limit = tmp;
