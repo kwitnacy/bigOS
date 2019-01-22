@@ -23,7 +23,7 @@ public class Memory {
     public static Boolean loadProgram(){
         String fileName;
         fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
-        System.out.println("sciezka: " + fileName);
+      //  System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         String program="";
@@ -31,7 +31,6 @@ public class Memory {
             Scanner skaner= new Scanner(file);
             while(skaner.hasNextLine()){
                 program+=skaner.nextLine() + " ";
-                System.out.println(program);
             }
             program= program.substring(0,program.length()-1);
             size = program.length();
