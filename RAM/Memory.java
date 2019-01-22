@@ -82,7 +82,7 @@ public class Memory {
         Scheduler.running.ser_base(base);
         Scheduler.running.ser_limit(next+10);
 
-        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next-1)+10);
+        System.out.println("[RAM]: Program has been put in RAM at " + base + "-" + (base+next+9));
         Integer tmp = freePartitions.get(base);
         freePartitions.remove(base);
         Integer limit = tmp;
