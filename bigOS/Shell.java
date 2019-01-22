@@ -307,12 +307,12 @@ public class Shell {
                     if(parts.get(1).equals("/pid"))
                     {
                         System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej proces o PID "+parts.get(2));
-                        Process_container.get_by_PID(Integer.parseInt(parts.get(2)));
+                        Process_container.display_proces(Integer.parseInt(parts.get(2)));
                     }
                     else if(parts.get(1).equals("/im"))
                     {
                         System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej proces o nazwie "+parts.get(2));
-                        Process_container.get_by_name(parts.get(2));
+                        Process_container.display_proces(parts.get(2));
                     }
                     else
                         System.out.println("[Interface]:Bledne argumenty");
@@ -360,7 +360,7 @@ public class Shell {
                 if(parts.size()==2)
                 {
                     System.out.println("[Interface]: Wywolanie funkcji wyswietlajacej zawartosc pliku "+ parts.get(1));
-                    FileManagement.readFile(parts.get(1));
+                    System.out.println(FileManagement.readFile(parts.get(1)));
                 }
                 else if(parts.size()==4)
                 {
