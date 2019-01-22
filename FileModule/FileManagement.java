@@ -1,4 +1,5 @@
-package filemodule;
+package FileModule;
+
 
 import java.util.LinkedList;
 
@@ -83,7 +84,7 @@ public class FileManagement {
     {
         if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
-        //ftemp.s.signal_s();    
+        ftemp.s.signal_s();
         disk.fileSystem.root.replacebyName(ftemp);
         return true;
     }
@@ -92,7 +93,7 @@ public class FileManagement {
     {
         if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
-        //ftemp.s.wait_s(PID);    
+        ftemp.s.wait_s(PID);
         disk.fileSystem.root.replacebyName(ftemp);
         return true;
     }
@@ -101,7 +102,7 @@ public class FileManagement {
     public static boolean printSem(String file_name){
         if(disk.fileSystem.root.checkExistance(file_name) == false) { System.out.println("[File Module]: File not found in the root."); return false;} //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
-        //ftemp.s.print_queue();
+        ftemp.s.print_queue();
         return true;
     }
     

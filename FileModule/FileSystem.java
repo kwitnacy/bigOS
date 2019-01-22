@@ -1,4 +1,5 @@
-package filemodule;
+package FileModule;
+
 
 import java.util.BitSet;
 

@@ -1,4 +1,4 @@
-package filemodule;
+package FileModule;
 
 /**
  *
