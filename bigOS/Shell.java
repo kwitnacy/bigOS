@@ -6,7 +6,7 @@ import Interpreter.Interpreter;
 import Processor.Scheduler;
 import Procesy.Process_container;
 import RAM.Memory;
-import filemodule.FileManagement;
+import FileModule.FileManagement;
 
 import java.util.ArrayList;
 import java.util.Scanner;
