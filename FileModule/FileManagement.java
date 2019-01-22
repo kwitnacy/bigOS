@@ -74,7 +74,7 @@ public class FileManagement {
         System.out.println("Username: " + ftemp.getUserName());
         System.out.println("FAT index: " + ftemp.getIndex());
         System.out.println("Size of file (number of blocks): " + ftemp.getSize());
-        System.out.print("Semaphore value: "); //ftemp.s.getValue();    
+        System.out.println("Semaphore value: " + ftemp.s.getValue());
         return true;
     }
     
