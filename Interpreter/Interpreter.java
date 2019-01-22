@@ -2,16 +2,16 @@ package Interpreter;
 import Processor.Scheduler;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
+import static RAM.Memory.writeMemory;
 import static filemodule.FileManagement.*;
-import Semaphore.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static RAM.Memory.readMemory;
 
 public class Interpreter {
 
-    private static int A,B,C,D, program_counter, base, limit, PID, etykietka;
-    private static String rozkaz, calyRozkaz;
+    private static int A,B,C,D, program_counter, base, limit, PID, etykietka, memory_counter;
+    private static String rozkaz="", calyRozkaz;
     private static String user;
 	
 	public Interpreter(){
@@ -20,7 +20,7 @@ public class Interpreter {
 
     private static void start(String filename) {
             Scheduler.running.change_state(State.Running);
-            program_counter = Processor.Scheduler.running.get_program_counter();
+            program_counter = 0;
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -28,7 +28,6 @@ public class Interpreter {
             B = Scheduler.running.get_BX();
             C = Scheduler.running.get_CX();
             D = Scheduler.running.get_DX();
-            getOrder();
         //}
     }
     static int addresToliczba(String address)
@@ -51,38 +50,54 @@ public class Interpreter {
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
-        int i =0;
-        char newPart, nastepny1, nastepny2;
+        int i =memory_counter;
+        rozkaz = "";
+        calyRozkaz = "";
+        Character newPart, nastepny1, nastepny2;
         String IfNew;
         Pattern newOrder = Pattern.compile("[A-Z][A-Z]");
         Matcher newOrderMatches = newOrder.matcher("");
         while(!newOrderMatches.matches())
         {
-            newPart = readMemory(base + program_counter);
+            newPart = readMemory(base + i);
             //odczytywanie calego rozkazu jako stringa
-            calyRozkaz = rozkaz + newPart;
+            calyRozkaz = calyRozkaz + newPart;
             if(i<2) rozkaz = rozkaz + newPart;
             //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
-            nastepny1 = readMemory(base + program_counter + 1);
-            nastepny2 = readMemory(base + program_counter + 2);
+            nastepny1 = readMemory(base + i + 2);
+            nastepny2 = readMemory(base + i + 3);
             IfNew = ""+nastepny1 + nastepny2;
             newOrderMatches = newOrder.matcher(IfNew);
             i++;
+            memory_counter++;
         }
-        System.out.println("wykonywany rozkaz: "+rozkaz);
+        System.out.println("wykonywany rozkaz: "+calyRozkaz);
     }
     public static void go(int how_many) //
     {
+        memory_counter = base;
         start(Scheduler.running.get_file_name());
-        for (int i = 0;i<how_many||!rozkaz.equals("HT");i++)
+        for (int i = 0;i<how_many&&!rozkaz.equals("HT");i++)
         {
+            getOrder();
             if(!executeOrder())
             {
                 return;
             }
             Scheduler.makeOlder(); //postarzanie procesu
             updateProcessor(); //zapisanie zmienionych wartosci rejestru
+            display();
         }
+    }
+    private static void display()
+    {
+        System.out.println("Stan po wykonanym rozkazie ");
+        System.out.println("PID: "+PID);
+        System.out.println("rejestr A: "+A);
+        System.out.println("rejestr B: "+B);
+        System.out.println("rejestr C: "+C);
+        System.out.println("rejestr D: "+D);
+        System.out.println("program_counter: "+ program_counter);
     }
     private static boolean executeOrder() {
         Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
@@ -434,6 +449,16 @@ public class Interpreter {
             }
             else
             {
+                int zmienna = readMemory(addresToliczba(x));
+                zmienna++;
+                if(zmienna<10) {
+                    char zmien = (char) (zmienna + '0');
+                    writeMemory(zmien, addresToliczba(x));
+                }
+                else
+                {
+                    //???????????????????????????
+                }
                 //miejsce w pamieci ++
                 //spytac Macieja czy w ogole jest taka mozliwosc
             }

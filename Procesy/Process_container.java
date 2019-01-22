@@ -2,7 +2,6 @@ package Procesy;
 
 import Processor.Scheduler;
 
-import java.awt.desktop.SystemEventListener;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;

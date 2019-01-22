@@ -2,6 +2,7 @@
 package bigOS;
 
 
+import Interpreter.Interpreter;
 import Procesy.Process_container;
 import RAM.Memory;
 import filemodule.FileManagement;
@@ -31,6 +32,7 @@ public class Shell {
         system=true;
         System.out.println("[Interface]: Rozpoczecie pracy interfejsu");
         start();
+        Memory.memoryInit();
         while(system)
         {
 
@@ -445,6 +447,10 @@ public class Shell {
 
                 }
                 break;
+            }
+            case "go":
+            {
+                Interpreter.go(2);
             }
             default:
             {
