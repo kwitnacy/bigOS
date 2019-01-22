@@ -20,7 +20,6 @@ public class Interpreter {
 
     private static void start(String filename) {
             Scheduler.running.change_state(State.Running);
-            program_counter = 0;
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             limit = Scheduler.running.get_limit();
@@ -50,7 +49,8 @@ public class Interpreter {
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
-        int i =memory_counter;
+        int i = memory_counter;
+        int totwocounter=0;
         rozkaz = "";
         calyRozkaz = "";
         Character newPart, nastepny1, nastepny2;
@@ -62,15 +62,17 @@ public class Interpreter {
             newPart = readMemory(base + i);
             //odczytywanie calego rozkazu jako stringa
             calyRozkaz = calyRozkaz + newPart;
-            if(i<2) rozkaz = rozkaz + newPart;
+            if(totwocounter<2) rozkaz = rozkaz + newPart;
             //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
-            nastepny1 = readMemory(base + i + 2);
-            nastepny2 = readMemory(base + i + 3);
+            nastepny1 = readMemory(base + i + 1);
+            nastepny2 = readMemory(base + i + 2);
             IfNew = ""+nastepny1 + nastepny2;
             newOrderMatches = newOrder.matcher(IfNew);
+            totwocounter++;
             i++;
             memory_counter++;
         }
+        System.out.println(rozkaz);
         System.out.println("wykonywany rozkaz: "+calyRozkaz);
     }
     public static void go(int how_many) //

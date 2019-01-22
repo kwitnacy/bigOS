@@ -1,7 +1,7 @@
-CF f
-WF f abc
-RF f 1 2
-DF f
+CF fa
+WF fa abc
+RF fa 1 2
+DF fa
 CF f2
 WF f2 8
 WF f2 5
