@@ -99,7 +99,7 @@ public class Scheduler
 	public static void remove_running(int PID){
 		if(running.get_PID() == PID){
 			System.out.println("----------------------\"usuawanie\" running----------------------");
-			Memory.removeProgram(int PID);
+			Memory.removeProgram(PID);
 			running = dummy;
 			running.change_state(State.Running);
 			schedule();
@@ -158,7 +158,7 @@ public class Scheduler
 		{
 			if(running.get_state() == State.Terminated)
 			{
-				Memory.removeProgram(int PID);
+				Memory.removeProgram(PID);
 			}
 			for (int i = 14 ; i > -1 ; i--)
 			{
