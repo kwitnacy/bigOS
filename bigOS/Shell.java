@@ -30,12 +30,13 @@ public class Shell {
     }
     void system()
     {
+        Memory.memoryInit();
         Scheduler pro = new Scheduler();                    //TO NIECH TU BEDZIE KOMU TO SZKODZI?
         Process_container con = new Process_container();    //TO NIECH TU BEDZIE KOMU TO SZKODZI?
         system=true;
         System.out.println("[Interface]: Rozpoczecie pracy interfejsu");
         start();
-        Memory.memoryInit();
+
         while(system)
         {
 

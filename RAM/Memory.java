@@ -12,6 +12,7 @@ public class Memory {
 
     public static char[] memory = new char[256];
 
+
     private static Map<Integer,Integer> allocatedPartitions = new HashMap<>();
     private static Map<Integer,Integer> freePartitions =  new HashMap<>();
 
@@ -24,7 +25,7 @@ public class Memory {
         String temp="src/Interpreter/" + fileName + ".txt";
         if(temp!=fileName)
             fileName= "src/Interpreter/" + fileName + ".txt";
-        System.out.println("sciezka: " + fileName);
+        //System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         String program="";
