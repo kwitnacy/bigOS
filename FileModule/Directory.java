@@ -25,7 +25,7 @@ public class Directory {
     
     public boolean addToRoot(File file){      //dodawanie pliku do katalogu
         for(File f : root){
-            if(this.checkExistance(file.getName())){
+            if(this.checkExistance(file.getName()) == true){ 
                 return false;    //podany plik istnieje więc nie dodajemy
             }
         }
@@ -36,7 +36,7 @@ public class Directory {
     
     public boolean deleteFromRoot(String fileName){       //usuwanie pliku o podanej nazwie z katalogu
         for(File f : root){
-            if(checkExistance(fileName) && f.getName().equals(fileName)){
+            if(checkExistance(fileName) == true && f.getName().equals(fileName)){ 
                 root.remove(f);
                 return true;    //poprawna nazwa i usunięcie FCB z katalogu
             }
@@ -46,7 +46,7 @@ public class Directory {
     }
     
     public File getFileByName(String fName){
-        if(checkExistance(fName)){
+        if(checkExistance(fName) == true){
             for(File f : root){
                 if(f.getName().equals(fName)) return f;  //zwraca żądany plik
             }
