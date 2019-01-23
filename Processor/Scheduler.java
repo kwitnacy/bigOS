@@ -16,21 +16,21 @@ public class Scheduler
 	private static List<Queue<Process>> queuesPCB; 						// lista kolejek PCB w stanie ready
 	private static Process dummy;											// proces dummy o priorytecie 0
 	public static Process running;									// aktualnie wykonywany proces
-	
+
 	public Scheduler(Process dummy)
 	{
 		Scheduler.dummy = dummy;					// inicjalizacja pustego procesu dummy
-		
+
 		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla kazdedgo priorytetu
-		
+
 		for (int i=0 ; i<15 ; i++)
 		{
 			queuesPCB.add(new LinkedList<Process>());
 		}
-		
+
 		running = dummy; 											// przypisanie procesorowi procesu dummy
 	}
-	
+
 	public Scheduler(){
 		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla kazdego priorytetu
 
@@ -38,7 +38,7 @@ public class Scheduler
 			queuesPCB.add(new LinkedList<Process>());
 		}
 	}
-	
+
 	static {
 		queuesPCB = new ArrayList<Queue<Process>>();				// inicjalizacja pustych kolejek dla ka�dedgo priorytetu
 
@@ -46,15 +46,15 @@ public class Scheduler
 			queuesPCB.add(new LinkedList<Process>());
 		}
 	}
-	
+
 	public static void add(Process toAdd) 									// dodawanie procesu do odpowiedniej kolejki
 	{
 		if(toAdd.get_name().equals("dummy")){
 			dummy = toAdd;
 			Memory.loadProgram(dummy.get_file_name(), dummy.get_PID());
-            running = dummy;
-            running.change_state(State.Running);
-            schedule();
+			running = dummy;
+			running.change_state(State.Running);
+			schedule();
 			System.out.println("[Processor]: Added dummy process.");
 		}
 		else
@@ -63,12 +63,12 @@ public class Scheduler
 			if(toAdd.get_base_priority() == toAdd.get_temp_priority())
 			{
 				System.out.println("[Processor]: Added to queue process with name: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
-				+ ", priorities base and temporary: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " and state: " + toAdd.get_state());
+						+ ", priorities base and temporary: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " and state: " + toAdd.get_state());
 			}
 			else 														// nie wiem czy pisac ze dodalem proces do kolejki, skoro to reorganizacja
 			{
-	//			System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
-	//			+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
+				//			System.out.println("Procesor: Dodalem do kolejki proces o nazwie: " + toAdd.get_name() + ", PID: " + toAdd.get_PID()
+				//			+ ", priorytetach bazowym i tymczasowym: " + toAdd.get_base_priority() + " ; " + toAdd.get_temp_priority() + " bedacym w stanie: " + toAdd.get_state());
 			}
 		}
 
@@ -92,19 +92,19 @@ public class Scheduler
 			{
 				Iterator<Process> iteratorkolejek = qq.iterator();
 				while (iteratorkolejek.hasNext())
+				{
+					Process block = iteratorkolejek.next();
+					if(block.get_PID() == PID)
 					{
-						Process block = iteratorkolejek.next();
-						if(block.get_PID() == PID)
-						{
-							System.out.println("[Processor]: Deleted from queue process with name: " + block.get_name() + ", PID: " + block.get_PID() 
-							+ ", priorities base and temporary: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " and state: " + block.get_state());
-							iteratorkolejek.remove();
-						}
+						System.out.println("[Processor]: Deleted from queue process with name: " + block.get_name() + ", PID: " + block.get_PID()
+								+ ", priorities base and temporary: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " and state: " + block.get_state());
+						iteratorkolejek.remove();
 					}
+				}
 			}
 		}
 	}
-	
+
 	public static void makeOlder() 										// postarzanie procesow, oraz inkrementacja licznika czekania procesow
 	{
 		if(running.get_base_priority() < running.get_temp_priority())
@@ -116,8 +116,8 @@ public class Scheduler
 			}
 			else
 			{
-				System.out.println("[Processor]: Rejuvenated process Running with name: " + running.get_name() + ", PID: " + running.get_PID() 
-				+ ", and priorities base and temporary (after change): " + running.get_base_priority() + " ; " + (running.get_temp_priority()+1));
+				System.out.println("[Processor]: Rejuvenated process Running with name: " + running.get_name() + ", PID: " + running.get_PID()
+						+ ", and priorities base and temporary (after change): " + running.get_base_priority() + " ; " + (running.get_temp_priority()+1));
 				running.dec_temp_priority();
 				running.set_waiting_counter(3);
 
@@ -129,10 +129,10 @@ public class Scheduler
 			while(iteratorkolejek.hasNext())
 			{
 				Process block = iteratorkolejek.next();
-				if(block.get_waiting_counter() >= waitingLimit && block.get_temp_priority() < 15) 
+				if(block.get_waiting_counter() >= waitingLimit && block.get_temp_priority() < 15)
 				{
-					System.out.println("[Processor]: Oldened process with name: " + block.get_name() + ", PID: " + block.get_PID() 
-					+ ", and priorities base and temporary (after change): " + block.get_base_priority() + " ; " + (block.get_temp_priority()+1));
+					System.out.println("[Processor]: Oldened process with name: " + block.get_name() + ", PID: " + block.get_PID()
+							+ ", and priorities base and temporary (after change): " + block.get_base_priority() + " ; " + (block.get_temp_priority()+1));
 					block.inc_temp_priority();
 					block.set_waiting_counter(-1);
 					qq.remove(block);
@@ -148,7 +148,7 @@ public class Scheduler
 		schedule();
 		return;
 	}
-	
+
 	public static void schedule() 											// planista
 	{
 		if(running.get_state() == State.Terminated || running.get_temp_priority() == 0) //zwykly przydzial procesora
@@ -157,32 +157,32 @@ public class Scheduler
 			{
 				for (Process block : queuesPCB.get(i))
 				{
-						if(Memory.loadProgram(block.get_file_name(), block.get_PID()))
-						{
-							running = block;
-							running.change_state(State.Running);
-							queuesPCB.get(i).remove(block);
-							System.out.println("[Processor]: Assigned processor to process with name: " + block.get_name() + ", PID: " + block.get_PID() 
-							+ ", and priorities (base and temporary): " + block.get_base_priority() + " ; " + block.get_temp_priority());
+					if(Memory.loadProgram(block.get_file_name(), block.get_PID()))
+					{
+						running = block;
+						running.change_state(State.Running);
+						queuesPCB.get(i).remove(block);
+						System.out.println("[Processor]: Assigned processor to process with name: " + block.get_name() + ", PID: " + block.get_PID()
+								+ ", and priorities (base and temporary): " + block.get_base_priority() + " ; " + block.get_temp_priority());
 
-							if(dummy.get_state() != State.Ready)
-								dummy.change_state(State.Ready);
-							
-							break;
-						}
-						else
-						{
-							System.out.println("[Procesor]: Deleted from queue process with name: "+block.get_name()+ " o PID: "+block.get_PID()+" which changed his state to Waiting.");
-							int tmp_pid = block.get_PID();
+						if(dummy.get_state() != State.Ready)
+							dummy.change_state(State.Ready);
 
-							queuesPCB.get(i).remove(block);
-							Memory.sem.wait_s(tmp_pid);
-							Memory.sem.print_queue();
-						}
+						break;
+					}
+					else
+					{
+						System.out.println("[Procesor]: Deleted from queue process with name: "+block.get_name()+ " o PID: "+block.get_PID()+" which changed his state to Waiting.");
+						int tmp_pid = block.get_PID();
+
+						queuesPCB.get(i).remove(block);
+						Memory.sem.wait_s(tmp_pid);
+						Memory.sem.print_queue();
+					}
 				}
 				if(running.get_state() == State.Running && running.get_base_priority() != 0)
 					break;
-			}			
+			}
 		}
 		else //wywlaszczanie
 		{
@@ -194,8 +194,8 @@ public class Scheduler
 					{
 						if(Memory.loadProgram(block.get_file_name(), block.get_PID()))
 						{
-							System.out.println("[Procesor]: Process preemptioned for a process with name: " + block.get_name() + ", PID: " + block.get_PID() 
-							+ ", and priorities (base and temporary): " + block.get_base_priority() + " ; " + block.get_temp_priority());
+							System.out.println("[Procesor]: Process preemptioned for a process with name: " + block.get_name() + ", PID: " + block.get_PID()
+									+ ", and priorities (base and temporary): " + block.get_base_priority() + " ; " + block.get_temp_priority());
 							running.change_state(State.Ready);
 							if(running.get_temp_priority() != 0){
 								add(running);
@@ -225,13 +225,13 @@ public class Scheduler
 		}
 		if(running.get_state() != State.Running || running.get_name().equals("dummy")) // sprawdzamy czy po przeleceniu kolejek jakis zostal� przydzielony
 		{
-				running = dummy;
-				running.change_state(State.Running);
-				System.out.println("[Processor]: Assigned processor to a Dummy process.");
+			running = dummy;
+			running.change_state(State.Running);
+			System.out.println("[Processor]: Assigned processor to a Dummy process.");
 		}
 
 	}
-	
+
 	public static void showReadyProcesses() // wyswietlanie ready
 	{
 		System.out.println("[Processor]: Showing processes in ready state:");
@@ -253,7 +253,7 @@ public class Scheduler
 		System.out.println("[Processor]: Currently running process is: (Name ; PID ; Base priority ; Temporary priority)");
 		System.out.println(running.get_name() + " ; " + running.get_PID() + " ; " + running.get_base_priority() + " ; " + running.get_temp_priority());
 	}
-	
+
 	public static void updateBase()
 	{
 		for(Queue<Process> qq : queuesPCB)

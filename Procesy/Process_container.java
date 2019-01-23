@@ -134,7 +134,6 @@ public class Process_container {
 
     public static Process get_by_name(String name){
         if(taken_names.contains(name)) {
-            System.out.println("hejo");
             return processes.get(names.get(name));
         }
         else

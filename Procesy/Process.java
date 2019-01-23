@@ -24,7 +24,7 @@ public class Process {
 
     String file_name;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public Process(String name, String file_name, int priority, int PID){
         this.state = State.New;
         this.name = name;
@@ -69,7 +69,7 @@ public class Process {
         this.state = State.Ready;
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public int get_PID(){
         return this.PID;
     }
@@ -158,7 +158,7 @@ public class Process {
         this.waiting_counter = waiting_counter;
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void display_process(){
         System.out.println("+-------------------------------------------------------+");
         System.out.println("|Name: " + this.name);
@@ -177,15 +177,15 @@ public class Process {
 
         if(this.state == State.Running && !this.name.equals("dummy"))
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Running");
-		
-		if(this.state == State.Ready && !this.name.equals("dummy"))
+
+        if(this.state == State.Ready && !this.name.equals("dummy"))
             System.out.println("[Process_Manager]: Changed state of process: " + this.name + " to Ready");
 
         if(this.state == State.Terminated){
             Process_container.delete(this.PID);
             System.out.println("[Process_Manager]: Deleted process " + this.name);
             Scheduler.schedule();       // tego nie jestem pewny ale chyba powinno byc jak sie usuwa proces zeby odrazu
-                                        // zastapic go nowym.
+            // zastapic go nowym.
         }
 
         if(this.state == State.Waiting){
@@ -218,7 +218,7 @@ public class Process {
         this.waiting_counter--;
     }
 
-///Messages/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///Messages/////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public Message get_last_message(){
         return this.last_message;
     }
@@ -239,11 +239,11 @@ public class Process {
             while(!display.isEmpty()){
                 Message m=display.poll();
                 System.out.println("[IPC]: Message "+counter+": Sender PID:"+m.get_sender_PID()+" Size:"+m.get_size()+" Text:"+m.get_text());
-            counter++;
+                counter++;
             }
         }
     }
-	public void display_messages_semaphore(){
+    public void display_messages_semaphore(){
         System.out.println("[IPC]: Process "+this.get_PID()+" messages semaphore value is: "+messages_semaphore.getValue());
     }
 
