@@ -39,7 +39,7 @@ public class Memory {
         catch(FileNotFoundException e){
             e.printStackTrace();
         }
-        int tmp=Scheduler.running.get_base(),licznik = 0;
+        int tmp=Process_container.get_by_PID(PID).get_base(),licznik = 0;
         String check="";
         for(int i=tmp;i<tmp+size;i++){
             check+=memory[i];
@@ -55,7 +55,8 @@ public class Memory {
             if(freePartitions.get(i)!=null)
                 value = freePartitions.get(i);
             if(value>=size+10){
-                writeMemory(program,i);
+                Process_container.get_by_PID(PID).ser_base(i);
+                writeMemory(program,PID);
                 return true;
             }
         }
@@ -76,7 +77,7 @@ public class Memory {
         Integer base = Scheduler.running.get_base();
         memory[base+address]=value;
     }
-    private static void writeMemory(String fileName,Integer base){
+    private static void writeMemory(String fileName,Integer PID){
         /*File file = new File(fileName);
 
         Integer next=0;
@@ -96,15 +97,15 @@ public class Memory {
         }*/
         Integer next=0;
         int index=0;
+        Integer base = Process_container.get_by_PID(PID).get_base();
         for(int i=base ;i< base + fileName.length() ;i++){
             memory[i]=fileName.charAt(index);
             index++;
         }
 
         allocatedPartitions.put(base,fileName.length()+10);
-        Scheduler.running.ser_base(base);
-        Scheduler.running.ser_limit(fileName.length()+10);
-
+       // Scheduler.running.ser_limit(fileName.length()+10);
+        Process_container.get_by_PID(PID).ser_limit(fileName.length()+10);
         System.out.println("[RAM]: Program has been put in RAM at [" + base + "," + (base+fileName.length()+9) + "]");
         Integer tmp = freePartitions.get(base);
         freePartitions.remove(base);
