@@ -1,5 +1,6 @@
 package Interpreter;
 import Processor.Scheduler;
+import Procesy.Process_container;
 import Procesy.State;
 import static Procesy.Process.make_porocess;
 import static RAM.Memory.writeMemory;
@@ -39,6 +40,11 @@ public class Interpreter {
     }
     private static void updateProcessor()
     {
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_AX(A);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_BX(B);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_CX(C);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_DX(D);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_program_counter(program_counter);
         Processor.Scheduler.running.set_AX(A);
         Processor.Scheduler.running.set_BX(B);
         Processor.Scheduler.running.set_CX(C);
@@ -562,7 +568,14 @@ public class Interpreter {
         if(adresmatchery.matches())
         {
             int dana = 0;
-            dana = readMemory(addresToliczba(y));
+            char danaa=' ';
+            try {
+                danaa = readMemory(addresToliczba(y));
+                dana=Character.getNumericValue(danaa);
+            }catch (NullPointerException e)
+            {
+                System.out.println("Empty addres");
+            }
             switch(x){
                 case "A":
                 {
