@@ -50,7 +50,6 @@ public class Interpreter {
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
         int i = program_counter;
-        System.out.println("hhhh"+i);
         int totwocounter=0;
         rozkaz = "";
         calyRozkaz = "";
@@ -61,7 +60,6 @@ public class Interpreter {
         Pattern slowo = Pattern.compile("\\w+");
         while(!newOrderMatches.matches())
         {
-            System.out.println(calyRozkaz);
             newPart = readMemory(base + i);
             //odczytywanie calego rozkazu jako stringa
             calyRozkaz = calyRozkaz + newPart;
@@ -90,8 +88,7 @@ public class Interpreter {
             program_counter++;
         }
         program_counter++;
-        System.out.println(rozkaz);
-        System.out.println("wykonywany rozkaz: "+calyRozkaz);
+        System.out.println("[Interpreter] wykonywany rozkaz: "+calyRozkaz);
     }
     public static void go(int how_many) //
     {
@@ -152,7 +149,6 @@ public class Interpreter {
         }
         Pattern etykieta = Pattern.compile("\\w+:");
         Matcher etykietamatcher = etykieta.matcher(calyRozkaz);
-        System.out.println("parametry "+x+" "+y+" "+z+" "+xx);
         switch (rozkaz) {
             case "AD": {
                 if(!add(x, y))
@@ -361,7 +357,7 @@ public class Interpreter {
             }
             case "JC":
             {
-                if (C == 0)
+                if (C != 0)
                 {
                     System.out.println("etykietka:"+String.valueOf(etykietka));
                     if(!jump(String.valueOf(etykietka))){
@@ -400,22 +396,18 @@ public class Interpreter {
         {
             if(x.equals("A"))
             {
-                A = 1;
                 D = 0;
             }
             if(x.equals("B"))
             {
-                A = A/B;
                 D = A%B;
             }
             if(x.equals("C"))
             {
-                A = A/C;
                 D = A%C;
             }
             if(x.equals("D"))
             {
-                A = A/D;
                 D = A%D;
             }
         }

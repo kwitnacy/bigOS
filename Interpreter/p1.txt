@@ -1,8 +1,10 @@
-MO A 22
-MO B 66
+MO A 45
+MO B 15
+MO C B
 PT:
-MO A B
+MO B C
 DI B
+MO A B
 MO C D
 JC PT
 MO [8] A
