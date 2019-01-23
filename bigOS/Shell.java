@@ -48,9 +48,9 @@ public class Shell {
                 Scanner sc = new Scanner(System.in);
                 System.out.print("bigOS:\\User>");
                 command=sc.nextLine();
-                System.out.println("[Interface]: Przechwycenie bufforu");
+                //System.out.println("[Interface]: Przechwycenie bufforu");
                 
-                System.out.println("[Interface]: Podzielenie bufforu na komendy i parametry");
+                //System.out.println("[Interface]: Podzielenie bufforu na komendy i parametry");
                 cut();
                 String x="";
                 if(!parts.isEmpty())

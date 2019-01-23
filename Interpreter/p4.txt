@@ -1,0 +1,5 @@
+RM [10]
+SM 1 2 10
+RM [20] 2
+SM 1 dziala
+HT
