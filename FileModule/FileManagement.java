@@ -150,9 +150,12 @@ public class FileManagement {
             System.out.println("[File Module]: File not found in the root.");
             return false;
         } //nie ma pliku w katalogu
-        
+
+        File ftemp = disk.fileSystem.root.getFileByName(name);
+
         int sizeBytes = data.length();   //tyle bajtów zajmuje
-        int blocks = (int) Math.ceil(sizeBytes / 32.0); //tyle bloków zajmie
+        int lastBlockBytes = (32-(ftemp.getSize()%32))%32; //tyle bajtów zostanie w ostatnim zajętym bloku
+        int blocks = (int) Math.ceil((sizeBytes-lastBlockBytes) / 32.0); //tyle bloków zajmie
         //System.out.println("[File Module]: Number of blocks needed for data: " + blocks);
 
         if(!properFileName(name) && blocks > disk.fileSystem.checkFreeBlocks()){
@@ -163,9 +166,8 @@ public class FileManagement {
             System.out.println("[File Module]: Not enough space on the disk.");
             return false;
         } //nie ma wystarczająco wolnych bloków
-        
-        File ftemp = disk.fileSystem.root.getFileByName(name);
-        
+
+
         ftemp.setSize(sizeBytes);
 
         char[] dat = data.toCharArray();    //dane zapisane w tablicy char[]
@@ -195,6 +197,13 @@ public class FileManagement {
         //zapis na bloki dyskowe
         int dataPos = 0;
         if(freeB.size()<0) System.out.println("[File Module]: Free blocks list capacity is less than 0!");
+        if(lastBlockBytes != 0){
+            for(int i=32-lastBlockBytes;i<32;i++){
+                disk.data[index*32+i] = dat[dataPos];
+                dataPos++;
+                if(dataPos >= dat.length) { break; }
+            }
+        }
         for(int i = 0; i < freeB.size(); i++){
             disk.fileSystem.FAT[index] = freeB.get(i);  //następny wolny indeks
             index = freeB.get(i);
@@ -239,21 +248,21 @@ public class FileManagement {
         blocks.removeLast();
         
         //System.out.println("[File Module]: Blocks that will be read: " + blocks);
-        
-        //Numer indeksu w pliku od którego mamy czytać
-        Double fromIndex = Math.floor(from/32);
-        
-        //Końcowy indeks w pliku do którego mamy czytać
-        Double toIndex = Math.floor((from+howMany)/32);
-        
+
         //Pozycja czytania
-        int readPosition = blocks.get(fromIndex.intValue())*32 + from%32;
-        int stopPosition = blocks.get(toIndex.intValue())*32 +(from+howMany)%32;
+        int readPosition = 0;
+        int stop = from+howMany;
         
+        if(stop > ftemp.getSize()) {
+            System.out.println("[File Module]: Wrong value.");
+            return null;
+        }
+
         //Pętla czytania
-        while(readPosition < stopPosition){
+        while(from < stop){
+            readPosition = blocks.get(from/32)*32 + from%32;
             output = output.concat(Character.toString(disk.getByte(readPosition)));
-            readPosition++;
+            from++;
         }
 
         return output;
@@ -287,10 +296,16 @@ public class FileManagement {
         
         //System.out.println("[File Module]: Blocks that will be read: " + blocks);
         String buffer;
-        
+        int blocknum=0;
         for(int i : blocks){
-           buffer = new String(disk.getBlock(i));
-           output = output.concat(buffer);
+            if(disk.getBlockOccup(i) == 32) {
+                buffer = new String(disk.getBlock(i));
+            }
+            else{
+                buffer = read(fileName,blocknum*32,disk.getBlockOccup(i));
+            }
+            output = output.concat(buffer);
+            blocknum++;
         }
         return output;
     }
