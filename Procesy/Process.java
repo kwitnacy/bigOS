@@ -230,21 +230,21 @@ public class Process {
     }
     public void display_messages_queue(){
         Queue<Message> display=this.messages_queue;
-        System.out.println("Process "+this.get_PID()+" received messages:");
+        System.out.println("[IPC]: Process "+this.get_PID()+" received messages:");
         if(display.isEmpty()){
-            System.out.println("Messages queue is empty.");
+            System.out.println("[IPC]: Messages queue is empty.");
         }
         else{
             int counter=1;
             while(!display.isEmpty()){
                 Message m=display.poll();
-                System.out.println("Message "+counter+": Sender PID:"+m.get_sender_PID()+" Size:"+m.get_size()+" Text:"+m.get_text());
+                System.out.println("[IPC]: Message "+counter+": Sender PID:"+m.get_sender_PID()+" Size:"+m.get_size()+" Text:"+m.get_text());
             counter++;
             }
         }
     }
 	public void display_messages_semaphore(){
-        System.out.println("Process "+this.get_PID()+" messages semaphore value is: "+messages_semaphore.getValue());
+        System.out.println("[IPC]: Process "+this.get_PID()+" messages semaphore value is: "+messages_semaphore.getValue());
     }
 
 
@@ -253,7 +253,7 @@ public class Process {
             return send_message(Process_container.get_by_name(receiverName).get_PID(),addres);
         }
         else{
-            System.out.println("[IPC] Sending failure, invalid receiver name.");
+            System.out.println("[IPC]: Sending failure, invalid receiver name.");
             return false;
         }
     }
@@ -262,7 +262,7 @@ public class Process {
             return send_message(Process_container.get_by_name(receiverName).get_PID(),size,addres);
         }
         else{
-            System.out.println("[IPC] Sending failure, invalid receiver name.");
+            System.out.println("[IPC]: Sending failure, invalid receiver name.");
             return false;
         }
     }
@@ -271,7 +271,7 @@ public class Process {
             return send_message(Process_container.get_by_name(receiverName).get_PID(),text);
         }
         else{
-            System.out.println("[IPC] Sending failure, invalid receiver name.");
+            System.out.println("[IPC]: Sending failure, invalid receiver name.");
             return false;
         }
     }
@@ -288,7 +288,7 @@ public class Process {
             counter++;
 
             if(Memory.readMemory(addres+counter+1)==null){
-                System.out.println("[IPC] Sending failure, memory error.");
+                System.out.println("[IPC]: Sending failure, memory error.");
                 return false;
             }
         }
@@ -303,7 +303,7 @@ public class Process {
                 text+=Memory.readMemory(addres+i);
             }
             else{
-                System.out.println("[IPC] Sending failure, memory error.");
+                System.out.println("[IPC]: Sending failure, memory error.");
                 return false;
             }
         }
@@ -311,15 +311,15 @@ public class Process {
     }
     public boolean send_message(int receiverPID, String text){
         if(Process_container.get_by_PID(receiverPID)==null){
-            System.out.println("[IPC] Sending failure, invalid receiver PID.");
+            System.out.println("[IPC]: Sending failure, invalid receiver PID.");
             return false;
         }
         else if(text.contains("$")){
-            System.out.println("[IPC] Sending failure, forbidden character in text.");
+            System.out.println("[IPC]: Sending failure, forbidden character in text.");
             return false;
         }
         else if(text.length()>8||text.length()<=0){
-            System.out.println("[IPC] Sending failure, size og message must be in <1,8>.");
+            System.out.println("[IPC]: Sending failure, size og message must be in <1,8>.");
             return false;
         }
 
@@ -329,8 +329,8 @@ public class Process {
         p.messages_queue.add(msg);
         p.get_messages_semaphore().signal_s();
 
-        System.out.println("[IPC] Succesfully sent message!");
-        System.out.println("[IPC] PID:"+msg.get_sender_PID()+" Size:"+msg.get_size()+" Text:"+msg.get_text());
+        System.out.println("[IPC]: Succesfully sent message!");
+        System.out.println("[IPC]: PID:"+msg.get_sender_PID()+" Size:"+msg.get_size()+" Text:"+msg.get_text());
         return true;
     }
 
@@ -339,11 +339,11 @@ public class Process {
         this.messages_semaphore.wait_s(this.PID);
 
         if(this.state==State.Waiting) {
-            System.out.println("[IPC] Reading failure, there are no messages to read.");
+            System.out.println("[IPC]: Reading failure, there are no messages to read.");
             return false;
         }
         else if(size<=0||size>this.messages_queue.peek().get_size()){
-            System.out.println("[IPC] Reading failure, message size : "+this.messages_queue.peek().get_size());
+            System.out.println("[IPC]: Reading failure, message size : "+this.messages_queue.peek().get_size());
             return false;
         }
 
@@ -351,22 +351,22 @@ public class Process {
         String ram_msg = (char)last_message.get_sender_PID()+last_message.get_text().substring(0,size)+'$';
 
         if(!Memory.writeMessage(this,ram_msg,addres)){
-            System.out.println("[IPC] Reading failure, memory error.");
+            System.out.println("[IPC]: Reading failure, memory error.");
             return false;
         }
 
         this.messages_queue.poll();
         int written_pid=ram_msg.charAt(0);
 
-        System.out.println("[IPC] Succesfully read message!");
-        System.out.println("[IPC] Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
+        System.out.println("[IPC]: Succesfully read message!");
+        System.out.println("[IPC]: Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
         return true;
     }
     public boolean read_message(int addres){
         this.messages_semaphore.wait_s(this.PID);
 
         if(this.state==State.Waiting) {
-            System.out.println("[IPC] Reading failure, there are no messages to read.");
+            System.out.println("[IPC]: Reading failure, there are no messages to read.");
             return false;
         }
 
@@ -374,15 +374,15 @@ public class Process {
         String ram_msg = (char)last_message.get_sender_PID()+last_message.get_text()+'$';
 
         if(!Memory.writeMessage(this,ram_msg,addres)){
-            System.out.println("[IPC] Reading failure, memory error.");
+            System.out.println("[IPC]: Reading failure, memory error.");
             return false;
         }
 
         this.messages_queue.poll();
         int written_pid=ram_msg.charAt(0);
 
-        System.out.println("[IPC] Succesfully read message!");
-        System.out.println("[IPC] Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
+        System.out.println("[IPC]: Succesfully read message!");
+        System.out.println("[IPC]: Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
         return true;
     }
 

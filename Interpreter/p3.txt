@@ -1,7 +1,7 @@
-CP p123 p4 3
-SM p123 abcd
-SM 2 haha
-SM p123 qtaz
-RM [10]
-RM [20]
+SM 1 abc
+SM p1 def
+RM [3]
+SM p1 3 [4]
+SM p1 [3]
+SM p1 haha
 HT

@@ -145,7 +145,7 @@ public class Shell {
     }
     void start()
     {
-        System.out.println("\n \t\t        bigOS 1.0\n\t***NAJSMACZNIESZY SYSTEM OPERACYJNY***");
+        System.out.println("\n \t\t        bigOS 1.0\n\t***NAJSMACZNIEJSZY SYSTEM OPERACYJNY***");
     }
     void login()
     {
@@ -198,19 +198,10 @@ public class Shell {
             }
             case "show_messages":
             {
-                if(parts.size()==3)
+                if(parts.size()==2)
                 {
-                    if("/pid".equals(parts.get(1))){
-                        System.out.println("[Interface]: Wywolanie funkcji wypisujacej kolejke wiadomosci dla procesu o PID: "+parts.get(1));
-                    Process_container.get_by_PID(Integer.getInteger(parts.get(2))).display_messages_queue();
-                    }
-                    else if("/im".equals(parts.get(1)))
-                    {
-                        System.out.println("[Interface]: Wywolanie funkcji wypisujacej kolejke wiadomosci dla procesu o nazwie: "+parts.get(1));
-                        Process_container.get_by_name(parts.get(2)).display_messages_queue();
-                    }
-                    else
-                        System.out.println("[Interface]: Bledne argumenty");
+                    System.out.println("[Interface]: Wywolanie funkcji wypisujacej kolejke wiadomosci dla procesu o nazwie: "+parts.get(1));
+                    Process_container.get_by_name(parts.get(1)).display_messages_queue();
                 }
                 else
                     System.out.println("[Interface]: Bledne argumenty");
@@ -220,8 +211,8 @@ public class Shell {
             {
                 if(parts.size()==2)
                 {
-                    System.out.println("[Interface]: Wywolanie funkcji wypisujacej wartosc semafora dla procesu o PID: "+parts.get(1));
-                    Process_container.get_by_PID(Integer.getInteger(parts.get(1))).display_messages_semaphore();
+                    System.out.println("[Interface]: Wywolanie funkcji wypisujacej wartosc semafora dla procesu o nazwie: "+parts.get(1));
+                    Process_container.get_by_name(parts.get(1)).display_messages_semaphore();
                 }
                 else
                     System.out.println("[Interface]: Bledne argumenty");
@@ -241,9 +232,8 @@ public class Shell {
                             + "CF [P1]                  - TWORZY PLIK O NAZWIE P1;\n"
                             + "WF [P1] [P2] ... [PN]    - DOPISUJE DO PLIKU [P1] ZAWARTOSC KOLEJNYCH PARAMETROW;\n"
                             + "DF [P1]                  - USUWA PLIK [P1];\n"
-                            + "SHOW_MESSAGE /PID [P1]   - WYSWIETLA KOLEJKE WIADOMOSCI DLA PROCESU O PID [P1];\n"
-                            + "SHOW_MESSAGE /IM [P1]    - WYSWIETLA KOLEJKE WIADOMOSCI DLA PROCESU O NAZWIE [P1];\n"
-                            + "MESSAGES_SEM [P1]        - WYSWIETLA STAN SEMAFORA DLA PROCESU O PID [P1];\n"
+                            + "SHOW_MESSAGES [P1]       - WYSWIETLA KOLEJKE WIADOMOSCI DLA PROCESU O NAZWIE [P1];\n"
+                            + "MESSAGES_SEM [P1]        - WYSWIETLA STAN SEMAFORA DLA PROCESU O NAZWIE [P1];\n"
                             + "TASKLIST                 - WYSWIETLA WSZYSTKIE PROCESY;\n"
                             + "TASKLIST /PID [P1]       - WYSWIETLA PROCES O PID [P1];\n"
                             + "TASKLIST /IM [P1]        - WYSWIETLA PROCES O NAZWIE [P1];\n"
