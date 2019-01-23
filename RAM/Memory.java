@@ -20,10 +20,11 @@ public class Memory {
         freePartitions.put(0,256);
     }
 
-    public static Boolean loadProgram(){
-        String fileName;
-        fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
-      //  System.out.println("sciezka: " + fileName);
+    public static Boolean loadProgram(String fileName,Integer PID){
+        String temp="src/Interpreter/" + fileName + ".txt";
+        if(temp!=fileName)
+            fileName= "src/Interpreter/" + fileName + ".txt";
+        System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         String program="";
@@ -66,7 +67,7 @@ public class Memory {
         }
         if(free>=size+10) {
             move();
-            loadProgram();
+            loadProgram(fileName,PID);
         }
         System.out.println("[RAM]: there is not enough space to load the program");
         return false;
