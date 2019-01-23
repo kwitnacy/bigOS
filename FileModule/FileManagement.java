@@ -16,6 +16,12 @@ public class FileManagement {
     
     //pomocnicze funkcje
     
+	public static List<String> get_root(){
+        List<String> l = new LinkedList<>();
+        l = disk.fileSystem.root.getRoot();
+        return l;
+    }
+	
     //sprawdza czy wprowadzona nazwa pliku jest poprawna
     private static boolean properFileName(String name){
         if(name.isEmpty() || name.length()>2 || name.length()<0) return false;
