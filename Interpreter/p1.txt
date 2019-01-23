@@ -7,5 +7,6 @@ DI B
 MO A B
 MO C D
 JC PT
-MO [8] A
+MO [85] A
+MO B [85]
 HT

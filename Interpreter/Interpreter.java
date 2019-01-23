@@ -19,7 +19,6 @@ public class Interpreter {
 	}
 
     private static void start(String filename) {
-            Scheduler.running.change_state(State.Running);
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
             System.out.println(base);
@@ -50,7 +49,6 @@ public class Interpreter {
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
-        int wynik = base+program_counter;
         int totwocounter=0;
         rozkaz = "";
         calyRozkaz = "";
@@ -91,10 +89,11 @@ public class Interpreter {
     }
     public static void go(int how_many) //
     {
-
-        int start = base;
-        program_counter = start + program_counter;
         start(Scheduler.running.get_file_name());
+        //if(readMemory(program_counter)=='.')
+        //            {
+        //
+        //            }
         int i = 0;
         do
         {
@@ -466,8 +465,14 @@ public class Interpreter {
             {
                 int zmienna = readMemory(addresToliczba(x));
                 zmienna++;
-                char zmien = (char) (zmienna + '0');
-                writeMemory(zmien, addresToliczba(x));
+                char c;
+                String wynik = Integer.toString(zmienna);
+                int ii;
+                for(int i=0;i<wynik.length();i++) {
+                    c = wynik.charAt(i);
+                    ii = addresToliczba(x)+i;
+                    writeMemory(c,ii);
+                }
             }
         }
         return true;
@@ -536,9 +541,13 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
-                char c = y.charAt(0);
-                //do pamieci o danym adresie = addresToliczba(y);
-                writeMemory(c,addresToliczba(x));
+                char c;
+                int ii;
+                for(int i=0;i<y.length();i++) {
+                    c = y.charAt(i);
+                    ii = addresToliczba(x)+i;
+                    writeMemory(c,ii);
+                }
             }
         }
         if(adresmatchery.matches())
@@ -585,7 +594,14 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
-                //do pamieci o danym adresie = A;
+                char c;
+                String a = Integer.toString(A);
+                int ii;
+                for(int i=0;i<a.length();i++) {
+                    c = a.charAt(i);
+                    ii = addresToliczba(x)+i;
+                    writeMemory(c,ii);
+                }
             }
         }
         if (y.equals("B"))
@@ -604,7 +620,14 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
-                //do pamieci o danym adresie = B;
+                char c;
+                String b = Integer.toString(B);
+                int ii;
+                for(int i=0;i<b.length();i++) {
+                    c = b.charAt(i);
+                    ii = addresToliczba(x)+i;
+                    writeMemory(c,ii);
+                }
             }
         }
         if(y.equals("C"))
@@ -623,7 +646,14 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
-                //do pamieci o danym adresie = C;
+                char c;
+                String cc = Integer.toString(C);
+                int ii;
+                for(int i=0;i<cc.length();i++) {
+                    c = cc.charAt(i);
+                    ii = addresToliczba(x)+i;
+                    writeMemory(c,ii);
+                }
             }
         }
         if (y.equals("D"))
@@ -642,7 +672,14 @@ public class Interpreter {
             }
             else if (adresmatcherx.matches())
             {
-                //do pamieci o danym adresie = D;
+                char c;
+                String d = Integer.toString(D);
+                int ii;
+                for(int i=0;i<d.length();i++) {
+                    c = d.charAt(i);
+                    ii = addresToliczba(x)+i;
+                    writeMemory(c,ii);
+                }
             }
         }
         return true;
