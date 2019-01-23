@@ -175,7 +175,13 @@ public class Scheduler
 						else
 						{
 							System.out.println("[Procesor]: Usuwam z kolejki proces "+block.get_name()+ " o PID: "+block.get_PID()+" ktory przeszedl w stan Waiting.");
+							int tmp_pid = block.get_PID();
+
 							queuesPCB.get(i).remove(block);
+
+							System.out.println("dupa");
+							Memory.sem.wait_s(tmp_pid);
+							Memory.sem.print_queue();
 						}
 				}
 				if(running.get_state() == State.Running && running.get_base_priority() != 0)
@@ -210,7 +216,12 @@ public class Scheduler
 						else
 						{
 							System.out.println("[Procesor]: Usuwam z kolejki proces "+block.get_name()+ " o PID: "+block.get_PID()+" ktory przeszedl w stan Waiting.");
+							int tmp_pid = block.get_PID();
+
 							queuesPCB.get(i).remove(block);
+							System.out.println("dupa");
+							Memory.sem.wait_s(tmp_pid);
+							Memory.sem.print_queue();
 						}
 					}
 				}

@@ -19,10 +19,11 @@ public class Process_container {
 
     static private Vector<String> taken_names;                                      //  wektor przechowuje wykorzystane
                                                                                     //nazwy procesow
+    static private int size;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public Process_container(){
-        counter = 1;
+        size = counter = 1;
         processes = new ConcurrentHashMap<Integer, Process>();
         names = new ConcurrentHashMap<String, Integer>();
 
@@ -34,7 +35,7 @@ public class Process_container {
     }
 
     static {
-        counter = 1;
+        size = counter = 1;
         processes = new ConcurrentHashMap<Integer, Process>();
         names = new ConcurrentHashMap<String, Integer>();
 
@@ -56,6 +57,13 @@ public class Process_container {
             return;
         }
 
+        String temp_file_name = "src/Interpreter/" + file_name + ".txt";
+        File file = new File(temp_file_name);
+        if(!file.exists()) {
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". File doesn't exist.");
+            return;
+        }
+
         System.out.println("[Process_Manager]: Created process " + name + ".");
         Process temp = new Process(name, file_name, priority, counter);
 
@@ -63,13 +71,9 @@ public class Process_container {
         names.put(name, counter);
         taken_names.add(name);
         counter = counter + 1;
-        file_name="src/Interpreter/" + file_name + ".txt";
-        File file = new File(file_name);
-        if(file.exists())
-            Scheduler.add(temp);
-        else
-            System.out.println("[Process_Manager]: Couldn't create process " + name + ". File doesn't exist.");
+        size = counter;
 
+        Scheduler.add(temp);
     }
 
     public static void create_process(String name, String file_name, int priority, int limit){
@@ -83,12 +87,20 @@ public class Process_container {
             return;
         }
 
+        file_name="src/Interpreter/" + file_name + ".txt";
+        File file = new File(file_name);
+        if(!file.exists()) {
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". File doesn't exist.");
+            return;
+        }
+
         System.out.println("[Process_Manager]: Created process " + name + ".");
         Process temp = new Process(name, file_name, priority, counter, limit);
         processes.put(counter, temp);
         names.put(name, counter);
         taken_names.add(name);
         counter = counter + 1;
+        size = counter;
 
         Scheduler.add(temp);
     }
@@ -182,5 +194,9 @@ public class Process_container {
             System.out.println(s);
         }
         return 0;
+    }
+
+    public int get_size(){
+        return size;
     }
 }
