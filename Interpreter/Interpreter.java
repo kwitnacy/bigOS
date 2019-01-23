@@ -22,6 +22,7 @@ public class Interpreter {
             Scheduler.running.change_state(State.Running);
             PID = Processor.Scheduler.running.get_PID();
             base = Processor.Scheduler.running.get_base();
+            System.out.println(base);
             limit = Scheduler.running.get_limit();
             program_counter = Scheduler.running.get_program_counter();
             A = Scheduler.running.get_AX();
@@ -49,7 +50,7 @@ public class Interpreter {
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
-        int i = program_counter;
+        int wynik = base+program_counter;
         int totwocounter=0;
         rozkaz = "";
         calyRozkaz = "";
@@ -60,7 +61,7 @@ public class Interpreter {
         Pattern slowo = Pattern.compile("\\w+");
         while(!newOrderMatches.matches())
         {
-            newPart = readMemory(base + i);
+            newPart = readMemory(program_counter);
             //odczytywanie calego rozkazu jako stringa
             calyRozkaz = calyRozkaz + newPart;
             if(totwocounter<2) rozkaz = rozkaz + newPart;
@@ -68,8 +69,7 @@ public class Interpreter {
             {
                 Matcher slowomatcher = slowo.matcher(calyRozkaz);
                 while (slowomatcher.matches()) {
-                    calyRozkaz = calyRozkaz + readMemory(i+1);
-                    i=i+1;
+                    calyRozkaz = calyRozkaz + readMemory(program_counter+1);
                     program_counter = program_counter+1;
                     slowomatcher = slowo.matcher(calyRozkaz);
                 }
@@ -79,12 +79,11 @@ public class Interpreter {
                 break;
             }
             //Sprawdzanie czy nastepne dane to nie kolejny rozkaz
-            nastepny1 = readMemory(base + i + 2);
-            nastepny2 = readMemory(base + i + 3);
+            nastepny1 = readMemory(program_counter + 2);
+            nastepny2 = readMemory(program_counter + 3);
             IfNew = ""+nastepny1 + nastepny2;
             newOrderMatches = newOrder.matcher(IfNew);
             totwocounter++;
-            i++;
             program_counter++;
         }
         program_counter++;
