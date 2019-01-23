@@ -22,7 +22,7 @@ public class Semaphore{
     }
 
     public void print_queue(){
-        System.out.print("Kolejka semafora: ");
+        System.out.print("[Semaphore] Semaphore queue: ");
         for(Integer s : this.process_queue) {
             System.out.print(s);
             System.out.print(" ");
@@ -35,7 +35,7 @@ public class Semaphore{
         System.out.println(value);
         if(this.value < 0){
             this.process_queue.offer(pid);
-            System.out.println("Do kolejki semafora dodano proces o PID: " + pid);
+            System.out.println("[Semaphore] Process" + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
             Process_container.get_by_PID(pid).change_state(State.Waiting);
         }
     }
@@ -45,7 +45,7 @@ public class Semaphore{
         if(this.value <= 0) {
             if (process_queue.peek() != null) {
                 int pid = this.process_queue.poll();
-                System.out.println("Z kolejki semafora usunieto proces o PID: " + pid);
+                System.out.println("[Semaphore] Process" + Process_container.get_by_PID(pid).get_name() + "removed from semaphore queue");
                 Process_container.get_by_PID(pid).change_state(State.Ready);
             }
         }
