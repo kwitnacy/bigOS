@@ -57,8 +57,8 @@ public class Process_container {
             return;
         }
 
-        file_name="src/Interpreter/" + file_name + ".txt";
-        File file = new File(file_name);
+        String temp_file_name = "src/Interpreter/" + file_name + ".txt";
+        File file = new File(temp_file_name);
         if(!file.exists()) {
             System.out.println("[Process_Manager]: Couldn't create process " + name + ". File doesn't exist.");
             return;
