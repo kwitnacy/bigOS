@@ -135,9 +135,9 @@ public class FileManagement {
             File file = new File();
             file.setName(name);
             file.setUserName(user);
-            //System.out.println("[File Module]: User " + user + " created a file named " + name);
+            System.out.println("[File Module]: User " + user + " created a file named " + name + ".");
             disk.fileSystem.root.addToRoot(file);
-            //System.out.println("[File Module]: File " + name + " created by " + user + " added to the root.");
+            System.out.println("[File Module]: File " + name + " created by " + user + " added to the root.");
             return true;
         }
     }
@@ -156,7 +156,7 @@ public class FileManagement {
         int sizeBytes = data.length();   //tyle bajtów zajmuje
         int lastBlockBytes = (32-(ftemp.getSize()%32))%32; //tyle bajtów zostanie w ostatnim zajętym bloku
         int blocks = (int) Math.ceil((sizeBytes-lastBlockBytes) / 32.0); //tyle bloków zajmie
-        //System.out.println("[File Module]: Number of blocks needed for data: " + blocks);
+        System.out.println("[File Module]: Number of blocks needed for data: " + blocks);
 
         if(!properFileName(name) && blocks > disk.fileSystem.checkFreeBlocks()){
             System.out.println("[File Module]: Incorrect file name and not enough space on the disk.");
@@ -197,6 +197,7 @@ public class FileManagement {
         //zapis na bloki dyskowe
         int dataPos = 0;
         if(freeB.size()<0) System.out.println("[File Module]: Free blocks list capacity is less than 0!");
+		System.out.println("[File Module]: Writing to file " + name + " data " + data);
         if(lastBlockBytes != 0){
             for(int i=32-lastBlockBytes;i<32;i++){
                 disk.data[index*32+i] = dat[dataPos];
@@ -213,7 +214,6 @@ public class FileManagement {
                 dataPos++;
                 if(dataPos >= dat.length) { break; }
             }
-            //System.out.println("[File Module]: Setting " + freeB.get(i) + " block in bit vector.");
             disk.fileSystem.freeBlocks.set(freeB.get(i));   //blok zajęty
         }
         disk.fileSystem.root.replacebyName(ftemp);   //podmieniamy plik na ten ze zmodyfikowanym FCB
@@ -235,6 +235,8 @@ public class FileManagement {
             return null;
         }  //plik nie ma danych zapisanych na dysku
         
+		System.out.println("[File Module]: Reading " + howMany + " bytes from " + from + " byte, from " + fileName + " file.");
+		
         String output = new String();  //tu będą zapisane zczytane dane
         int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
@@ -247,7 +249,7 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        //System.out.println("[File Module]: Blocks that will be read: " + blocks);
+        System.out.println("[File Module]: Blocks that will be read: " + blocks);
 
         //Pozycja czytania
         int readPosition = 0;
@@ -282,6 +284,8 @@ public class FileManagement {
             return null;
         }  //plik nie ma danych zapisanych na dysku
         
+		System.out.println("[File Module]: File reading entire " + fileName + " file.");
+		
         String output = new String();  //tu będą zapisane zczytane dane
         int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
@@ -294,7 +298,7 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        //System.out.println("[File Module]: Blocks that will be read: " + blocks);
+        System.out.println("[File Module]: Blocks that will be read: " + blocks);
         String buffer;
         int blocknum=0;
         for(int i : blocks){
@@ -319,6 +323,8 @@ public class FileManagement {
             return false;
         }  //pliku o podanej nazwie nie ma w katalogu
         
+		System.out.println("[File Module]: Deleting " + name + " file from file system.");
+		
         File ftemp = disk.fileSystem.root.getFileByName(name);
         int tempindex = ftemp.getIndex();
         LinkedList<Integer> blocks = new LinkedList();
@@ -331,7 +337,7 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        //System.out.println("[File Module]: Blocks that will be deleated: " + blocks);
+        System.out.println("[File Module]: Blocks that will be deleated: " + blocks);
         for(int i : blocks){
            disk.clearBlock(i);
            disk.fileSystem.freeBlocks.set(i, false);
