@@ -2,6 +2,7 @@ package Semaphore;
 
 import Procesy.Process_container;
 import Procesy.State;
+import RAM.Memory;
 
 import java.util.Queue;
 import java.util.ArrayDeque;
@@ -36,6 +37,12 @@ public class Semaphore{
         if(this.value < 0){
             this.process_queue.offer(pid);
             System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
+
+            for(int i=0; i<Process_container.get_by_PID(pid).get_program_counter();i--){
+                if(Memory.readMemory(i)==' '){
+                    Process_container.get_by_PID(pid).set_program_counter(i+1);
+                }
+            }
             Process_container.get_by_PID(pid).change_state(State.Waiting);
         }
     }

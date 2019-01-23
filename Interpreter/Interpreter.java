@@ -95,10 +95,11 @@ public class Interpreter {
             if (!executeOrder()) {
                 return;
             }
-            Scheduler.makeOlder(); //postarzanie procesu
+
             if (!rozkaz.equals("CP")&&!rozkaz.equals("HT")) {
                 updateProcessor();
             }//zapisanie zmienionych wartosci rejestru
+            Scheduler.makeOlder(); //postarzanie procesu
             display();
             i++;
         } while (i+1<how_many && !rozkaz.equals("HT"));
