@@ -46,7 +46,7 @@ public class Memory {
         for(int i=tmp;i<tmp+size;i++){
             check+=memory[i];
         }
-        if(program.equals(check)){
+        if(program.equals(check) && tmp!=0){
             return true;
         }
 
@@ -153,9 +153,11 @@ public class Memory {
     }
     public static void move(){
         System.out.println("[RAM]: Doing compaction");
-        Integer tmp,limit=0,thisLimit=0,j=0,k=0;
+        Integer tmp,limit=0,thisLimit,j,k=0;
         Boolean flag=true;
-        for(int i=0;i<256;i++){
+        Map<Integer,Integer> zmiana = new HashMap<>();
+        Map<Integer,Integer> temp = new HashMap<>();
+        for(Integer i=0;i<256;i++){
             if(allocatedPartitions.get(i)!=null){
                 while(flag){
                     limit=allocatedPartitions.get(i)+i;
@@ -180,6 +182,21 @@ public class Memory {
                 freePartitions.put(j+k,tmp);
                 mergeMaps(freePartitions);
                 limit=j+k;
+                zmiana.put(i,j);
+            }
+
+            for(int p=1;p<Process_container.get_size();p++){
+                try{
+                    temp.put(p,Process_container.get_by_PID(p).get_base());
+                }
+                catch (Exception e){}
+            }
+        }
+        for(Integer i=1;i<Process_container.get_size();i++){
+            try{
+                Process_container.get_by_PID(i).ser_base(zmiana.get(temp.get(i)));
+            }
+            catch (Exception e){
             }
         }
     }
