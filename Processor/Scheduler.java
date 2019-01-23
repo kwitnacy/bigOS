@@ -77,26 +77,8 @@ public class Scheduler
 		}
 		return;
 	}
-	
-	public static void remove() 											// usuwanie z kolejek procesow ktore nie sa ready
-	{
-		for(Queue<Process> qq : queuesPCB)
-			{
-				Iterator<Process> iteratorkolejek = qq.iterator();
-				while (iteratorkolejek.hasNext())
-					{
-						Process block = iteratorkolejek.next();
-						if(block.get_state() != State.Ready)
-						{
-							System.out.println("[Procesor]: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
-							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
-							iteratorkolejek.remove();
-						}
-					}
-			}
-	}
 
-	public static void remove_running(int PID){
+	public static void remove_by_id(int PID){
 		if(running.get_PID() == PID){
 			System.out.println("----------------------\"usuawanie\" running----------------------");
 			running = dummy;
