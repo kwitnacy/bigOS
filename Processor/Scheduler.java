@@ -256,6 +256,10 @@ public class Scheduler
 
 	public static void updateBase()
 	{
+		if(running.get_base() != Process_container.get_by_PID(running.get_PID()).get_base())
+		{
+			running.ser_base(Process_container.get_by_PID(running.get_PID()).get_base());
+		}
 		for(Queue<Process> qq : queuesPCB)
 		{
 			for(Process block : qq)
