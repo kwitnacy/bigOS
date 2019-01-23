@@ -53,18 +53,20 @@ public class Shell {
                 cut();
                 String x="";
                 if(!parts.isEmpty())
+                {
                 for(int i=0;i<parts.get(0).length();i++)
                 {
                     if((int)parts.get(0).charAt(i)<=90&&(int)parts.get(0).charAt(i)>=65)
                     {
                         int help = (int)parts.get(0).charAt(i);
                         help=help+32;
-                        String y = Integer.toString(help);;
+                        char y = (char)help;
                         x=x+y;
                     }
                     else
                         x=x+parts.get(0).charAt(i);
                     
+                }
                 }
                 else
                 {
@@ -73,18 +75,20 @@ public class Shell {
                 parts.set(0, x);
                 x="";
                 if(parts.size()!=1&&!parts.isEmpty())
+                {
                 for(int i=0;i<parts.get(1).length();i++)
                 {
                     if((int)parts.get(1).charAt(i)<=90&&(int)parts.get(1).charAt(i)>=65)
                     {
                         int help = (int)parts.get(1).charAt(i);
                         help=help+32;
-                        String y = Integer.toString(help);
+                        char y = (char)help;
                         x=x+y;
                     }
                     else
                         x=x+parts.get(1).charAt(i);
                     
+                }
                 }
                 if("/pid".equals(x)||"/im".equals(x))
                     parts.set(1, x);
@@ -500,7 +504,7 @@ public class Shell {
                             System.out.println("[Interface]: Bledne argumenty");
                     else {
                         System.out.println("[Interface]: Wywolanie funkcji wypisujacej zawartosc " +parts.get(3) + "-bajtow pliku "+parts.get(1)+" zaczynajac od bajtu ["+parts.get(2)+"]");
-                        String x = FileManagement.read(parts.get(1), Integer.getInteger(parts.get(2)), Integer.getInteger(parts.get(3)));
+                        String x = FileManagement.read(parts.get(1), Integer.parseInt(parts.get(2)), Integer.parseInt(parts.get(3)));
                         System.out.println(x);
                     }
                 }
