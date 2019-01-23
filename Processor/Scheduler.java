@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import Procesy.Process;
+import Procesy.Process_container;
 import Procesy.State;
 import RAM.Memory;
 
@@ -251,5 +252,19 @@ public class Scheduler
 	{
 		System.out.println("[Processor]: Currently running process is: (Name ; PID ; Base priority ; Temporary priority)");
 		System.out.println(running.get_name() + " ; " + running.get_PID() + " ; " + running.get_base_priority() + " ; " + running.get_temp_priority());
+	}
+	
+	public static void updateBase()
+	{
+		for(Queue<Process> qq : queuesPCB)
+		{
+			for(Process block : qq)
+			{
+				if(block.get_base() != Process_container.get_by_PID(block.get_PID()).get_base())
+				{
+					block.ser_base(Process_container.get_by_PID(block.get_PID()).get_base());
+				}
+			}
+		}
 	}
 }
