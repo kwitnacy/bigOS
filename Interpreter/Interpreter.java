@@ -44,7 +44,6 @@ public class Interpreter {
         Processor.Scheduler.running.set_CX(C);
         Processor.Scheduler.running.set_DX(D);
         Processor.Scheduler.running.set_program_counter(program_counter);
-        System.out.println("Przypisane counter: " + program_counter);
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
@@ -84,7 +83,7 @@ public class Interpreter {
             program_counter++;
         }
         program_counter++;
-        System.out.println("[Interpreter] wykonywany rozkaz: "+calyRozkaz);
+        System.out.println("[Interpreter]: Executed order "+calyRozkaz);
     }
     public static void go(int how_many) //
     {
@@ -106,8 +105,8 @@ public class Interpreter {
     }
     private static void display()
     {
-        System.out.println("[Interpreter]: Stan po wykonanym rozkazie ");
-        System.out.println("[Interpreter]: PID:"+PID + " rejestr A:"+A+" rejestr B:"+B+" rejestr C:"+C+" rejestr D:"+D);
+        System.out.println("[Interpreter]: State of running process after executing order ");
+        System.out.println("[Interpreter]: PID:"+PID + " register A:"+A+" register B:"+B+" register C:"+C+" register D:"+D);
         System.out.println("[Interpeter]: program_counter: "+ program_counter);
     }
     private static boolean executeOrder() {
@@ -169,7 +168,7 @@ public class Interpreter {
                 break;
             }
             case "HT": {
-                System.out.println("Koniec programu");
+                System.out.println("[Interpreter]: End of program");
                 Scheduler.running.change_state(State.Terminated);
                 return true;
             }
@@ -222,7 +221,7 @@ public class Interpreter {
                         }
                     }
                     else {
-                        System.out.println("Bledny rozkaz - czwarty argument niezgodny. Koniec programu");
+                        System.out.println("[Interpreter]: Error. Fourth argument is wrong. End of program");
                         Scheduler.running.change_state(State.Terminated);
                         return false;
                     }
@@ -258,7 +257,6 @@ public class Interpreter {
                 Matcher adresmatcherz = adres.matcher(z);
                 if (dane2matcher.matches())
                 {
-                    System.out.println("nananan");
                     if (adresmatchery.matches()) //SM <PID odbiorcy> [adres]
                     {
                         if (pidmatcher.matches()) {
@@ -284,7 +282,7 @@ public class Interpreter {
                 {
                     if (!sizematcher.matches())
                     {
-                        System.out.println("Blad. Niezgodny drugi argument. Koniec programu");
+                        System.out.println("[Interpreter]: Error. Second argument is wrong. End of program.");
                         Scheduler.running.change_state(State.Terminated);
                         return false;
                     }
@@ -298,7 +296,7 @@ public class Interpreter {
                         }
                     }
                     else {
-                        System.out.println("Bledny rozkaz. Niezgodny trzeci argument. Koniec programu");
+                        System.out.println("[Interpreter]: Error. Wrong third argument. End of program");
                         Scheduler.running.change_state(State.Terminated);
                         return false;
                     }
@@ -319,21 +317,20 @@ public class Interpreter {
                     }
                     else
                     {
-                        System.out.println("Blad! Argumenty sa niezgodne. Koniec programu");
+                        System.out.println("[Interpreter]: Error! Some arguments are wrong. End of program");
                         Scheduler.running.change_state(State.Terminated);
                         return false;
                     }
                 }
                 if(dane1matcher.matches())//RM [adres]
                 {
-                    System.out.println("xxx:"+x);
                     if (adresmatcherx.matches())
                     {
                         Scheduler.running.read_message(addresToliczba(x));
                     }
                     else
                     {
-                        System.out.println("Blad! Argument jest niezgodny. Koniec programu");
+                        System.out.println("[Interpreter]: Error! Wrong argument. End of program");
                         Scheduler.running.change_state(State.Terminated);
                         return false;
                     }
@@ -351,7 +348,6 @@ public class Interpreter {
             {
                 if (C != 0)
                 {
-                    System.out.println("etykietka:"+String.valueOf(etykietka));
                     if(!jump(String.valueOf(etykietka))){
                         return false;
                     }
@@ -363,7 +359,7 @@ public class Interpreter {
                 if (etykietamatcher.matches()) {
                     etykietka = base + program_counter;
                 } else {
-                    System.out.println("Bledny rozkaz. Koniec programu");
+                    System.out.println("[Interpreter]: Error. End of program");
                     Scheduler.running.change_state(State.Terminated);
                     return false;
                 }
@@ -380,7 +376,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(x);
         if (!rejestrmatcher.matches()&&!adresmatcher.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong first argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
@@ -392,21 +388,39 @@ public class Interpreter {
             }
             if(x.equals("B"))
             {
+                if (B==0)
+                {
+                    System.out.println("[Interpreter]: Error. Dividing by zero. End of program");
+                    Scheduler.running.change_state(State.Terminated);
+                    return false;
+                }
                 D = A%B;
             }
             if(x.equals("C"))
             {
+                if (C==0)
+                {
+                    System.out.println("[Interpreter]: Error. Dividing by zero. End of program");
+                    Scheduler.running.change_state(State.Terminated);
+                    return false;
+                }
                 D = A%C;
             }
             if(x.equals("D"))
             {
+                if (D==0)
+                {
+                    System.out.println("[Interpreter]: Error. Dividing by zero. End of program");
+                    Scheduler.running.change_state(State.Terminated);
+                    return false;
+                }
                 D = A%D;
             }
         }
         else if(adresmatcher.matches())
         {
             if (readMemory(addresToliczba(x))==0){
-                System.out.println("Blad. Proba dzielenia przez zero. Koniec programu");
+                System.out.println("[Interpreter]: Error. Dividing by zero. End of program");
                 Scheduler.running.change_state(State.Terminated);
                 return false;
             }
@@ -423,7 +437,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(x);
         if (!rejestrmatcher.matches()&&!adresmatcher.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong first argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
@@ -451,7 +465,7 @@ public class Interpreter {
         {
             if(addresToliczba(x)>base + limit)
             {
-                System.out.println("Blad. Proba wyjscia poza pamiec programu. Koniec programu");
+                System.out.println("[Interpreter]: Error. Reaching outside the program. End of program.");
                 Scheduler.running.change_state(State.Terminated);
                 return false;
             }
@@ -477,13 +491,13 @@ public class Interpreter {
         Matcher jumpmatcher = jump.matcher(x);
         if (!jumpmatcher.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
         if (base+Integer.parseInt(x) > base + limit)
         {
-            System.out.println("Blad. Proba wyjscoa poza pamiec programu. Koniec programu");
+            System.out.println("[Interpreter]: Error. Reaching outside the program. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
@@ -505,13 +519,13 @@ public class Interpreter {
         Matcher adresmatcherx = adres.matcher(x);
         if (!rejestrmatcherx.matches()&&!adresmatcherx.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong first argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
         if(!liczbamatcher.matches()&&!adresmatchery.matches()&&!rejestrmatchery.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong second argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
@@ -685,7 +699,7 @@ public class Interpreter {
         Matcher rejestrmatchery = rejestr.matcher(y);
         if (!rejestrmatcherx.matches())
         {
-            System.out.println("[Interpreter]: Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong first argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
@@ -695,7 +709,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(y);
         if(!liczbamatcher.matches()&&!adresmatcher.matches()&&!rejestrmatchery.matches())
         {
-            System.out.println("[Interpreter]: Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
+            System.out.println("[Interpreter]: Error. Wrong first argument. End of program");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
