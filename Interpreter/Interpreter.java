@@ -13,22 +13,20 @@ public class Interpreter {
     private static int A,B,C,D, program_counter, base, limit, PID, etykietka;
     private static String rozkaz="", calyRozkaz;
     private static String user;
-	
-	public Interpreter(){
 
-	}
+    public Interpreter(){
+
+    }
 
     private static void start(String filename) {
-            PID = Processor.Scheduler.running.get_PID();
-            base = Processor.Scheduler.running.get_base();
-            System.out.println(base);
-            limit = Scheduler.running.get_limit();
-            program_counter = Scheduler.running.get_program_counter();
-            A = Scheduler.running.get_AX();
-            B = Scheduler.running.get_BX();
-            C = Scheduler.running.get_CX();
-            D = Scheduler.running.get_DX();
-        //}
+        PID = Processor.Scheduler.running.get_PID();
+        base = Processor.Scheduler.running.get_base();
+        limit = Processor.Scheduler.running.get_limit();
+        program_counter = Processor.Scheduler.running.get_program_counter();
+        A = Processor.Scheduler.running.get_AX();
+        B = Processor.Scheduler.running.get_BX();
+        C = Processor.Scheduler.running.get_CX();
+        D = Processor.Scheduler.running.get_DX();
     }
     static int addresToliczba(String address)
     {
@@ -41,11 +39,12 @@ public class Interpreter {
     }
     private static void updateProcessor()
     {
-        Scheduler.running.set_AX(A);
-        Scheduler.running.set_BX(B);
-        Scheduler.running.set_CX(C);
-        Scheduler.running.set_DX(D);
-        Scheduler.running.set_program_counter(program_counter);
+        Processor.Scheduler.running.set_AX(A);
+        Processor.Scheduler.running.set_BX(B);
+        Processor.Scheduler.running.set_CX(C);
+        Processor.Scheduler.running.set_DX(D);
+        Processor.Scheduler.running.set_program_counter(program_counter);
+        System.out.println("Przypisane counter: " + program_counter);
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
@@ -90,10 +89,6 @@ public class Interpreter {
     public static void go(int how_many) //
     {
         start(Scheduler.running.get_file_name());
-        //if(readMemory(program_counter)=='.')
-        //            {
-        //
-        //            }
         int i = 0;
         do
         {
@@ -102,20 +97,18 @@ public class Interpreter {
                 return;
             }
             Scheduler.makeOlder(); //postarzanie procesu
-            updateProcessor(); //zapisanie zmienionych wartosci rejestru
+            if (!rozkaz.equals("CP")&&!rozkaz.equals("HT")) {
+                updateProcessor();
+            }//zapisanie zmienionych wartosci rejestru
             display();
             i++;
         } while (i+1<how_many && !rozkaz.equals("HT"));
     }
     private static void display()
     {
-        System.out.println("Stan po wykonanym rozkazie ");
-        System.out.println("PID: "+PID);
-        System.out.println("rejestr A: "+A);
-        System.out.println("rejestr B: "+B);
-        System.out.println("rejestr C: "+C);
-        System.out.println("rejestr D: "+D);
-        System.out.println("program_counter: "+ program_counter);
+        System.out.println("[Interpreter]: Stan po wykonanym rozkazie ");
+        System.out.println("[Interpreter]: PID:"+PID + " rejestr A:"+A+" rejestr B:"+B+" rejestr C:"+C+" rejestr D:"+D);
+        System.out.println("[Interpeter]: program_counter: "+ program_counter);
     }
     private static boolean executeOrder() {
         Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
@@ -164,14 +157,14 @@ public class Interpreter {
             }
             case "IC": {
                 if(!increment(x)){
-                 return false;
+                    return false;
                 }
                 break;
             }
             case "JP": {
                 if (!jump(x))
                 {
-                 return false;
+                    return false;
                 }
                 break;
             }
@@ -200,7 +193,7 @@ public class Interpreter {
             case "RF": {
                 waitFile(x,PID);
                 if (dane3matcher.matches()) {
-                System.out.println(read(x,Integer.parseInt(y),Integer.parseInt(z)));}
+                    System.out.println(read(x,Integer.parseInt(y),Integer.parseInt(z)));}
                 else if (dane4matcher.matches()){
                     Pattern rejestr = Pattern.compile("[A-D]");
                     Matcher rejestrmatcher = rejestr.matcher(xx);
@@ -247,12 +240,13 @@ public class Interpreter {
                 break;
             }
             case "CP": {
+                updateProcessor();
                 make_porocess(x,y,Integer.parseInt(z));
                 //np. CP M file 7
                 break;
             }
             case "SM": {
-                             //x           //y    //z
+                //x           //y    //z
                 //SM <nazwa/PID odbiorcy> <tekst>
                 //SM <nazwa/PID odbiorcy> <size> [adres]
                 //SM <nazwa/PID odbiorcy> [adres]
@@ -282,7 +276,7 @@ public class Interpreter {
                         }
                         else
                         {
-                            Scheduler.running.send_message(x, z);
+                            Scheduler.running.send_message(x, y);
                         }
                     }
                 }
@@ -297,7 +291,7 @@ public class Interpreter {
                     if (adresmatcherz.matches())
                     {
                         if (pidmatcher.matches()) { //SM <PID odbiorcy> <size> [adres]
-                        Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), addresToliczba(z));
+                            Scheduler.running.send_message(Integer.parseInt(x), Integer.parseInt(y), addresToliczba(z));
                         }
                         else{ //SM <nazwa odbiorcy> <size> [adres]
                             Scheduler.running.send_message(x, Integer.parseInt(y), addresToliczba(z));
@@ -359,7 +353,7 @@ public class Interpreter {
                 {
                     System.out.println("etykietka:"+String.valueOf(etykietka));
                     if(!jump(String.valueOf(etykietka))){
-                     return false;
+                        return false;
                     }
                     break;
                 }
@@ -691,7 +685,7 @@ public class Interpreter {
         Matcher rejestrmatchery = rejestr.matcher(y);
         if (!rejestrmatcherx.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
+            System.out.println("[Interpreter]: Bledny rozkaz. Niezgodny pierwszy argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
@@ -701,7 +695,7 @@ public class Interpreter {
         Matcher adresmatcher = adres.matcher(y);
         if(!liczbamatcher.matches()&&!adresmatcher.matches()&&!rejestrmatchery.matches())
         {
-            System.out.println("Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
+            System.out.println("[Interpreter]: Bledny rozkaz. Niezgodny drugi argument. Koniec programu");
             Scheduler.running.change_state(State.Terminated);
             return false;
         }
