@@ -115,7 +115,6 @@ public class Scheduler
 						{
 							System.out.println("[Procesor]: Usuwam z kolejki proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 							+ ", priorytetach bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority() + " bedacym w stanie: " + block.get_state());
-							//Memory.removeProgram(PID);
 							iteratorkolejek.remove();
 						}
 					}
@@ -125,18 +124,34 @@ public class Scheduler
 	
 	public static void makeOlder() 										// postarzanie procesow, oraz inkrementacja licznika czekania procesow
 	{
+		if(running.get_base_priority() < running.get_temp_priority())
+		{
+			if(running.get_waiting_counter() > 0)
+			{
+				running.dec_waiting_counter();
+
+			}
+			else
+			{
+				System.out.println("[Procesor]: Odmlodzilem proces Running: " + running.get_name() + ", PID: " + running.get_PID() 
+				+ ", oraz z priorytetami bazowym i tymczasowym (po zmianie): " + running.get_base_priority() + " ; " + (running.get_temp_priority()+1));
+				running.dec_temp_priority();
+				running.set_waiting_counter(3);
+
+			}
+		}
 		for (Queue<Process> qq : queuesPCB)
 		{
 			Iterator<Process> iteratorkolejek = qq.iterator();
 			while(iteratorkolejek.hasNext())
 			{
 				Process block = iteratorkolejek.next();
-				if(block.get_waiting_counter() > waitingLimit && block.get_temp_priority() < 15) 
+				if(block.get_waiting_counter() >= waitingLimit && block.get_temp_priority() < 15) 
 				{
 					System.out.println("[Procesor]: Postarzylem proces o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 					+ ", oraz z priorytetami bazowym i tymczasowym (po zmianie): " + block.get_base_priority() + " ; " + (block.get_temp_priority()+1));
 					block.inc_temp_priority();
-					block.set_waiting_counter(0);
+					block.set_waiting_counter(-1);
 					qq.remove(block);
 					add(block);
 				}
@@ -178,8 +193,6 @@ public class Scheduler
 							int tmp_pid = block.get_PID();
 
 							queuesPCB.get(i).remove(block);
-
-							System.out.println("dupa");
 							Memory.sem.wait_s(tmp_pid);
 							Memory.sem.print_queue();
 						}
@@ -219,7 +232,6 @@ public class Scheduler
 							int tmp_pid = block.get_PID();
 
 							queuesPCB.get(i).remove(block);
-							System.out.println("dupa");
 							Memory.sem.wait_s(tmp_pid);
 							Memory.sem.print_queue();
 						}
