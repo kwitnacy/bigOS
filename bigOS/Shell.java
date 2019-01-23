@@ -42,6 +42,8 @@ public class Shell {
             login();
             while(session)
             {
+                try
+                {
                 Scanner sc = new Scanner(System.in);
                 System.out.print("bigOS:\\User>");
                 command=sc.nextLine();
@@ -87,6 +89,11 @@ public class Shell {
                 if("/pid".equals(x)||"/im".equals(x))
                     parts.set(1, x);
                 execute();
+                }
+                catch(Exception e)
+                {
+                    System.out.println(e);
+                }
             }
         }
     }
@@ -470,9 +477,10 @@ public class Shell {
                         {
                             if((int)parts.get(2).charAt(1)==62)
                             {
-                    System.out.println("[Interface]: Wywolanie funkcji tworzacych nowy plik "+ parts.get(3)+ " z zawartoscia pliku "+parts.get(3));
+                    System.out.println("[Interface]: Wywolanie funkcji tworzacych nowy plik "+ parts.get(3)+ " z zawartoscia pliku "+parts.get(1));
                     String x = FileManagement.readFile(parts.get(1));
-                    FileManagement.create(x, user);
+                    FileManagement.create(parts.get(3), user);
+                    FileManagement.write(parts.get(3),x);
                     // Zabezpieczeniowiec!!!
                             }
                             else
@@ -492,7 +500,8 @@ public class Shell {
                             System.out.println("[Interface]: Bledne argumenty");
                     else {
                         System.out.println("[Interface]: Wywolanie funkcji wypisujacej zawartosc " +parts.get(3) + "-bajtow pliku "+parts.get(1)+" zaczynajac od bajtu ["+parts.get(2)+"]");
-                        System.out.println(FileManagement.read(parts.get(1), Integer.getInteger(parts.get(2)), Integer.getInteger(parts.get(3))));
+                        String x = FileManagement.read(parts.get(1), Integer.getInteger(parts.get(2)), Integer.getInteger(parts.get(3)));
+                        System.out.println(x);
                     }
                 }
                 else
