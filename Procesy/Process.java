@@ -211,11 +211,11 @@ public class Process {
     }
 
     public void inc_waiting_counter(){
-        this.temp_priority++;
+        this.waiting_counter++;
     }
 
     public void dec_waiting_counter(){
-        this.temp_priority--;
+        this.waiting_counter--;
     }
 
 ///Messages/////////////////////////////////////////////////////////////////////////////////////////////////////////////

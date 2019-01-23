@@ -219,6 +219,7 @@ public class Scheduler
 							}
 							running = block;
 							running.change_state(State.Running);
+							running.set_waiting_counter(2);
 							queuesPCB.get(i).remove(block);
 
 							if(dummy.get_state() != State.Ready)
