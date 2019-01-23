@@ -28,7 +28,7 @@ public class Process_container {
 
         taken_names = new Vector<>();
         taken_names.add("dummy");
-        Process temp = new Process("dummy", "d1", 0, 0);
+        Process temp = new Process("dummy", "p0", 0, 0);
         processes.put(0, temp);
         Scheduler.add(temp);
     }
@@ -40,7 +40,7 @@ public class Process_container {
 
         taken_names = new Vector<>();
         taken_names.add("dummy");
-        Process temp = new Process("dummy", "d1", 0, 0);
+        Process temp = new Process("dummy", "p0", 0, 0);
         processes.put(0, temp);
         Scheduler.add(temp);
     }
