@@ -27,7 +27,6 @@ public class Memory {
         String temp="src/Interpreter/" + fileName + ".txt";
         if(temp!=fileName)
             fileName= "src/Interpreter/" + fileName + ".txt";
-        //System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         String program="";
@@ -42,15 +41,12 @@ public class Memory {
         catch(FileNotFoundException e){
             e.printStackTrace();
         }
-        int tmp=Process_container.get_by_PID(PID).get_base(),licznik = 0;
+        int tmp=Process_container.get_by_PID(PID).get_base();
         String check="";
         for(int i=tmp;i<tmp+size;i++){
             check+=memory[i];
         }
-        //System.out.println(program);
-        //System.out.println(check);
         if(program.equals(check)){
-          //  System.out.println("rowne");
             return true;
         }
 
@@ -81,24 +77,6 @@ public class Memory {
         memory[base+address]=value;
     }
     private static void writeMemory(String fileName,Integer PID){
-        /*File file = new File(fileName);
-
-        Integer next=0;
-        try{
-            Scanner skaner= new Scanner(file);
-            while(skaner.hasNextLine()){
-                String line= skaner.nextLine();
-
-                int index=0;
-                for(int i=base + next ;i< base +next + line.length();i++){
-                    memory[i]=line.charAt(index);
-                    index++;
-                }next+=line.length();
-            }
-        }catch(FileNotFoundException e){
-            e.printStackTrace();
-        }*/
-        Integer next=0;
         int index=0;
         Integer base = Process_container.get_by_PID(PID).get_base();
         for(int i=base ;i< base + fileName.length() ;i++){
@@ -107,7 +85,6 @@ public class Memory {
         }
 
         allocatedPartitions.put(base,fileName.length()+10);
-       // Scheduler.running.ser_limit(fileName.length()+10);
         Process_container.get_by_PID(PID).ser_limit(fileName.length()+10);
         System.out.println("[RAM]: Program has been put in RAM at [" + base + "," + (base+fileName.length()+9) + "]");
         Integer tmp = freePartitions.get(base);
@@ -142,7 +119,6 @@ public class Memory {
     }
     public static void removeProgram(int PID) {
         Integer base = Process_container.get_by_PID(PID).get_base();
-//        Integer base= Scheduler.running.get_base();
         System.out.println(base);
         for(int i=base;i<allocatedPartitions.get(base) + base; i++){
             memory[i]=' ';
@@ -167,10 +143,17 @@ public class Memory {
         System.out.println("Allocated partitions: " + allocatedPartitions.entrySet());
         System.out.println("Free partitions: " + freePartitions.entrySet());
     }
-
+    public static void printMemory(Integer address){
+        System.out.println("[RAM]: Memory at index "+ address + " : " + memory[address]);
+    }
+    public static void printMemory(Integer address1, Integer address2){
+        for(int i=address1;i<=address2;i++){
+            System.out.println(i+". " + memory[i]);
+        }
+    }
     public static void move(){
         System.out.println("[RAM]: Doing compaction");
-        Integer tmp=0,limit=0,thisLimit=0,j=0,k=0;
+        Integer tmp,limit=0,thisLimit=0,j=0,k=0;
         Boolean flag=true;
         for(int i=0;i<256;i++){
             if(allocatedPartitions.get(i)!=null){
