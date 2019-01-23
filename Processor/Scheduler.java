@@ -154,20 +154,15 @@ public class Scheduler
 	
 	public static void schedule() 											// planista
 	{
-		Process temp = running;
 		if(running.get_state() == State.Terminated || running.get_temp_priority() == 0) //zwykly przydzial procesora
 		{
-			if(running.get_state() == State.Terminated)
-			{
-			//	Memory.removeProgram(running.get_PID());
-			}
 			for (int i = 14 ; i > -1 ; i--)
 			{
 				for (Process block : queuesPCB.get(i))
 				{
-					running = block;
-						if(Memory.loadProgram())
+						if(Memory.loadProgram(block.get_file_name(), block.get_PID()))
 						{
+							running = block;
 							running.change_state(State.Running);
 							queuesPCB.get(i).remove(block);
 							System.out.println("Procesor: Przydzielilem procesor do procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
@@ -195,15 +190,15 @@ public class Scheduler
 				{
 					if(block.get_temp_priority() > running.get_temp_priority())
 					{
-						running = block;
-						if(Memory.loadProgram())
+						if(Memory.loadProgram(block.get_file_name(), block.get_PID()))
 						{
 							System.out.println("Procesor: Wywlaszczylem procesor dla procesu o nazwie: " + block.get_name() + ", PID: " + block.get_PID() 
 							+ ", oraz z priorytetami bazowym i tymczasowym: " + block.get_base_priority() + " ; " + block.get_temp_priority());
-							temp.change_state(State.Ready);
+							running.change_state(State.Ready);
 							if(running.get_temp_priority() != 0){
-								add(temp); //skoro dodajemy running do kolejki procesow gotowych to czy jej liczniki zostaly zapisane?
+								add(running);
 							}
+							running = block;
 							running.change_state(State.Running);
 							queuesPCB.get(i).remove(block);
 
@@ -220,18 +215,12 @@ public class Scheduler
 				}
 			}
 		}
-		if(running.get_state() == State.Waiting || running.get_name().equals("dummy")) // sprawdzamy czy po przeleceniu kolejek jakis zostal� przydzielony
+		if(running.get_state() != State.Ready || running.get_name().equals("dummy")) // sprawdzamy czy po przeleceniu kolejek jakis zostal� przydzielony
 		{
-			if(temp.get_state() != State.Terminated)
-			{
-				running = temp;
-			}
-			else
-			{
+
 				running = dummy;
 				running.change_state(State.Running);
 				System.out.println("Procesor: Przydzielilem procesor do procesu Dummy");
-			}
 		}
 
 	}
