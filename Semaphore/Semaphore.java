@@ -38,11 +38,13 @@ public class Semaphore{
             this.process_queue.offer(pid);
             System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
 
-            for(int i=0; i<Process_container.get_by_PID(pid).get_program_counter();i--){
+            System.out.println(Process_container.get_by_PID(pid).get_program_counter() + " -------------------");
+/*
+            for(int i=Process_container.get_by_PID(pid).get_program_counter() ; i>0 ; i--){
                 if(Memory.readMemory(i)==' '){
                     Process_container.get_by_PID(pid).set_program_counter(i+1);
                 }
-            }
+            }*/
             Process_container.get_by_PID(pid).change_state(State.Waiting);
         }
     }

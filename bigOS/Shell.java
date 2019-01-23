@@ -376,11 +376,7 @@ public class Shell {
                 {
                     String buffor="";
                     for(int i=2;i<parts.size();i++)
-                    {
-                        buffor=buffor+parts.get(i);
-                        if(i<parts.size()-1)
-                            buffor=buffor+" ";
-                    }
+                        buffor=buffor+parts.get(i)+" ";
                     // Zabezpieczeniowiec sprawdza czy mozna wpisac
                     boolean blad = FileManagement.write(parts.get(1),buffor);
                     if(blad){
@@ -490,8 +486,8 @@ public class Shell {
                         }
                         else if (parts.get(2).length()==1)
                         {
-                    System.out.println("[Interface]: Adding to file called "+ parts.get(3)+ " text of file "+parts.get(1));
-                    String x = FileManagement.readFile(parts.get(1));
+                    System.out.println("[Interface]: Adding to file called "+ parts.get(3)+ " text of file "+parts.get(3));
+                    String x = FileManagement.readFile(parts.get(2));
                     FileManagement.write(x, parts.get(3));
                     // Zabezpieczeniowiec!!!
                         }

@@ -197,9 +197,9 @@ public class Scheduler
 							System.out.println("[Procesor]: Process preemptioned for a process with name: " + block.get_name() + ", PID: " + block.get_PID()
 									+ ", and priorities (base and temporary): " + block.get_base_priority() + " ; " + block.get_temp_priority());
 							running.change_state(State.Ready);
-							if(running.get_temp_priority() != 0){
-								add(running);
-							}
+//							if(running.get_temp_priority() != 0){
+//								add(running);
+//							}
 							running = block;
 							running.change_state(State.Running);
 							running.set_waiting_counter(2);

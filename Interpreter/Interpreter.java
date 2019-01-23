@@ -19,7 +19,7 @@ public class Interpreter {
 
     }
 
-    private static void start(String filename) {
+    private static void start() {
         PID = Processor.Scheduler.running.get_PID();
         base = Processor.Scheduler.running.get_base();
         limit = Processor.Scheduler.running.get_limit();
@@ -40,6 +40,7 @@ public class Interpreter {
     }
     private static void updateProcessor()
     {
+        System.out.println(Processor.Scheduler.running.get_PID());
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_AX(A);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_BX(B);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_CX(C);
@@ -61,6 +62,7 @@ public class Interpreter {
         Pattern newOrder = Pattern.compile("[A-Z][A-Z]");
         Matcher newOrderMatches = newOrder.matcher("");
         Pattern slowo = Pattern.compile("\\w+");
+
         while(!newOrderMatches.matches())
         {
             newPart = readMemory(program_counter);
@@ -93,7 +95,7 @@ public class Interpreter {
     }
     public static void go(int how_many) //
     {
-        start(Scheduler.running.get_file_name());
+        start();
         int i = 0;
         do
         {
@@ -102,9 +104,9 @@ public class Interpreter {
                 return;
             }
 
-            if (!rozkaz.equals("CP")&&!rozkaz.equals("HT")) {
+            //if (!rozkaz.equals("CP")&&!rozkaz.equals("HT")) {
                 updateProcessor();
-            }//zapisanie zmienionych wartosci rejestru
+            //}//zapisanie zmienionych wartosci rejestru
             Scheduler.makeOlder(); //postarzanie procesu
             display();
             i++;

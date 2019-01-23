@@ -68,12 +68,4 @@ public class Directory {
         }
         System.out.println();
     }
-	
-	    public List<String> getRoot(){
-        List<String> output = new LinkedList<>();
-        for(int i = 0; i < root.size(); i++){
-            output.add(root.get(i).getName());
-        }
-        return output;
-    }
 }
