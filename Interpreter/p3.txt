@@ -1,4 +1,4 @@
-CP p123 p4 3
+CP p123 p1 3
 SM p123 abcd
 SM 2 haha
 SM p123 qtaz
