@@ -1,6 +1,8 @@
 package RAM;
 import Processor.Scheduler;
 import Procesy.Process_container;
+import Semaphore.Semaphore;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.io.FileNotFoundException;
 public class Memory {
 
     public static char[] memory = new char[256];
-
+    public static Semaphore sem = new Semaphore(0);
 
     private static Map<Integer,Integer> allocatedPartitions = new HashMap<>();
     private static Map<Integer,Integer> freePartitions =  new HashMap<>();
@@ -150,6 +152,7 @@ public class Memory {
         System.out.println("[RAM]: program has been deleted.");
         freePartitions.put(base,tmp);
         mergeMaps(freePartitions);
+        sem.signal_s();
     }
 
     public static void printMemory(){
