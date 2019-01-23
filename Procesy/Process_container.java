@@ -3,6 +3,7 @@ package Procesy;
 import Processor.Scheduler;
 import RAM.Memory;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +28,7 @@ public class Process_container {
 
         taken_names = new Vector<>();
         taken_names.add("dummy");
-        Process temp = new Process("dummy", "d1", 0, 0);
+        Process temp = new Process("dummy", "p0", 0, 0);
         processes.put(0, temp);
         Scheduler.add(temp);
     }
@@ -39,7 +40,7 @@ public class Process_container {
 
         taken_names = new Vector<>();
         taken_names.add("dummy");
-        Process temp = new Process("dummy", "d1", 0, 0);
+        Process temp = new Process("dummy", "p0", 0, 0);
         processes.put(0, temp);
         Scheduler.add(temp);
     }
@@ -62,8 +63,13 @@ public class Process_container {
         names.put(name, counter);
         taken_names.add(name);
         counter = counter + 1;
+        file_name="src/Interpreter/" + file_name + ".txt";
+        File file = new File(file_name);
+        if(file.exists())
+            Scheduler.add(temp);
+        else
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". File doesn't exist.");
 
-        Scheduler.add(temp);
     }
 
     public static void create_process(String name, String file_name, int priority, int limit){

@@ -12,6 +12,7 @@ public class Memory {
 
     public static char[] memory = new char[256];
 
+
     private static Map<Integer,Integer> allocatedPartitions = new HashMap<>();
     private static Map<Integer,Integer> freePartitions =  new HashMap<>();
 
@@ -20,10 +21,11 @@ public class Memory {
         freePartitions.put(0,256);
     }
 
-    public static Boolean loadProgram(){
-        String fileName;
-        fileName= "src/Interpreter/" + Scheduler.running.get_file_name() + ".txt";
-      //  System.out.println("sciezka: " + fileName);
+    public static Boolean loadProgram(String fileName,Integer PID){
+        String temp="src/Interpreter/" + fileName + ".txt";
+        if(temp!=fileName)
+            fileName= "src/Interpreter/" + fileName + ".txt";
+        //System.out.println("sciezka: " + fileName);
         Integer size=0,value=0;
         File file = new File(fileName);
         String program="";
@@ -38,7 +40,7 @@ public class Memory {
         catch(FileNotFoundException e){
             e.printStackTrace();
         }
-        int tmp=Scheduler.running.get_base(),licznik = 0;
+        int tmp=Process_container.get_by_PID(PID).get_base(),licznik = 0;
         String check="";
         for(int i=tmp;i<tmp+size;i++){
             check+=memory[i];
@@ -54,7 +56,8 @@ public class Memory {
             if(freePartitions.get(i)!=null)
                 value = freePartitions.get(i);
             if(value>=size+10){
-                writeMemory(program,i);
+                Process_container.get_by_PID(PID).ser_base(i);
+                writeMemory(program,PID);
                 return true;
             }
         }
@@ -66,7 +69,7 @@ public class Memory {
         }
         if(free>=size+10) {
             move();
-            loadProgram();
+            loadProgram(fileName,PID);
         }
         System.out.println("[RAM]: there is not enough space to load the program");
         return false;
@@ -75,7 +78,7 @@ public class Memory {
         Integer base = Scheduler.running.get_base();
         memory[base+address]=value;
     }
-    private static void writeMemory(String fileName,Integer base){
+    private static void writeMemory(String fileName,Integer PID){
         /*File file = new File(fileName);
 
         Integer next=0;
@@ -95,15 +98,15 @@ public class Memory {
         }*/
         Integer next=0;
         int index=0;
+        Integer base = Process_container.get_by_PID(PID).get_base();
         for(int i=base ;i< base + fileName.length() ;i++){
             memory[i]=fileName.charAt(index);
             index++;
         }
 
         allocatedPartitions.put(base,fileName.length()+10);
-        Scheduler.running.ser_base(base);
-        Scheduler.running.ser_limit(fileName.length()+10);
-
+       // Scheduler.running.ser_limit(fileName.length()+10);
+        Process_container.get_by_PID(PID).ser_limit(fileName.length()+10);
         System.out.println("[RAM]: Program has been put in RAM at [" + base + "," + (base+fileName.length()+9) + "]");
         Integer tmp = freePartitions.get(base);
         freePartitions.remove(base);

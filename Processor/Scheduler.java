@@ -50,6 +50,7 @@ public class Scheduler
 	{
 		if(toAdd.get_name().equals("dummy")){
 			dummy = toAdd;
+			Memory.loadProgram(dummy.get_file_name(), dummy.get_PID());
 			dummy.change_state(State.Running);
             running = dummy;
             schedule();
@@ -215,9 +216,8 @@ public class Scheduler
 				}
 			}
 		}
-		if(running.get_state() != State.Ready || running.get_name().equals("dummy")) // sprawdzamy czy po przeleceniu kolejek jakis zostal� przydzielony
+		if(running.get_state() != State.Running || running.get_name().equals("dummy")) // sprawdzamy czy po przeleceniu kolejek jakis zostal� przydzielony
 		{
-
 				running = dummy;
 				running.change_state(State.Running);
 				System.out.println("Procesor: Przydzielilem procesor do procesu Dummy");

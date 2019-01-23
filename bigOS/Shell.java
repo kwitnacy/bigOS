@@ -30,18 +30,21 @@ public class Shell {
     }
     void system()
     {
+        Memory.memoryInit();
         Scheduler pro = new Scheduler();                    //TO NIECH TU BEDZIE KOMU TO SZKODZI?
         Process_container con = new Process_container();    //TO NIECH TU BEDZIE KOMU TO SZKODZI?
         system=true;
         System.out.println("[Interface]: Rozpoczecie pracy interfejsu");
         start();
-        Memory.memoryInit();
+
         while(system)
         {
 
             login();
             while(session)
             {
+                try
+                {
                 Scanner sc = new Scanner(System.in);
                 System.out.print("bigOS:\\User>");
                 command=sc.nextLine();
@@ -51,18 +54,20 @@ public class Shell {
                 cut();
                 String x="";
                 if(!parts.isEmpty())
+                {
                 for(int i=0;i<parts.get(0).length();i++)
                 {
                     if((int)parts.get(0).charAt(i)<=90&&(int)parts.get(0).charAt(i)>=65)
                     {
                         int help = (int)parts.get(0).charAt(i);
                         help=help+32;
-                        String y = Integer.toString(help);;
+                        char y = (char)help;
                         x=x+y;
                     }
                     else
                         x=x+parts.get(0).charAt(i);
                     
+                }
                 }
                 else
                 {
@@ -71,22 +76,29 @@ public class Shell {
                 parts.set(0, x);
                 x="";
                 if(parts.size()!=1&&!parts.isEmpty())
+                {
                 for(int i=0;i<parts.get(1).length();i++)
                 {
                     if((int)parts.get(1).charAt(i)<=90&&(int)parts.get(1).charAt(i)>=65)
                     {
                         int help = (int)parts.get(1).charAt(i);
                         help=help+32;
-                        String y = Integer.toString(help);
+                        char y = (char)help;
                         x=x+y;
                     }
                     else
                         x=x+parts.get(1).charAt(i);
                     
                 }
+                }
                 if("/pid".equals(x)||"/im".equals(x))
                     parts.set(1, x);
                 execute();
+                }
+                catch(Exception e)
+                {
+                    System.out.println(e);
+                }
             }
         }
     }
@@ -470,9 +482,10 @@ public class Shell {
                         {
                             if((int)parts.get(2).charAt(1)==62)
                             {
-                    System.out.println("[Interface]: Wywolanie funkcji tworzacych nowy plik "+ parts.get(3)+ " z zawartoscia pliku "+parts.get(3));
+                    System.out.println("[Interface]: Wywolanie funkcji tworzacych nowy plik "+ parts.get(3)+ " z zawartoscia pliku "+parts.get(1));
                     String x = FileManagement.readFile(parts.get(1));
-                    FileManagement.create(x, user);
+                    FileManagement.create(parts.get(3), user);
+                    FileManagement.write(parts.get(3),x);
                     // Zabezpieczeniowiec!!!
                             }
                             else
@@ -492,7 +505,8 @@ public class Shell {
                             System.out.println("[Interface]: Bledne argumenty");
                     else {
                         System.out.println("[Interface]: Wywolanie funkcji wypisujacej zawartosc " +parts.get(3) + "-bajtow pliku "+parts.get(1)+" zaczynajac od bajtu ["+parts.get(2)+"]");
-                        System.out.println(FileManagement.read(parts.get(1), Integer.getInteger(parts.get(2)), Integer.getInteger(parts.get(3))));
+                        String x = FileManagement.read(parts.get(1), Integer.parseInt(parts.get(2)), Integer.parseInt(parts.get(3)));
+                        System.out.println(x);
                     }
                 }
                 else
