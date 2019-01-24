@@ -24,7 +24,11 @@ public class Memory {
     }
 
     public static Boolean loadProgram(String fileName,Integer PID){
-        String temp="src/Interpreter/" + fileName + ".txt";
+        String temp="";
+        if(fileName.length()<7) {
+            temp = "src/Interpreter/" + fileName + ".txt";
+        }else temp=fileName;
+
         if(temp!=fileName)
             fileName= "src/Interpreter/" + fileName + ".txt";
         Integer size=0,value=0;
@@ -191,6 +195,7 @@ public class Memory {
                 catch (Exception e){}
             }
         }
+        System.out.println("[RAM]: Updating processes base");
         for(Integer i=1;i<Process_container.get_size();i++){
             try{
                 Process_container.get_by_PID(i).ser_base(zmiana.get(temp.get(i)));
