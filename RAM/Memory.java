@@ -72,6 +72,7 @@ public class Memory {
         if(free>=size+10) {
             move();
             loadProgram(fileName,PID);
+            return true;
         }
         System.out.println("[RAM]: there is not enough space to load the program");
         return false;
