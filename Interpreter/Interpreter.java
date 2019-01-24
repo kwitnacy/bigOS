@@ -323,12 +323,12 @@ public class Interpreter {
                             }
                             if (x.equals("D")) {
                                 Scheduler.running.send_message(D, y);
-                            } else if (pidmatcher.matches()) {
+                            }}
+                        else if (pidmatcher.matches()) {
                                 Scheduler.running.send_message(Integer.parseInt(x), y);
                             } else {
                                 Scheduler.running.send_message(x, y);
                             }
-                        }
                     }
                 }
                 if (dane3matcher.matches())
