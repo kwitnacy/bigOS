@@ -249,6 +249,8 @@ public class Shell {
                             + "FCB [P1]                 - SHOWS FCB OF FILE CALLED[P1];\n"
                             + "SEM [P1]                 - SHOWS SEMAPHORE OD FILE CALLED [P1];\n"
                             + "PRINT_MEMORY             - PRINTS MEMORY RAM;\n"
+                            + "PRINT_MEMORY [P1]        - PRINTS MEMORY RAM ON ADRESS [P1];\n"
+                            + "PRINT_MEMORY [P1] [P2]   - PRINTS MEMORY RAM BETWEEN ADRESSES [P1] AND [P2];\n"
                             + "SHOW_RUN                 - SHOWS RUNNING PROCESS;\n"
                             + "SHOW_READY               - SHOWS READY PROCESSES\n"
                             + "MOVE                     - COMPACTS RAM\n");
@@ -263,6 +265,16 @@ public class Shell {
                 {
                     System.out.println("[Interface]: Prints memory RAM");
                     Memory.printMemory();
+                }
+                else if(parts.size()==2)
+                {
+                    System.out.println("[Interface]: Prints memory RAM on adress:["+parts.get(1)+"]");
+                    Memory.printMemory(Integer.parseInt(parts.get(1)));
+                }
+                else if(parts.size()==3)
+                {
+                    System.out.println("[Interface]: Prints memory RAM between adresses:["+parts.get(1)+"] and["+parts.get(2)+"]");
+                    Memory.printMemory(Integer.parseInt(parts.get(1)),Integer.parseInt(parts.get(2)));
                 }
                 else
                     System.out.println("[Interface]: Wrong argument");
@@ -376,7 +388,11 @@ public class Shell {
                 {
                     String buffor="";
                     for(int i=2;i<parts.size();i++)
-                        buffor=buffor+parts.get(i)+" ";
+                         {
+                        buffor=buffor+parts.get(i);
+                        if(i<parts.size()-1)
+                            buffor=buffor+" ";
+                    }
                     // Zabezpieczeniowiec sprawdza czy mozna wpisac
                     boolean blad = FileManagement.write(parts.get(1),buffor);
                     if(blad){
@@ -486,8 +502,8 @@ public class Shell {
                         }
                         else if (parts.get(2).length()==1)
                         {
-                    System.out.println("[Interface]: Adding to file called "+ parts.get(3)+ " text of file "+parts.get(3));
-                    String x = FileManagement.readFile(parts.get(2));
+                    System.out.println("[Interface]: Adding to file called "+ parts.get(3)+ " text of file "+parts.get(1));
+                    String x = FileManagement.readFile(parts.get(1));
                     FileManagement.write(x, parts.get(3));
                     // Zabezpieczeniowiec!!!
                         }
@@ -567,7 +583,7 @@ public class Shell {
                         }
                 else
                     System.out.println("[Interface]: Wrong argument");
-                    
+                    break;
             }
             default:
             {
