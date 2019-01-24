@@ -44,10 +44,14 @@ public class Semaphore{
         this.value--;
         if(this.value < 0){
             this.process_queue.offer(pid);
-            System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
+            System.out.println("[Semaphore]: Process " + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
             this.print_queue();
-
-            Process_container.get_by_PID(pid).set_program_counter(Process_container.get_by_PID(pid).get_program_counter() - Interpreter.get_size_rozkaz() - 1);
+            try {
+                Process_container.get_by_PID(pid).set_program_counter(Process_container.get_by_PID(pid).get_program_counter() - Interpreter.get_size_rozkaz() - 1);
+            }
+            catch (Exception e){
+                System.out.println("[Semaphore]: No free ram");
+            }
             Process_container.get_by_PID(pid).change_state(State.Waiting);
         }
     }
