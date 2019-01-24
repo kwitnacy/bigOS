@@ -330,8 +330,8 @@ public class Process {
         Message msg=new Message(this.PID,text.length(),text);
 
         p.messages_queue.add(msg);
-        p.get_messages_semaphore().incValue();
         p.get_messages_semaphore().signal_s();
+        p.get_messages_semaphore().incValue();
 
 
         System.out.println("[IPC]: Succesfully sent message!");
