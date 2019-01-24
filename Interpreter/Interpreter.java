@@ -401,7 +401,7 @@ public class Interpreter {
             }
             default: {
                 if (etykietamatcher.matches()) {
-                    etykietka = base + program_counter;
+                    etykietka = program_counter;
                 } else {
                     System.out.println("[Interpreter]: Error. End of program");
                     Scheduler.running.change_state(State.Terminated);

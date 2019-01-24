@@ -1,5 +1,5 @@
-MO A 45
-MO B 15
+MO A 13
+MO B 7
 MO C B
 PT:
 MO B C
