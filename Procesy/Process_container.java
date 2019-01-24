@@ -48,7 +48,7 @@ public class Process_container {
         String temp_file_name = "src/Interpreter/" + file_name + ".txt";
         File file = new File(temp_file_name);
         if(!file.exists()) {
-            System.out.println("[Process_Manager]: Couldn't create process " + name + ". File doesn't exist.");
+            System.out.println("[Process_Manager]: Couldn't create process " + name + ". File " + temp_file_name + " doesn't exist.");
             return;
         }
 
@@ -94,7 +94,6 @@ public class Process_container {
     }
 
     public static void show_all_processes(){
-        System.out.println("Mam tyle procesow: " + processes.size());
         processes.forEach((Integer, Process) -> Process.display_process());
     }
 

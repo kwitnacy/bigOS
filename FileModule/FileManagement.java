@@ -103,7 +103,6 @@ public class FileManagement {
         } //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
         ftemp.s.wait_s(PID);
-        System.out.println("Dodano do kolejki semafora " + file_name + "proces o PID " + PID);
         disk.fileSystem.root.replacebyName(ftemp);
         return true;
     }
