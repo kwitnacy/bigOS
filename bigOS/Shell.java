@@ -91,7 +91,7 @@ public class Shell {
                     
                 }
                 }
-                if("/pid".equals(x)||"/im".equals(x))
+                if("/pid".equals(x)||"/im".equals(x)||"user".equals(x)||"-l".equals(x))
                     parts.set(1, x);
                 execute();
                 }
