@@ -33,9 +33,9 @@ public class Semaphore{
     }
 
     public void wait_s(int pid){
-        System.out.println("WYKONUJE WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEJT");
+        System.out.println("WAIT-----------------------------"+this.value);
         this.value--;
-        System.out.println(value);
+        System.out.println("WAIT-----------------------------"+this.value);
         if(this.value < 0){
             this.process_queue.offer(pid);
             System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
@@ -48,10 +48,36 @@ public class Semaphore{
     }
 
     public void signal_s(){
-        System.out.println("JASDKSDVASDJNVLKSDVLKASNVDLKNlknflkewdmlkDNSVLNDVLKNLJNK");
+        System.out.println("SIGNAL-------------------------"+this.value);
         this.value++;
-        System.out.println(this.value);
+        System.out.println("SIGNAL-------------------------"+this.value);
         if(this.value <= 0) {
+            if (process_queue.peek() != null) {
+                int pid = this.process_queue.poll();
+                System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " removed from semaphore queue");
+                Process_container.get_by_PID(pid).change_state(State.Ready);
+            }
+        }
+    }
+    public void wait_s_m(int pid){
+        System.out.println("WAIT-----------------------------"+this.value);
+        this.value--;
+        System.out.println("WAIT-----------------------------"+this.value);
+        if(this.value < 0){
+            this.process_queue.offer(pid);
+            System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " added to semaphore queue");
+            System.out.println(Process_container.get_by_PID(pid).get_program_counter() + " -------------------");
+            Process_container.get_by_PID(pid).set_program_counter(Process_container.get_by_PID(pid).get_program_counter() - Interpreter.get_size_rozkaz() - 1);
+            Process_container.get_by_PID(pid).change_state(State.Waiting);
+            this.value++;
+        }
+    }
+
+    public void signal_s_m(){
+        System.out.println("SIGNAL-------------------------"+this.value);
+        this.value++;
+        System.out.println("SIGNAL-------------------------"+this.value);
+        if(this.value <= 1) {
             if (process_queue.peek() != null) {
                 int pid = this.process_queue.poll();
                 System.out.println("[Semaphore] Process " + Process_container.get_by_PID(pid).get_name() + " removed from semaphore queue");

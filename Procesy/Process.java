@@ -330,7 +330,7 @@ public class Process {
         Message msg=new Message(this.PID,text.length(),text);
 
         p.messages_queue.add(msg);
-        p.get_messages_semaphore().signal_s();
+        p.get_messages_semaphore().signal_s_m();
 
         System.out.println("[IPC]: Succesfully sent message!");
         System.out.println("[IPC]: PID:"+msg.get_sender_PID()+" Size:"+msg.get_size()+" Text:"+msg.get_text());
@@ -339,7 +339,7 @@ public class Process {
 
 
     public boolean read_message(int size, int addres){
-        this.messages_semaphore.wait_s(this.PID);
+        this.messages_semaphore.wait_s_m(this.PID);
 
         if(this.state==State.Waiting) {
             System.out.println("[IPC]: Reading failure, there are no messages to read.");
@@ -366,10 +366,7 @@ public class Process {
         return true;
     }
     public boolean read_message(int addres){
-        this.messages_semaphore.wait_s(this.PID);
-
-//        if(this.messages_queue.isEmpty())
-//            this.messages_semaphore.wait_s(this.PID);
+        this.messages_semaphore.wait_s_m(this.PID);
 
         if(this.state == State.Waiting) {
             System.out.println("[IPC]: Reading failure, there are no messages to read.");
