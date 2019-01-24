@@ -202,7 +202,7 @@ public class Memory {
     }
 
     public static boolean writeMessage(Procesy.Process proc, String message, int address){
-        if(address+message.length()>proc.get_limit()-proc.get_base()||address<0){
+        if(address+message.length()>proc.get_limit()||address<0){
             System.out.println("[RAM]: Attempt of writing outside process memory.");
             return false;
         }

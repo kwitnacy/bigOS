@@ -1,9 +1,5 @@
-CP p123 p4 3
-RM [10]
-SM p123 wiad3
-SM p123 def
-RM [3]
-SM p1 3 [4]
-SM p1 [3]
-SM p1 haha
+CP p123 p4 5
+SM p123 hello
+RM [53]
+SM p123 2 [54]
 HT

@@ -308,8 +308,9 @@ public class Interpreter {
                             int dana = 0;
                             char danaa=' ';
                             try {
-                                danaa = readMemory(addresToliczba(y));
-                                dana=Character.getNumericValue(danaa);
+                                danaa = readMemory(addresToliczba(x));
+                                dana=danaa;
+
                             } catch(NullPointerException e){
                                 System.out.println( e);
                             }

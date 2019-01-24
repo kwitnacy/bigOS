@@ -1,5 +1,4 @@
-SM p3 abc
-SM 1 cde
-RM [20]
-SM 1 dziala
+RM [33]
+SM [33] world
+RM [33]
 HT
