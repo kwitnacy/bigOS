@@ -2,6 +2,8 @@ package FileModule;
 
 
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -15,7 +17,13 @@ public class FileManagement {
     }
     
     //pomocnicze funkcje
-    
+    public static Map<String,String> get_root()
+    {
+        Map<String,String> i= new TreeMap<>();
+        i=disk.fileSystem.root.getRoot();
+        return i;
+    }
+
     //sprawdza czy wprowadzona nazwa pliku jest poprawna
     private static boolean properFileName(String name){
         if(name.isEmpty() || name.length()>2 || name.length()<0) return false;
@@ -103,6 +111,7 @@ public class FileManagement {
         } //nie ma pliku w katalogu
         File ftemp = disk.fileSystem.root.getFileByName(file_name);
         ftemp.s.wait_s(PID);
+        System.out.println("Dodano do kolejki semafora " + file_name + "proces o PID " + PID);
         disk.fileSystem.root.replacebyName(ftemp);
         return true;
     }
@@ -336,7 +345,7 @@ public class FileManagement {
         }
         blocks.removeLast();
         
-        System.out.println("[File Module]: Blocks that will be deleated: " + blocks);
+        System.out.println("[File Module]: Blocks that will be deleted: " + blocks);
         for(int i : blocks){
            disk.clearBlock(i);
            disk.fileSystem.freeBlocks.set(i, false);

@@ -2,6 +2,8 @@ package FileModule;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -67,5 +69,14 @@ public class Directory {
             System.out.print(root.get(i).getName() + " ");
         }
         System.out.println();
+    }
+    public Map<String,String> getRoot()
+    {
+        Map<String,String> output= new TreeMap<>();
+        for (int i=0; i<root.size(); i++)
+        {
+            output.put(root.get(i).getName(),root.get(i).getUserName());
+        }
+        return output;
     }
 }
