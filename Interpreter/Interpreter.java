@@ -283,52 +283,42 @@ public class Interpreter {
                 Pattern liczba = Pattern.compile("\\d+");
                 Matcher pidmatcher = liczba.matcher(x);
                 Matcher sizematcher = liczba.matcher(y);
+                Matcher adresmatcherx = adres.matcher(x);
                 Matcher adresmatchery = adres.matcher(y);
                 Matcher adresmatcherz = adres.matcher(z);
-                Pattern rejestr = Pattern.compile("[A-D]");
-                Matcher rejestrmatcher = rejestr.matcher(x);
-                if (dane2matcher.matches()) {
+                if (dane2matcher.matches())
+                {
                     if (adresmatchery.matches()) //SM <PID odbiorcy> [adres]
                     {
-                        if (rejestrmatcher.matches()) {
-                            if (x.equals("A")) {
-                                Scheduler.running.send_message(A, addresToliczba(y));
-                            }
-                            if (x.equals("B")) {
-                                Scheduler.running.send_message(B, addresToliczba(y));
-                            }
-                            if (x.equals("C")) {
-                                Scheduler.running.send_message(C, addresToliczba(y));
-                            }
-                            if (x.equals("D")) {
-                                Scheduler.running.send_message(D, addresToliczba(y));
-                            }
-
-                        } else if (pidmatcher.matches()) {
+                        if (pidmatcher.matches()) {
                             Scheduler.running.send_message(Integer.parseInt(x), addresToliczba(y));
-                        } else //SM <nazwa odbiorcy> [adres]
+                        }
+                        else //SM <nazwa odbiorcy> [adres]
                         {
                             Scheduler.running.send_message(x, addresToliczba(y));
                         }
-                    } else { ////SM <nazwa/PID odbiorcy> <tekst>
-                        if (rejestrmatcher.matches()) {
-                            if (x.equals("A")) {
-                                Scheduler.running.send_message(A, y);
+                    }
+                    else { ////SM <nazwa/PID odbiorcy> <tekst>
+                        if(pidmatcher.matches())
+                        {
+                            Scheduler.running.send_message(Integer.parseInt(x), y);
+                        }
+                        else if (adresmatcherx.matches())
+                        {
+                            int dana = 0;
+                            char danaa=' ';
+                            try {
+                                danaa = readMemory(addresToliczba(y));
+                                dana=Character.getNumericValue(danaa);
+                            } catch(NullPointerException e){
+                                System.out.println( e);
                             }
-                            if (x.equals("B")) {
-                                Scheduler.running.send_message(B, y);
-                            }
-                            if (x.equals("C")) {
-                                Scheduler.running.send_message(C, y);
-                            }
-                            if (x.equals("D")) {
-                                Scheduler.running.send_message(D, y);
-                            }}
-                        else if (pidmatcher.matches()) {
-                                Scheduler.running.send_message(Integer.parseInt(x), y);
-                            } else {
-                                Scheduler.running.send_message(x, y);
-                            }
+                            Scheduler.running.send_message(dana, y);
+                        }
+                        else
+                        {
+                            Scheduler.running.send_message(x, y);
+                        }
                     }
                 }
                 if (dane3matcher.matches())
