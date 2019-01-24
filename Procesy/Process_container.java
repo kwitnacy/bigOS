@@ -34,18 +34,6 @@ public class Process_container {
         Scheduler.add(temp);
     }
 
-    static {
-        size = counter = 1;
-        processes = new ConcurrentHashMap<Integer, Process>();
-        names = new ConcurrentHashMap<String, Integer>();
-
-        taken_names = new Vector<>();
-        taken_names.add("dummy");
-        Process temp = new Process("dummy", "p0", 0, 0);
-        processes.put(0, temp);
-        Scheduler.add(temp);
-    }
-
     public static void create_process(String name, String file_name, int priority){
         if (priority > 15 || priority < 1){
             System.out.println("[Process_Manager]: Couldn't create process " + name + ". Wrong priority.");
