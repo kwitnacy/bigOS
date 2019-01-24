@@ -285,26 +285,49 @@ public class Interpreter {
                 Matcher sizematcher = liczba.matcher(y);
                 Matcher adresmatchery = adres.matcher(y);
                 Matcher adresmatcherz = adres.matcher(z);
-                if (dane2matcher.matches())
-                {
+                Pattern rejestr = Pattern.compile("[A-D]");
+                Matcher rejestrmatcher = rejestr.matcher(x);
+                if (dane2matcher.matches()) {
                     if (adresmatchery.matches()) //SM <PID odbiorcy> [adres]
                     {
-                        if (pidmatcher.matches()) {
+                        if (rejestrmatcher.matches()) {
+                            if (x.equals("A")) {
+                                Scheduler.running.send_message(A, addresToliczba(y));
+                            }
+                            if (x.equals("B")) {
+                                Scheduler.running.send_message(B, addresToliczba(y));
+                            }
+                            if (x.equals("C")) {
+                                Scheduler.running.send_message(C, addresToliczba(y));
+                            }
+                            if (x.equals("D")) {
+                                Scheduler.running.send_message(D, addresToliczba(y));
+                            }
+
+                        } else if (pidmatcher.matches()) {
                             Scheduler.running.send_message(Integer.parseInt(x), addresToliczba(y));
-                        }
-                        else //SM <nazwa odbiorcy> [adres]
+                        } else //SM <nazwa odbiorcy> [adres]
                         {
                             Scheduler.running.send_message(x, addresToliczba(y));
                         }
-                    }
-                    else { ////SM <nazwa/PID odbiorcy> <tekst>
-                        if(pidmatcher.matches())
-                        {
-                            Scheduler.running.send_message(Integer.parseInt(x), y);
-                        }
-                        else
-                        {
-                            Scheduler.running.send_message(x, y);
+                    } else { ////SM <nazwa/PID odbiorcy> <tekst>
+                        if (rejestrmatcher.matches()) {
+                            if (x.equals("A")) {
+                                Scheduler.running.send_message(A, y);
+                            }
+                            if (x.equals("B")) {
+                                Scheduler.running.send_message(B, y);
+                            }
+                            if (x.equals("C")) {
+                                Scheduler.running.send_message(C, y);
+                            }
+                            if (x.equals("D")) {
+                                Scheduler.running.send_message(D, y);
+                            } else if (pidmatcher.matches()) {
+                                Scheduler.running.send_message(Integer.parseInt(x), y);
+                            } else {
+                                Scheduler.running.send_message(x, y);
+                            }
                         }
                     }
                 }
