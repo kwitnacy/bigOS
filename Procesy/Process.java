@@ -169,7 +169,7 @@ public class Process {
         System.out.println("|Piority (base): " + this.base_priority);
         System.out.println("|Piority (temp): " + this.temp_priority);
         System.out.println("|Message: " + this.last_message.get_text());
-        System.out.println("|PROGRAMCOUNTER: " + this.program_counter);
+        System.out.println("|Program counter: " + this.program_counter);
         System.out.println("+-------------------------------------------------------+");
     }
 

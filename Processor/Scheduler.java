@@ -81,7 +81,6 @@ public class Scheduler
 
 	public static void remove_by_id(int PID){
 		if(running.get_PID() == PID){
-			System.out.println("----------------------\"deleting\" running----------------------");
 			running = dummy;
 			running.change_state(State.Running);
 			schedule();
