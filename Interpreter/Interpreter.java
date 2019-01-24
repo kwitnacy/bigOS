@@ -49,7 +49,6 @@ public class Interpreter {
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_CX(C);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_DX(D);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_program_counter(program_counter);
-        System.out.println(program_counter + "to o co nam chodzi");
 
         Processor.Scheduler.running.set_AX(A);
         Processor.Scheduler.running.set_BX(B);

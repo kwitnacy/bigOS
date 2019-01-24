@@ -119,7 +119,6 @@ public class Memory {
     }
     public static void removeProgram(int PID) {
         Integer base = Process_container.get_by_PID(PID).get_base();
-        System.out.println(base);
         for(int i=base;i<allocatedPartitions.get(base) + base; i++){
             memory[i]=' ';
         }

@@ -145,7 +145,7 @@ public class Shell {
     }
     void start()
     {
-        System.out.println("\n \t\t        bigOS 1.0\n\t***NAJSMACZNIESZY SYSTEM OPERACYJNY***");
+        System.out.println("\n \t\t        bigOS 1.0\n\t***NAJSMACZNIEJSZY SYSTEM OPERACYJNY***");
     }
     void login()
     {
