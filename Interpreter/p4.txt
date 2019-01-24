@@ -1,4 +1,4 @@
-SM 1 abc
+SM p3 abc
 SM 1 cde
 RM [20]
 SM 1 dziala

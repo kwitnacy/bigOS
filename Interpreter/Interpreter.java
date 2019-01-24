@@ -19,6 +19,10 @@ public class Interpreter {
 
     }
 
+    public static int get_size_rozkaz(){
+        return calyRozkaz.length();
+    }
+
     private static void start() {
         PID = Processor.Scheduler.running.get_PID();
         base = Processor.Scheduler.running.get_base();
@@ -40,17 +44,31 @@ public class Interpreter {
     }
     private static void updateProcessor()
     {
-        System.out.println(Processor.Scheduler.running.get_PID());
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_AX(A);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_BX(B);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_CX(C);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_DX(D);
         Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_program_counter(program_counter);
+        System.out.println(program_counter + "to o co nam chodzi");
+
         Processor.Scheduler.running.set_AX(A);
         Processor.Scheduler.running.set_BX(B);
         Processor.Scheduler.running.set_CX(C);
         Processor.Scheduler.running.set_DX(D);
         Processor.Scheduler.running.set_program_counter(program_counter);
+
+    }
+    private static void updatewithout()
+    {
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_AX(A);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_BX(B);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_CX(C);
+        Process_container.get_by_PID(Processor.Scheduler.running.get_PID()).set_DX(D);
+        Processor.Scheduler.running.set_AX(A);
+        Processor.Scheduler.running.set_BX(B);
+        Processor.Scheduler.running.set_CX(C);
+        Processor.Scheduler.running.set_DX(D);
+
     }
     private static void getOrder() //odczytywanie rozkazu z pamieci
     {
@@ -104,9 +122,10 @@ public class Interpreter {
                 return;
             }
 
-            //if (!rozkaz.equals("CP")&&!rozkaz.equals("HT")) {
-                updateProcessor();
-            //}//zapisanie zmienionych wartosci rejestru
+            updatewithout();
+            if (!rozkaz.equals("CP")&&!rozkaz.equals("HT")) {
+                //updateProcessor();
+            }//zapisanie zmienionych wartosci rejestru
             Scheduler.makeOlder(); //postarzanie procesu
             display();
             i++;
@@ -119,6 +138,7 @@ public class Interpreter {
         System.out.println("[Interpeter]: program_counter: "+ program_counter);
     }
     private static boolean executeOrder() {
+        updateProcessor();
         Pattern dane2 = Pattern.compile("([A-Z]+)\\s(\\[*\\w+]*)\\s(\\[*\\w+]*)");
         Matcher dane2matcher = dane2.matcher(calyRozkaz);
         String x = "", y = "", z = "", xx="";
@@ -174,6 +194,7 @@ public class Interpreter {
                 {
                     return false;
                 }
+                updateProcessor();
                 break;
             }
             case "HT": {
@@ -201,7 +222,7 @@ public class Interpreter {
             case "RF": {
                 waitFile(x,PID);
                 if (dane3matcher.matches()) {
-                    System.out.println(read(x,Integer.parseInt(y),Integer.parseInt(z)));}
+                    System.out.println("Interpreter: read bytes:"+read(x,Integer.parseInt(y),Integer.parseInt(z)));}
                 else if (dane4matcher.matches()){
                     Pattern rejestr = Pattern.compile("[A-D]");
                     Matcher rejestrmatcher = rejestr.matcher(xx);
@@ -360,6 +381,7 @@ public class Interpreter {
                     if(!jump(String.valueOf(etykietka))){
                         return false;
                     }
+                    updateProcessor();
                     break;
                 }
                 return true;

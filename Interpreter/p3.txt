@@ -1,6 +1,6 @@
 CP p123 p4 3
 RM [10]
-SM p123 abc
+SM p123 wiad3
 SM p123 def
 RM [3]
 SM p1 3 [4]

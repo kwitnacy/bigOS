@@ -368,7 +368,10 @@ public class Process {
     public boolean read_message(int addres){
         this.messages_semaphore.wait_s(this.PID);
 
-        if(this.state==State.Waiting) {
+//        if(this.messages_queue.isEmpty())
+//            this.messages_semaphore.wait_s(this.PID);
+
+        if(this.state == State.Waiting) {
             System.out.println("[IPC]: Reading failure, there are no messages to read.");
             return false;
         }
@@ -388,5 +391,4 @@ public class Process {
         System.out.println("[IPC]: Sender: "+written_pid+" Text: "+ram_msg.substring(1,ram_msg.length()-1));
         return true;
     }
-
 }

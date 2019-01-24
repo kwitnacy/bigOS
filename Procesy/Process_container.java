@@ -193,7 +193,7 @@ public class Process_container {
         return 0;
     }
 
-    public int get_size(){
+    public static int get_size(){
         return size;
     }
 }
